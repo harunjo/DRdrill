@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DR Drill — drdrill.harunjonatan.com
 
-## Getting Started
+A free, bilingual (Indonesian/English) business-continuity readiness tool.
+Describe your environment — on-premise, full cloud, hybrid, or private cloud —
+and get a four-part report: readiness score, RPO/RTO gap table, risk flags,
+and an AI-narrated disaster drill story.
 
-First, run the development server:
+Built by Harun Jonatan · [harunjonatan.com](https://harunjonatan.com)
+
+## Architecture (trust model)
+
+- **Deterministic engine, browser-only** (`lib/engine.ts`): every number is
+  computed client-side. Environment details never leave the browser.
+- **Pseudonymized narrative** (`lib/narrative.ts`, `app/api/narrative/route.ts`):
+  the LLM receives only anonymized findings (labels `W1..Wn`); the browser
+  re-substitutes real names after mechanically validating the story — every
+  number and label in the story must exist in the findings, or it is
+  regenerated once and then withheld.
+- **Server guards**: strict schema validation, per-IP rate limit (Upstash REST,
+  fail-closed), provider chain Claude Haiku → DeepSeek.
+- **No storage**: no accounts, no sessions, no database. The only server-side
+  data is anonymous aggregate usage counts (Vercel Web Analytics).
+
+Docs: `docs/brainstorms/` (requirements) and `docs/plans/` (implementation plan).
+
+## Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
+npm test        # vitest — engine + narrative validation suites
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy `.env.example` to `.env.local` and fill in keys. Without LLM keys the
+assessment works fully; the drill section degrades gracefully.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Vercel project (team: harunkerja), production branch `master`.
+- Domain: `drdrill.harunjonatan.com` — add as a custom domain on the Vercel
+  project; Vercel provides the CNAME to add to harunjonatan.com's DNS.
+- Environment variables (Vercel project settings): see `.env.example`.
+- Provision an Upstash Redis free-tier database for rate limiting
+  (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`). The narrative route
+  fails closed if the limiter errors, and logs a warning when unconfigured.
 
-## Learn More
+## Launch checklist (gates — do not announce before these pass)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [ ] **Calibration pass (operator):** review every constant in
+      `lib/calibration.ts` against field experience; adjust and commit.
+- [ ] **Provider retention terms verified (R22):** confirm Anthropic API
+      no-training/retention terms; confirm DeepSeek terms — if DeepSeek does
+      not meet the bar, remove it as fallback (Haiku-only) and update the
+      privacy copy. Record the verification date here: ____
+- [ ] **Custom-events tier check:** confirm the Vercel plan supports Web
+      Analytics custom events (`assessment_completed`, `narrative_generated`,
+      `scenario_swapped`). If not, page views alone are the demand signal.
+- [ ] **Both locales spot-checked** end to end (intake → report → drill), on a
+      phone-width viewport.
+- [ ] **Drill validated in ID and EN** for a sample environment; confirm the
+      story never contains a number or name outside the findings.
+- [ ] **Demand gate written down:** threshold = ____ completed assessments
+      within ____ weeks of the launch posts; review date = ____. If unmet,
+      revisit before investing in v2 (see requirements doc).

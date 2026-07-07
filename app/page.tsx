@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { track } from "@vercel/analytics";
 import { assess, type Assessment, type Environment } from "@/lib/engine";
 import { dictionaries, type Lang } from "@/lib/i18n";
 import { Intake, emptyProtection, emptyWorkload } from "@/components/intake";
@@ -43,7 +44,16 @@ export default function Home() {
         {t.privacyLine}
       </p>
 
-      <Intake t={t} env={env} onChange={setEnv} onRun={() => setAssessment(assess(env))} />
+      <Intake
+        t={t}
+        env={env}
+        onChange={setEnv}
+        onRun={() => {
+          setAssessment(assess(env));
+          // R24: anonymous event counts only — no environment data attached.
+          track("assessment_completed");
+        }}
+      />
 
       {assessment && (
         <Report

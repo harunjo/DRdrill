@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { track } from "@vercel/analytics";
 import type { Dictionary, Lang } from "@/lib/i18n";
 import type { FindingsPayload } from "@/lib/engine";
 import {
@@ -74,6 +75,7 @@ export function Drill({
           setStory(data.narrative);
           setStatus("idle");
           setStaleLang(false);
+          track("narrative_generated"); // R24: anonymous count, no payload
           return;
         }
       }
@@ -105,7 +107,10 @@ export function Drill({
           <button
             key={sc}
             disabled={generating}
-            onClick={() => setScenario(sc)}
+            onClick={() => {
+              setScenario(sc);
+              track("scenario_swapped"); // R24: anonymous count
+            }}
             className={`rounded border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
               scenario === sc
                 ? "border-blue-600 bg-blue-50 font-medium text-blue-900"
