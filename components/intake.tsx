@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { Dictionary } from "@/lib/i18n";
 import {
   MAX_NAME_LENGTH,
@@ -38,6 +39,39 @@ export function workloadValid(w: Workload): boolean {
 const MODELS: DeploymentModel[] = ["onprem", "cloud", "hybrid", "private"];
 const TYPES: WorkloadType[] = ["database", "vm", "files", "saas"];
 
+// The localized step titles carry their own "1. " / "2. " prefix; the console
+// renders the index as a chip, so strip the leading number for the heading.
+const stripNum = (s: string) => s.replace(/^\s*\d+\.\s*/, "");
+
+function Step({
+  index,
+  title,
+  hint,
+  children,
+}: {
+  index: number;
+  title: string;
+  hint?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="panel mt-6 p-5 sm:p-6">
+      <div className="flex items-baseline gap-3">
+        <span className="font-mono text-sm font-semibold text-signal">
+          {String(index).padStart(2, "0")}
+        </span>
+        <div>
+          <h2 className="font-display text-lg font-semibold tracking-tight">{stripNum(title)}</h2>
+          {hint && <p className="mt-1 text-sm text-muted">{hint}</p>}
+        </div>
+      </div>
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+const selectCls = "field px-2.5 py-2 text-sm";
+
 export function Intake({
   t,
   env,
@@ -71,46 +105,64 @@ export function Intake({
       },
     });
 
-  return (
-    <div>
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold">{t.intake.stepModel}</h2>
-        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {MODELS.map((m) => (
-            <button
-              key={m}
-              onClick={() => onChange({ ...env, model: m })}
-              className={`rounded border px-3 py-3 text-sm transition-colors ${
-                env.model === m
-                  ? "border-blue-600 bg-blue-50 font-medium text-blue-900"
-                  : "border-neutral-300 hover:border-blue-400"
-              }`}
-            >
-              {t.intake.models[m]}
-            </button>
-          ))}
-        </div>
-      </section>
+  const toggle = (checked: boolean, label: string, onToggle: (v: boolean) => void) => (
+    <label
+      className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-sm transition-colors ${
+        checked
+          ? "border-signal/40 bg-signal/[0.07] text-text"
+          : "border-line text-muted hover:border-line hover:text-text"
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onToggle(e.target.checked)}
+      />
+      <span>{label}</span>
+    </label>
+  );
 
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold">{t.intake.stepWorkloads}</h2>
-        <p className="mt-1 text-sm text-neutral-500">{t.intake.workloadsHint}</p>
+  return (
+    <div className="mt-12">
+      <Step index={1} title={t.intake.stepModel}>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {MODELS.map((m) => {
+            const active = env.model === m;
+            return (
+              <button
+                key={m}
+                onClick={() => onChange({ ...env, model: m })}
+                aria-pressed={active}
+                className={`rounded-lg border px-3 py-3 text-sm font-medium transition-colors ${
+                  active
+                    ? "border-signal bg-signal/12 text-signal shadow-[0_0_0_1px_var(--color-signal)]"
+                    : "border-line text-muted hover:border-signal/50 hover:text-text"
+                }`}
+              >
+                {t.intake.models[m]}
+              </button>
+            );
+          })}
+        </div>
+      </Step>
+
+      <Step index={2} title={t.intake.stepWorkloads} hint={t.intake.workloadsHint}>
         {env.workloads.map((w) => {
           const nameMissing = w.name.trim().length === 0;
           const sizeInvalid = !Number.isFinite(w.sizeGB) || w.sizeGB <= 0;
           return (
-            <div key={w.id} className="mt-3 rounded border border-neutral-300 p-3">
+            <div key={w.id} className="mt-3 rounded-xl border border-line bg-well p-4 first:mt-0">
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 <div className="col-span-2">
                   <input
-                    className="w-full rounded border px-2 py-1.5"
+                    className="field w-full px-3 py-2 text-sm"
                     placeholder={t.intake.workloadName}
                     maxLength={MAX_NAME_LENGTH}
                     value={w.name}
                     onChange={(e) => updateWorkload(w.id, { name: e.target.value })}
                   />
-                  <div className="mt-0.5 flex justify-between text-[11px] text-neutral-400">
-                    <span className="text-red-600">
+                  <div className="mt-1 flex justify-between font-mono text-[11px] text-faint">
+                    <span className="text-crit">
                       {nameMissing ? t.intake.errors.nameRequired : ""}
                     </span>
                     <span>
@@ -121,7 +173,7 @@ export function Intake({
                   </div>
                 </div>
                 <select
-                  className="rounded border px-2 py-1.5"
+                  className={selectCls}
                   value={w.type}
                   onChange={(e) => updateWorkload(w.id, { type: e.target.value as WorkloadType })}
                 >
@@ -135,21 +187,21 @@ export function Intake({
                   <input
                     type="number"
                     min={1}
-                    className="w-full rounded border px-2 py-1.5"
+                    className="field w-full px-3 py-2 text-sm"
                     title={t.intake.sizeLabel}
                     value={Number.isFinite(w.sizeGB) ? w.sizeGB : ""}
                     onChange={(e) => updateWorkload(w.id, { sizeGB: Number(e.target.value) })}
                   />
                   {sizeInvalid && (
-                    <div className="mt-0.5 text-[11px] text-red-600">
+                    <div className="mt-1 font-mono text-[11px] text-crit">
                       {t.intake.errors.sizeInvalid}
                     </div>
                   )}
                 </div>
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-3">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
                 <select
-                  className="rounded border px-2 py-1.5 text-sm"
+                  className={selectCls}
                   value={w.tier}
                   onChange={(e) => updateWorkload(w.id, { tier: Number(e.target.value) as Tier })}
                 >
@@ -161,7 +213,7 @@ export function Intake({
                 </select>
                 {env.model === "hybrid" && (
                   <select
-                    className="rounded border px-2 py-1.5 text-sm"
+                    className={selectCls}
                     value={w.placement ?? "onprem"}
                     onChange={(e) =>
                       updateWorkload(w.id, { placement: e.target.value as Placement })
@@ -172,7 +224,7 @@ export function Intake({
                   </select>
                 )}
                 <button
-                  className="ml-auto text-sm text-red-500 hover:underline"
+                  className="ml-auto font-mono text-xs text-faint transition-colors hover:text-crit"
                   onClick={() =>
                     onChange({ ...env, workloads: env.workloads.filter((x) => x.id !== w.id) })
                   }
@@ -185,51 +237,47 @@ export function Intake({
         })}
         {env.workloads.length < MAX_WORKLOADS ? (
           <button
-            className="mt-2 text-sm text-blue-600 hover:underline"
+            className="mt-3 w-full rounded-xl border border-dashed border-line py-2.5 text-sm font-medium text-signal transition-colors hover:border-signal/50 hover:bg-signal/[0.04]"
             onClick={() => onChange({ ...env, workloads: [...env.workloads, emptyWorkload()] })}
           >
             {t.intake.addWorkload}
           </button>
         ) : (
-          <p className="mt-2 text-sm text-neutral-500">{t.intake.errors.maxWorkloads}</p>
+          <p className="mt-3 font-mono text-xs text-muted">{t.intake.errors.maxWorkloads}</p>
         )}
-      </section>
+      </Step>
 
-      <section className="mt-8">
-        <h2 className="text-lg font-semibold">{t.intake.stepProtection}</h2>
+      <Step index={3} title={t.intake.stepProtection}>
         {groups.map((g) => {
           const p = env.protection[g] ?? emptyProtection;
           return (
-            <div key={g} className="mt-3 rounded border border-neutral-300 p-3">
+            <div key={g} className="mt-3 rounded-xl border border-line bg-well p-4 first:mt-0">
               {groups.length > 1 && (
-                <div className="mb-2 text-sm font-medium">{t.intake.protectionGroups[g]}</div>
+                <div className="mb-3 font-mono text-xs uppercase tracking-wider text-signal">
+                  {t.intake.protectionGroups[g]}
+                </div>
               )}
               <div className="grid gap-2 sm:grid-cols-2">
-                <label className="flex items-center gap-2 text-sm">
+                <label className="flex items-center gap-2 rounded-lg border border-line px-3 py-2.5 text-sm text-muted">
                   <span className="flex-1">{t.intake.freqLabel[g]}</span>
                   <input
                     type="number"
                     min={0}
-                    className="w-20 rounded border px-2 py-1"
+                    className="field w-20 px-2 py-1 text-sm"
                     value={p.frequencyHours}
                     onChange={(e) => updateProtection(g, { frequencyHours: Number(e.target.value) })}
                   />
                 </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={p.replication}
-                    onChange={(e) => updateProtection(g, { replication: e.target.checked })}
-                  />
-                  {t.intake.replication}
-                </label>
+                {toggle(p.replication, t.intake.replication, (v) =>
+                  updateProtection(g, { replication: v }),
+                )}
                 {p.replication && (
-                  <label className="flex items-center gap-2 text-sm">
+                  <label className="flex items-center gap-2 rounded-lg border border-line px-3 py-2.5 text-sm text-muted">
                     <span className="flex-1">{t.intake.replicationLag}</span>
                     <input
                       type="number"
                       min={0}
-                      className="w-20 rounded border px-2 py-1"
+                      className="field w-20 px-2 py-1 text-sm"
                       value={p.replicationLagMin}
                       onChange={(e) =>
                         updateProtection(g, { replicationLagMin: Number(e.target.value) })
@@ -237,45 +285,30 @@ export function Intake({
                     />
                   </label>
                 )}
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={p.offsiteCopy}
-                    onChange={(e) => updateProtection(g, { offsiteCopy: e.target.checked })}
-                  />
-                  {t.intake.offsite[g]}
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={p.immutableCopy}
-                    onChange={(e) => updateProtection(g, { immutableCopy: e.target.checked })}
-                  />
-                  {t.intake.immutable}
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={p.secondSite}
-                    onChange={(e) => updateProtection(g, { secondSite: e.target.checked })}
-                  />
-                  {t.intake.secondSite[g]}
-                </label>
+                {toggle(p.offsiteCopy, t.intake.offsite[g], (v) =>
+                  updateProtection(g, { offsiteCopy: v }),
+                )}
+                {toggle(p.immutableCopy, t.intake.immutable, (v) =>
+                  updateProtection(g, { immutableCopy: v }),
+                )}
+                {toggle(p.secondSite, t.intake.secondSite[g], (v) =>
+                  updateProtection(g, { secondSite: v }),
+                )}
               </div>
             </div>
           );
         })}
-      </section>
+      </Step>
 
       <div className="mt-8">
         <button
-          className="rounded bg-blue-600 px-5 py-2.5 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-neutral-300"
+          className="w-full rounded-xl bg-signal px-5 py-3.5 font-display text-base font-semibold text-ink transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:bg-line-soft disabled:text-faint sm:w-auto sm:px-8"
           disabled={!canRun}
           onClick={onRun}
         >
           {t.intake.run}
         </button>
-        {!canRun && <p className="mt-2 text-sm text-neutral-500">{t.intake.zeroWorkloads}</p>}
+        {!canRun && <p className="mt-3 font-mono text-xs text-muted">{t.intake.zeroWorkloads}</p>}
       </div>
     </div>
   );

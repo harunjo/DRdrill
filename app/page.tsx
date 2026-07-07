@@ -27,18 +27,36 @@ export default function Home() {
   }, [lang]);
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-8 font-sans">
-      <header className="flex items-start justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">{t.appName}</h1>
-        <div className="flex gap-1 text-xs">
+    <main className="mx-auto w-full max-w-3xl grow px-5 py-10 sm:py-14">
+      {/* Console header bar */}
+      <header className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden
+            className="relative flex h-2.5 w-2.5"
+            title="online"
+          >
+            <span className="absolute inline-flex h-full w-full rounded-full bg-signal/50 motion-safe:animate-ping" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-signal" />
+          </span>
+          <div className="leading-none">
+            <div className="font-display text-xl font-bold tracking-tight">{t.appName}</div>
+            <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
+              business-continuity readout
+            </div>
+          </div>
+        </div>
+
+        <div className="flex overflow-hidden rounded-lg border border-line font-mono text-xs">
           {(["id", "en"] as Lang[]).map((l) => (
             <button
               key={l}
               onClick={() => setLang(l)}
-              className={`rounded border px-2 py-1 ${
+              aria-pressed={lang === l}
+              className={`px-3 py-1.5 transition-colors ${
                 lang === l
-                  ? "border-blue-600 bg-blue-50 font-medium text-blue-900"
-                  : "border-neutral-300 text-neutral-500 hover:border-blue-400"
+                  ? "bg-signal/15 font-semibold text-signal"
+                  : "text-muted hover:text-text"
               }`}
             >
               {l.toUpperCase()}
@@ -46,9 +64,28 @@ export default function Home() {
           ))}
         </div>
       </header>
-      <p className="mt-2 text-neutral-500">{t.tagline}</p>
-      <p className="mt-3 rounded border border-green-200 bg-green-50 p-3 text-sm text-green-900">
-        {t.privacyLine}
+
+      {/* Thesis */}
+      <h1 className="mt-10 max-w-2xl font-display text-3xl font-semibold leading-[1.15] tracking-tight sm:text-[2.6rem]">
+        {t.tagline}
+      </h1>
+
+      {/* Trust chip — runs local */}
+      <p className="mt-6 flex items-start gap-3 rounded-xl border border-signal/25 bg-signal/[0.06] p-4 text-sm text-muted">
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          className="mt-0.5 h-4 w-4 shrink-0 text-signal"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+        <span>{t.privacyLine}</span>
       </p>
 
       <Intake
@@ -79,9 +116,9 @@ export default function Home() {
         />
       )}
 
-      <footer className="mt-16 border-t pt-4 text-xs text-neutral-400">
+      <footer className="mt-20 border-t border-line-soft pt-5 font-mono text-[11px] text-faint">
         {t.footer.attribution}{" "}
-        <a className="underline" href="https://harunjonatan.com">
+        <a className="text-muted underline decoration-line hover:text-signal" href="https://harunjonatan.com">
           harunjonatan.com
         </a>
       </footer>

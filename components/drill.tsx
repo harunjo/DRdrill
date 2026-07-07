@@ -124,8 +124,10 @@ export function Drill({
   const generating = status === "generating";
 
   return (
-    <div className="mt-2">
-      <div className="text-sm text-neutral-500">{t.drill.pickScenario}</div>
+    <div className="mt-3">
+      <div className="font-mono text-[11px] uppercase tracking-wider text-faint">
+        {t.drill.pickScenario}
+      </div>
       <div className="mt-2 flex flex-wrap gap-2">
         {SCENARIOS.map((sc) => (
           <button
@@ -135,10 +137,10 @@ export function Drill({
               setScenario(sc);
               track("scenario_swapped"); // R24: anonymous count
             }}
-            className={`rounded border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`rounded-lg border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
               scenario === sc
-                ? "border-blue-600 bg-blue-50 font-medium text-blue-900"
-                : "border-neutral-300 hover:border-blue-400"
+                ? "border-signal bg-signal/12 font-medium text-signal"
+                : "border-line text-muted hover:border-signal/50 hover:text-text"
             }`}
           >
             {t.drill.scenarios[sc]}
@@ -146,35 +148,42 @@ export function Drill({
         ))}
       </div>
 
-      <div className="mt-4 min-h-[6rem] text-sm leading-relaxed">
-        {generating && (
-          <p className="animate-pulse text-neutral-500">{t.drill.generating}</p>
-        )}
-        {!generating && status === "unavailable" && (
-          <p className="rounded border border-neutral-200 bg-neutral-50 p-3 text-neutral-600">
-            {t.drill.unavailable}
-          </p>
-        )}
-        {!generating && status === "redacted" && (
-          <p className="rounded border border-neutral-200 bg-neutral-50 p-3 text-neutral-600">
-            {t.drill.redacted}
-          </p>
-        )}
-        {!generating && status === "cap" && (
-          <p className="rounded border border-neutral-200 bg-neutral-50 p-3 text-neutral-600">
-            {t.drill.capReached}
-          </p>
-        )}
-        {!generating && story && status === "idle" && (
-          <>
-            {staleLang && (
-              <p className="mb-2 text-xs text-amber-600">{t.drill.languageNotice}</p>
-            )}
-            <div className="whitespace-pre-line rounded border border-neutral-200 bg-neutral-50 p-3 font-mono text-[13px]">
-              {substituteLabels(story, labelMap)}
-            </div>
-          </>
-        )}
+      {/* Terminal frame — the drill readout */}
+      <div className="mt-4 overflow-hidden rounded-xl border border-line bg-well">
+        <div className="flex items-center gap-2 border-b border-line-soft px-3 py-2">
+          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-crit/70" />
+          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-signal/70" />
+          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-ok/70" />
+          <span className="ml-2 truncate font-mono text-[11px] text-faint">
+            drill://{scenario}
+          </span>
+        </div>
+
+        <div className="min-h-[7rem] p-4 font-mono text-[13px] leading-relaxed">
+          {generating && (
+            <p className="text-muted">
+              {t.drill.generating}
+              <span className="term-cursor" />
+            </p>
+          )}
+          {!generating && status === "unavailable" && (
+            <p className="text-muted">{t.drill.unavailable}</p>
+          )}
+          {!generating && status === "redacted" && (
+            <p className="text-muted">{t.drill.redacted}</p>
+          )}
+          {!generating && status === "cap" && <p className="text-muted">{t.drill.capReached}</p>}
+          {!generating && story && status === "idle" && (
+            <>
+              {staleLang && (
+                <p className="mb-2 not-italic text-signal">{t.drill.languageNotice}</p>
+              )}
+              <div className="whitespace-pre-line text-text">
+                {substituteLabels(story, labelMap)}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
