@@ -5,6 +5,7 @@ import { assess, type Assessment, type Environment } from "@/lib/engine";
 import { dictionaries, type Lang } from "@/lib/i18n";
 import { Intake, emptyProtection, emptyWorkload } from "@/components/intake";
 import { Report } from "@/components/report";
+import { Drill } from "@/components/drill";
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("id");
@@ -48,7 +49,14 @@ export default function Home() {
         <Report
           t={t}
           assessment={assessment}
-          drill={<p className="mt-2 text-sm text-neutral-500">{t.drill.unavailable}</p>}
+          drill={
+            <Drill
+              t={t}
+              lang={lang}
+              findings={assessment.findings}
+              labelMap={assessment.labelMap}
+            />
+          }
         />
       )}
 
