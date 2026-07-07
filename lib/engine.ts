@@ -201,7 +201,13 @@ export function assess(env: Environment): Assessment {
   // 3-2-1 across the environment: any protected group counts copies; media
   // diversity approximated by replication or a cloud+onprem split; offsite by
   // any group's offsite/cross-region copy. ponytail: coarse, honest.
-  const groups = Object.values(env.protection).filter(Boolean) as Protection[];
+  // Only the groups the deployment model actually uses count — leftover
+  // toggles from switching models must not credit phantom protection.
+  const activePlacements: Placement[] =
+    env.model === "hybrid" ? ["onprem", "cloud"] : env.model === "cloud" ? ["cloud"] : ["onprem"];
+  const groups = activePlacements
+    .map((g) => protectionFor(env, g))
+    .filter(Boolean) as Protection[];
   const anyBackup = groups.some((p) => p.frequencyHours > 0);
   const rule321 = {
     threeCopies: anyBackup && groups.some((p) => p.offsiteCopy || p.replication),
@@ -241,9 +247,18 @@ export function assess(env: Environment): Assessment {
   return { results, flags, rule321, score, findings, labelMap };
 }
 
-export function fmtMinutes(min: number | null, unrecoverableText = "unrecoverable"): string {
-  if (min === null) return unrecoverableText;
-  if (min < 60) return `${min} min`;
-  if (min < 1440) return `${Math.round((min / 60) * 10) / 10} h`;
-  return `${Math.round((min / 1440) * 10) / 10} d`;
+export interface DurationLabels {
+  unrecoverable: string;
+  min: string;
+  h: string;
+  d: string;
+}
+
+const EN_DURATION: DurationLabels = { unrecoverable: "unrecoverable", min: "min", h: "h", d: "d" };
+
+export function fmtMinutes(min: number | null, labels: DurationLabels = EN_DURATION): string {
+  if (min === null) return labels.unrecoverable;
+  if (min < 60) return `${min} ${labels.min}`;
+  if (min < 1440) return `${Math.round((min / 60) * 10) / 10} ${labels.h}`;
+  return `${Math.round((min / 1440) * 10) / 10} ${labels.d}`;
 }

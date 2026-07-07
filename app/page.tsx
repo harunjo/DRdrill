@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { track } from "@vercel/analytics";
 import { assess, type Assessment, type Environment } from "@/lib/engine";
 import { dictionaries, type Lang } from "@/lib/i18n";
@@ -16,8 +16,15 @@ export default function Home() {
     protection: { onprem: { ...emptyProtection }, cloud: { ...emptyProtection } },
   });
   const [assessment, setAssessment] = useState<Assessment | null>(null);
+  // Increments per run — keys the Drill so its story cache/state never
+  // survives a re-assessment (a story must match the findings on screen).
+  const [runId, setRunId] = useState(0);
 
   const t = dictionaries[lang];
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   return (
     <main className="mx-auto max-w-2xl px-4 py-8 font-sans">
@@ -50,6 +57,7 @@ export default function Home() {
         onChange={setEnv}
         onRun={() => {
           setAssessment(assess(env));
+          setRunId((r) => r + 1);
           // R24: anonymous event counts only — no environment data attached.
           track("assessment_completed");
         }}
@@ -61,6 +69,7 @@ export default function Home() {
           assessment={assessment}
           drill={
             <Drill
+              key={runId}
               t={t}
               lang={lang}
               findings={assessment.findings}

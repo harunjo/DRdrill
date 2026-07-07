@@ -33,10 +33,14 @@ export function Drill({
   const [scenario, setScenario] = useState<Scenario>("ransomware");
   const [status, setStatus] = useState<Status>("idle");
   const [staleLang, setStaleLang] = useState(false);
-  // cache: story per scenario+lang for THIS assessment
+  // cache: story per scenario+lang for THIS assessment (the component is
+  // keyed per assessment in app/page.tsx, so a re-run resets all of this)
   const cache = useRef<Map<string, string>>(new Map());
   const [story, setStory] = useState<string | null>(null);
   const inFlight = useRef(false);
+  // The (scenario, lang) the user currently wants. A generation that finishes
+  // for a superseded key re-fires for this one instead of displaying.
+  const wanted = useRef("");
 
   async function generate(sc: Scenario, lg: Lang) {
     const key = `${sc}:${lg}`;
@@ -48,13 +52,20 @@ export function Drill({
       return;
     }
     if (budgetUsed >= SESSION_BUDGET) {
-      // Out of budget: keep whatever story is shown; if it's another
-      // language, mark it stale (R23), or show the cap notice when empty.
-      if (story) setStaleLang(true);
-      else setStatus("cap");
+      // Out of budget. Same scenario in the other language → keep showing it
+      // with the language notice (R23). Otherwise the cap notice.
+      const otherLang = cache.current.get(`${sc}:${lg === "id" ? "en" : "id"}`);
+      if (otherLang) {
+        setStory(otherLang);
+        setStatus("idle");
+        setStaleLang(true);
+      } else {
+        setStory(null);
+        setStatus("cap");
+      }
       return;
     }
-    if (inFlight.current) return;
+    if (inFlight.current) return; // the finally-block re-fire covers this key
     inFlight.current = true;
     setStatus("generating");
     budgetUsed += 1;
@@ -72,20 +83,32 @@ export function Drill({
         const check = validateNarrative(data.narrative, findings);
         if (check.ok) {
           cache.current.set(key, data.narrative);
-          setStory(data.narrative);
-          setStatus("idle");
-          setStaleLang(false);
+          if (wanted.current === key) {
+            setStory(data.narrative);
+            setStatus("idle");
+            setStaleLang(false);
+          }
           track("narrative_generated"); // R24: anonymous count, no payload
           return;
         }
       }
-      setStory(null);
-      setStatus("redacted");
+      if (wanted.current === key) {
+        setStory(null);
+        setStatus("redacted");
+      }
     } catch {
-      setStory(null);
-      setStatus("unavailable");
+      budgetUsed -= 1; // refund — no story was produced by a provider
+      if (wanted.current === key) {
+        setStory(null);
+        setStatus("unavailable");
+      }
     } finally {
       inFlight.current = false;
+      // If the user switched scenario/language mid-flight, serve them now.
+      if (wanted.current !== key) {
+        const [wsc, wlg] = wanted.current.split(":") as [Scenario, Lang];
+        void generate(wsc, wlg);
+      }
     }
   }
 
@@ -93,6 +116,7 @@ export function Drill({
   // renders instantly, the story arrives after). Language switch re-fires and
   // regenerates within budget (R23).
   useEffect(() => {
+    wanted.current = `${scenario}:${lang}`;
     void generate(scenario, lang);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scenario, lang]);

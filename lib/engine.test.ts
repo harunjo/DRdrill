@@ -217,6 +217,22 @@ describe("findings payload pseudonymization (R12, R8)", () => {
   });
 });
 
+describe("3-2-1 rule ignores protection groups the model doesn't use", () => {
+  it("full-cloud environment gets no credit from leftover on-prem toggles", () => {
+    const env: Environment = {
+      model: "cloud",
+      workloads: [wl({ name: "App" })],
+      protection: {
+        cloud: noProtection, // nothing protected in the active group
+        onprem: { ...noProtection, frequencyHours: 24, offsiteCopy: true }, // leftover
+      },
+    };
+    const r = assess(env).rule321;
+    expect(r.threeCopies).toBe(false);
+    expect(r.oneOffsite).toBe(false);
+  });
+});
+
 describe("3-2-1 rule", () => {
   it("passes with backup + offsite + replication", () => {
     const env: Environment = {

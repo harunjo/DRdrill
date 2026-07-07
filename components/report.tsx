@@ -39,6 +39,7 @@ export function Report({
 }) {
   const a = assessment;
   const caption = `${t.appName}`;
+  const dur = { unrecoverable: t.report.unrecoverable, ...t.report.units };
   const scoreColor =
     a.score >= 70 ? "text-green-600" : a.score >= 40 ? "text-amber-600" : "text-red-600";
 
@@ -74,14 +75,14 @@ export function Report({
                   {t.report.achievableRto}
                 </span>
                 <span className="text-neutral-500">
-                  {fmtMinutes(a.findings.workloads.find((w) => w.label === r.label)!.targetRpoMin)}{" "}
-                  / {fmtMinutes(a.findings.workloads.find((w) => w.label === r.label)!.targetRtoMin)}
+                  {fmtMinutes(a.findings.workloads.find((w) => w.label === r.label)!.targetRpoMin, dur)}{" "}
+                  / {fmtMinutes(a.findings.workloads.find((w) => w.label === r.label)!.targetRtoMin, dur)}
                 </span>
                 <span className={r.rpoMeets ? "text-green-600" : "text-red-600"}>
-                  {fmtMinutes(r.achievableRpoMin, t.report.unrecoverable)}
+                  {fmtMinutes(r.achievableRpoMin, dur)}
                 </span>
                 <span className={r.rtoMeets ? "text-green-600" : "text-red-600"}>
-                  {fmtMinutes(r.achievableRtoMin, t.report.unrecoverable)}
+                  {fmtMinutes(r.achievableRtoMin, dur)}
                 </span>
               </div>
             </div>
@@ -103,13 +104,13 @@ export function Report({
                 <tr key={r.workload.id} className="border-b">
                   <td className="py-1.5 pr-2">{r.workload.name}</td>
                   <td className="py-1.5 pr-2 text-neutral-500">
-                    {fmtMinutes(f.targetRpoMin)} / {fmtMinutes(f.targetRtoMin)}
+                    {fmtMinutes(f.targetRpoMin, dur)} / {fmtMinutes(f.targetRtoMin, dur)}
                   </td>
                   <td className={`py-1.5 pr-2 ${r.rpoMeets ? "text-green-600" : "text-red-600"}`}>
-                    {fmtMinutes(r.achievableRpoMin, t.report.unrecoverable)}
+                    {fmtMinutes(r.achievableRpoMin, dur)}
                   </td>
                   <td className={`py-1.5 ${r.rtoMeets ? "text-green-600" : "text-red-600"}`}>
-                    {fmtMinutes(r.achievableRtoMin, t.report.unrecoverable)}
+                    {fmtMinutes(r.achievableRtoMin, dur)}
                   </td>
                 </tr>
               );

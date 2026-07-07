@@ -98,6 +98,23 @@ describe("validateNarrative (R20, AE3)", () => {
     const story = "23:59 — W1 monitoring alarms fire.";
     expect(validateNarrative(story, findings).ok).toBe(true);
   });
+
+  it("does not count workload-label digits as invented numbers", () => {
+    const many: FindingsPayload = {
+      ...findings,
+      workloads: Array.from({ length: 5 }, (_, i) => ({
+        ...findings.workloads[0],
+        label: `W${i + 1}`,
+      })),
+    };
+    // "4" is not derivable from any finding, but W4 is a valid label
+    expect(validateNarrative("02:14 — W4 is encrypted.", many).ok).toBe(true);
+  });
+
+  it("exempts inline clock times, not just beat prefixes", () => {
+    const story = "02:14 — By 06:30 the team restores W1.";
+    expect(validateNarrative(story, findings).ok).toBe(true);
+  });
 });
 
 describe("substituteLabels", () => {

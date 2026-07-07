@@ -12,8 +12,13 @@ async function rateLimitOk(ip: string): Promise<boolean> {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
   if (!url || !token) {
-    // Not configured (local dev): allow, but say so loudly in logs.
-    console.warn("[narrative] Upstash not configured — rate limiting disabled");
+    // Unconfigured: allow in local dev only. In production a missing/typo'd
+    // env var must NOT silently ship an unlimited paid endpoint — fail closed.
+    if (process.env.NODE_ENV === "production") {
+      console.error("[narrative] Upstash not configured in production — failing closed");
+      return false;
+    }
+    console.warn("[narrative] Upstash not configured — rate limiting disabled (dev only)");
     return true;
   }
   try {
@@ -78,7 +83,16 @@ async function callDeepSeek(prompt: string): Promise<string> {
 }
 
 export async function POST(request: Request) {
-  const ip = (request.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
+  // Vercel overwrites these headers with the real client IP; on any other
+  // host the leftmost x-forwarded-for entry is client-supplied — re-verify
+  // before moving platforms.
+  const ip = (
+    request.headers.get("x-vercel-forwarded-for") ??
+    request.headers.get("x-forwarded-for") ??
+    "unknown"
+  )
+    .split(",")[0]
+    .trim();
   if (!(await rateLimitOk(ip))) {
     return Response.json({ error: "rate_limited" }, { status: 429 });
   }

@@ -79,6 +79,7 @@ export const en = {
     achievableRpo: "Achievable RPO",
     achievableRto: "Achievable RTO",
     unrecoverable: "unrecoverable",
+    units: { min: "min", h: "h", d: "d" },
     flagsTitle: "Risk flags",
     flags: {
       "no-immutable": {

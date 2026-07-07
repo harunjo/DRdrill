@@ -16,7 +16,7 @@ export interface NarrativeRequest {
   lang: "id" | "en";
 }
 
-const LABEL_RE = /^W\d+$/;
+const LABEL_RE = /^W\d{1,2}$/; // max 10 workloads — also caps label length (cost vector)
 const MODELS = ["onprem", "cloud", "hybrid", "private"];
 const TYPES = ["database", "vm", "files", "saas"];
 const FLAG_CODES = [
@@ -189,7 +189,7 @@ export function validateNarrative(
   const allowed = allowedNumbers(findings);
   const offending: string[] = [];
 
-  // Strip clock-time beat prefixes before number checking.
+  // Strip clock-time beat prefixes before checking.
   const stripped = text
     .split("\n")
     .map((line) => line.replace(/^\s*\d{1,2}[:.]\d{2}\s*[—\-–]\s*/, ""))
@@ -198,7 +198,14 @@ export function validateNarrative(
   for (const m of stripped.matchAll(/W(\d+)/g)) {
     if (!validLabels.has(m[0])) offending.push(m[0]);
   }
-  for (const m of stripped.matchAll(/\d+(?:[.,]\d+)?/g)) {
+
+  // Number scan runs on text with labels removed (W4's "4" is not a number
+  // claim) and inline clock times removed (the prompt permits clock times
+  // anywhere; "by 06:30 the restore completes" is narrative structure).
+  const numScan = stripped
+    .replace(/W\d+/g, "")
+    .replace(/\b\d{1,2}[:.]\d{2}\b/g, "");
+  for (const m of numScan.matchAll(/\d+(?:[.,]\d+)?/g)) {
     const tok = m[0].replace(",", ".");
     const normalized = String(Number(tok));
     if (!allowed.has(tok) && !allowed.has(normalized)) offending.push(tok);

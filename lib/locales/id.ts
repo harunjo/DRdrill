@@ -78,6 +78,7 @@ export const id: Dictionary = {
     achievableRpo: "RPO tercapai",
     achievableRto: "RTO tercapai",
     unrecoverable: "tidak dapat dipulihkan",
+    units: { min: "mnt", h: "jam", d: "hari" },
     flagsTitle: "Tanda risiko",
     flags: {
       "no-immutable": {
