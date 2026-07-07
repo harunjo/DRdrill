@@ -118,6 +118,11 @@ export const id: Dictionary = {
       twoMedia: "dua media",
       oneOffsite: "satu offsite",
     },
+    legend: {
+      withinTarget: "dalam target",
+      overrun: "melebihi",
+      target: "target",
+    },
   },
 
   drill: {

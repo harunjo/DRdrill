@@ -119,6 +119,11 @@ export const en = {
       twoMedia: "two media",
       oneOffsite: "one offsite",
     },
+    legend: {
+      withinTarget: "within target",
+      overrun: "overrun",
+      target: "target",
+    },
   },
 
   drill: {

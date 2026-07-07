@@ -302,7 +302,7 @@ export function Intake({
 
       <div className="mt-8">
         <button
-          className="w-full rounded-xl bg-signal px-5 py-3.5 font-display text-base font-semibold text-ink transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:bg-line-soft disabled:text-faint sm:w-auto sm:px-8"
+          className="btn-primary w-full px-5 py-3.5 font-display text-base font-semibold sm:w-auto sm:px-9"
           disabled={!canRun}
           onClick={onRun}
         >

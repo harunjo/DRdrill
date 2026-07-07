@@ -1,23 +1,24 @@
 @import "tailwindcss";
 
-/* ── Incident Console design tokens ───────────────────────────────────────
-   Committed dark instrument theme. Amber is the single brand signal
-   (ops-room "attention"); green/red are reserved for the data's verdict. */
+/* ── Incident Console — refined dark instrument theme ─────────────────────
+   Depth comes from layered surfaces (page < panel > well) with an inset top
+   highlight and a soft drop shadow — not from hard borders. Amber is a spark,
+   not a flood: the live dot, the CTA, active states, good scores. */
 @theme {
-  --color-ink: #0a1016;
-  --color-panel: #101c24;
-  --color-well: #0b151c;
-  --color-line: #223744;
-  --color-line-soft: #1a2b35;
+  --color-ink: #090e13;
+  --color-panel: #111a22;
+  --color-well: #0b1218;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-soft: rgba(255, 255, 255, 0.05);
 
-  --color-text: #e7eef4;
-  --color-muted: #90a4b2;
-  --color-faint: #5f7684;
+  --color-text: #e9eff4;
+  --color-muted: #9caebb;
+  --color-faint: #61758699;
 
   --color-signal: #f5a524;
   --color-signal-dim: #b57d1f;
-  --color-ok: #37c793;
-  --color-crit: #f0553f;
+  --color-ok: #2fce93;
+  --color-crit: #f2593f;
 
   --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
@@ -29,23 +30,29 @@
 }
 
 body {
-  background:
-    radial-gradient(120% 60% at 50% -10%, rgba(245, 165, 36, 0.08), transparent 60%),
-    var(--color-ink);
+  background-color: #090e13;
+  background-image:
+    radial-gradient(130% 80% at 50% -25%, rgba(245, 165, 36, 0.1), transparent 55%),
+    radial-gradient(100% 60% at 50% 120%, rgba(47, 206, 147, 0.05), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: auto, auto, 34px 34px, 34px 34px;
+  background-attachment: fixed;
   color: var(--color-text);
   font-family: var(--font-sans);
   min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: rgba(245, 165, 36, 0.28);
+  background: rgba(245, 165, 36, 0.26);
   color: #fff;
 }
 
 *:focus-visible {
   outline: 2px solid var(--color-signal);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 input[type="checkbox"] {
@@ -54,34 +61,72 @@ input[type="checkbox"] {
   height: 1rem;
 }
 
-/* Thin console scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-line) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 /* ── Component helpers ──────────────────────────────────────────────────── */
 @layer components {
+  /* Elevated surface: gradient fill + inset top highlight + soft shadow.
+     This layered depth is the main prototype→product upgrade. */
   .panel {
-    background: var(--color-panel);
-    border: 1px solid var(--color-line-soft);
-    border-radius: 14px;
+    background: linear-gradient(180deg, #131f28 0%, #0f1820 100%);
+    border: 1px solid var(--color-line);
+    border-radius: 18px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.05) inset,
+      0 20px 40px -28px rgba(0, 0, 0, 0.9);
   }
 
+  /* Inset control well */
   .field {
-    background: var(--color-well);
+    background: #0a1016;
     border: 1px solid var(--color-line);
-    border-radius: 9px;
+    border-radius: 10px;
     color: var(--color-text);
     font-family: var(--font-sans);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35) inset;
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
   .field::placeholder {
-    color: var(--color-faint);
+    color: #5f7482;
   }
   .field:focus {
     outline: none;
     border-color: var(--color-signal);
-    box-shadow: 0 0 0 3px rgba(245, 165, 36, 0.16);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.35) inset,
+      0 0 0 3px rgba(245, 165, 36, 0.16);
+  }
+
+  /* Tactile primary CTA */
+  .btn-primary {
+    background: linear-gradient(180deg, #ffc960 0%, #f5a524 100%);
+    color: #1c1206;
+    border-radius: 12px;
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.45) inset,
+      0 10px 24px -10px rgba(245, 165, 36, 0.55);
+    transition: filter 0.15s, box-shadow 0.15s, transform 0.05s;
+  }
+  .btn-primary:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .btn-primary:disabled {
+    background: #16212a;
+    color: #536672;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* Hairline that fades at the ends — refined divider */
+  .rule-fade {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.09), transparent);
   }
 }
 
@@ -92,10 +137,10 @@ input[type="checkbox"] {
 }
 .term-cursor {
   display: inline-block;
-  width: 0.55ch;
-  height: 1.1em;
-  margin-left: 1px;
-  translate: 0 0.15em;
+  width: 0.5ch;
+  height: 1.05em;
+  margin-left: 2px;
+  translate: 0 0.14em;
   background: var(--color-signal);
   animation: term-blink 1.05s steps(1) infinite;
 }

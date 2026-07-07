@@ -65,17 +65,27 @@ export default function Home() {
         </div>
       </header>
 
+      <div className="mt-6 rule-fade" />
+
       {/* Thesis */}
-      <h1 className="mt-10 max-w-2xl font-display text-3xl font-semibold leading-[1.15] tracking-tight sm:text-[2.6rem]">
-        {t.tagline}
-      </h1>
+      <div className="mt-12">
+        <div className="flex items-center gap-3">
+          <span className="h-px w-8 bg-signal/70" />
+          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-signal">
+            {t.appName}
+          </span>
+        </div>
+        <h1 className="mt-4 max-w-[24ch] font-display text-[1.9rem] font-semibold leading-[1.14] tracking-[-0.01em] text-balance sm:text-[2.35rem]">
+          {t.tagline}
+        </h1>
+      </div>
 
       {/* Trust chip — runs local */}
-      <p className="mt-6 flex items-start gap-3 rounded-xl border border-signal/25 bg-signal/[0.06] p-4 text-sm text-muted">
+      <p className="mt-7 flex max-w-2xl items-start gap-3 rounded-xl border border-line bg-well/60 px-4 py-3.5 text-[13px] leading-relaxed text-muted">
         <svg
           aria-hidden
           viewBox="0 0 24 24"
-          className="mt-0.5 h-4 w-4 shrink-0 text-signal"
+          className="mt-px h-4 w-4 shrink-0 text-signal"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"

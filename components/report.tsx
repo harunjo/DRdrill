@@ -107,6 +107,39 @@ function GapMeter({
   );
 }
 
+function ScoreRing({ value, band, label }: { value: number; band: string; label: string }) {
+  const r = 54;
+  const c = 2 * Math.PI * r;
+  const off = c * (1 - Math.max(0, Math.min(100, value)) / 100);
+  return (
+    <div className="relative h-32 w-32 shrink-0">
+      <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
+        <circle cx="64" cy="64" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="9" />
+        <circle
+          cx="64"
+          cy="64"
+          r={r}
+          fill="none"
+          stroke={band}
+          strokeWidth="9"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={off}
+          style={{ filter: "drop-shadow(0 0 6px color-mix(in srgb, " + band + " 45%, transparent))" }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="font-display text-4xl font-bold leading-none" style={{ color: band }}>
+          {value}
+        </span>
+        <span className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-faint">
+          {label}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export function Report({
   t,
   assessment,
@@ -129,8 +162,6 @@ export function Report({
 
   const band =
     a.score >= 70 ? "var(--color-ok)" : a.score >= 40 ? "var(--color-signal)" : "var(--color-crit)";
-  const scoreText =
-    a.score >= 70 ? "text-ok" : a.score >= 40 ? "text-signal" : "text-crit";
 
   const rule = [
     [a.rule321.threeCopies, t.report.rule321.threeCopies],
@@ -141,47 +172,47 @@ export function Report({
   return (
     <div className="mt-10">
       <Panel title={t.report.scoreTitle} caption={caption}>
-        <div className="mt-3 flex items-end gap-1 font-display font-bold leading-none">
-          <span className={`text-6xl ${scoreText}`}>{count}</span>
-          <span className="pb-1 text-2xl font-normal text-faint">{t.report.scoreOutOf}</span>
-        </div>
-
-        <div className="relative mt-4 h-2 overflow-hidden rounded-full bg-well">
-          <div
-            className="h-full transition-[width] duration-1000 ease-out"
-            style={{ width: lit ? `${a.score}%` : "0%", background: band }}
-          />
-          {[40, 70].map((tick) => (
-            <span
-              key={tick}
-              aria-hidden
-              className="absolute top-0 h-full w-px bg-ink/70"
-              style={{ left: `${tick}%` }}
-            />
-          ))}
-        </div>
-
-        <p className="mt-3 text-sm text-muted">{fmt(t.report.coverage, { n: a.results.length })}</p>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="font-mono text-[11px] uppercase tracking-wider text-faint">
-            {t.report.rule321Title}
-          </span>
-          {rule.map(([pass, label]) => (
-            <span
-              key={label}
-              className={`rounded-md border px-2.5 py-1 font-mono text-xs ${
-                pass ? "border-ok/30 bg-ok/[0.08] text-ok" : "border-line text-faint"
-              }`}
-            >
-              {pass ? "●" : "○"} {label}
-            </span>
-          ))}
+        <div className="mt-5 flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
+          <ScoreRing value={count} band={band} label={t.report.scoreOutOf} />
+          <div className="min-w-0 flex-1">
+            <p className="text-sm leading-relaxed text-muted">
+              {fmt(t.report.coverage, { n: a.results.length })}
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-faint">
+                {t.report.rule321Title}
+              </span>
+              {rule.map(([pass, label]) => (
+                <span
+                  key={label}
+                  className={`rounded-md border px-2.5 py-1 font-mono text-xs ${
+                    pass ? "border-ok/30 bg-ok/[0.08] text-ok" : "border-line text-faint"
+                  }`}
+                >
+                  {pass ? "●" : "○"} {label}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       </Panel>
 
       <Panel title={t.report.gapTitle} caption={caption}>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-mono text-[10px] uppercase tracking-wider text-faint">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-ok" />
+            {t.report.legend.withinTarget}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-crit" />
+            {t.report.legend.overrun}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-3.5 w-0.5 rounded-full bg-text/80" />
+            {t.report.legend.target}
+          </span>
+        </div>
+        <div className="mt-3">
           {a.results.map((r) => {
             const f = a.findings.workloads.find((w) => w.label === r.label)!;
             return (
