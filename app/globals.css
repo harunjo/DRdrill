@@ -16,8 +16,10 @@
   --color-muted: #8b9299;
   --color-faint: #5c6370;
 
-  --color-signal: #8b8bf4;
-  --color-signal-dim: #6465b0;
+  /* No brand accent — chrome is monochrome; the only color on the page is
+     the data's verdict (ok/warn/crit). "signal" = neutral white for
+     selected/active/focus states. */
+  --color-signal: #ededef;
   --color-ok: #3dd68c;
   --color-warn: #d9a13c;
   --color-crit: #f2555a;
@@ -46,7 +48,7 @@ body {
 }
 
 ::selection {
-  background: rgba(139, 139, 244, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   color: #fff;
 }
 
@@ -90,8 +92,8 @@ input[type="checkbox"] {
   }
   .field:focus {
     outline: none;
-    border-color: var(--color-signal);
-    box-shadow: 0 0 0 3px rgba(139, 139, 244, 0.14);
+    border-color: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
   }
 
   /* Linear-style primary action: light button on dark ground */

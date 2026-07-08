@@ -158,7 +158,7 @@ export function Report({
   const count = useCountUp(a.score, lit);
 
   const band =
-    a.score >= 70 ? "var(--color-ok)" : a.score >= 40 ? "var(--color-signal)" : "var(--color-crit)";
+    a.score >= 70 ? "var(--color-ok)" : a.score >= 40 ? "var(--color-warn)" : "var(--color-crit)";
 
   const rule = [
     [a.rule321.threeCopies, t.report.rule321.threeCopies],
