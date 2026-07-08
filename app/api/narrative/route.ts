@@ -1,44 +1,17 @@
 import { buildPrompt, validateRequest } from "@/lib/narrative";
+import { rateLimitOk, type RateEntry } from "@/lib/ratelimit";
 
 // Public, unauthenticated, paid endpoint — three server-side guards:
 // 1. strict schema validation (only pseudonymized findings pass, R8/R12/R21)
-// 2. per-IP rate limit via Upstash REST (fail CLOSED on limiter errors)
+// 2. per-IP rate limit (in-memory, best-effort — see lib/ratelimit.ts; cost is
+//    ultimately bounded by the provider spend cap + max_tokens)
 // 3. provider chain: Claude Haiku primary → DeepSeek fallback (R22 — see
 //    README for the verified retention terms of each provider)
 
 const RATE_LIMIT_PER_MINUTE = 10;
-
-async function rateLimitOk(ip: string): Promise<boolean> {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) {
-    // Unconfigured: allow in local dev only. In production a missing/typo'd
-    // env var must NOT silently ship an unlimited paid endpoint — fail closed.
-    if (process.env.NODE_ENV === "production") {
-      console.error("[narrative] Upstash not configured in production — failing closed");
-      return false;
-    }
-    console.warn("[narrative] Upstash not configured — rate limiting disabled (dev only)");
-    return true;
-  }
-  try {
-    // ponytail: fixed 60s window via INCR+EXPIRE — no client library needed.
-    const key = `drdrill:rl:${ip}`;
-    const resp = await fetch(`${url}/pipeline`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify([
-        ["INCR", key],
-        ["EXPIRE", key, "60", "NX"],
-      ]),
-    });
-    if (!resp.ok) return false; // fail closed
-    const data = (await resp.json()) as { result: number }[];
-    return data[0].result <= RATE_LIMIT_PER_MINUTE;
-  } catch {
-    return false; // fail closed
-  }
-}
+const RATE_WINDOW_MS = 60_000;
+// Module-level so it persists across requests on a warm Fluid Compute instance.
+const hits = new Map<string, RateEntry>();
 
 async function callAnthropic(prompt: string): Promise<string> {
   const key = process.env.ANTHROPIC_API_KEY;
@@ -93,7 +66,7 @@ export async function POST(request: Request) {
   )
     .split(",")[0]
     .trim();
-  if (!(await rateLimitOk(ip))) {
+  if (!rateLimitOk(hits, ip, Date.now(), RATE_LIMIT_PER_MINUTE, RATE_WINDOW_MS)) {
     return Response.json({ error: "rate_limited" }, { status: 429 });
   }
 
