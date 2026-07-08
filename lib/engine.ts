@@ -31,6 +31,9 @@ export interface Workload {
   tier: Tier;
   /** hybrid only — which side this workload runs on; ignored otherwise */
   placement?: Placement;
+  /** executive view only — cost of one hour of this workload's downtime, in
+   *  IDR. Optional; browser-only; never enters FindingsPayload (R13). */
+  costPerHourDowntime?: number;
 }
 
 /** One protection profile per placement group. Field semantics vary by side:
@@ -110,7 +113,7 @@ export interface Assessment {
   labelMap: Record<string, string>;
 }
 
-function placementOf(w: Workload, model: DeploymentModel): Placement {
+export function placementOf(w: Workload, model: DeploymentModel): Placement {
   if (model === "cloud") return "cloud";
   if (model === "hybrid") return w.placement ?? "onprem";
   return "onprem"; // onprem + private share the derivation path
