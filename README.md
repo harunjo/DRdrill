@@ -16,10 +16,12 @@ Built by Harun Jonatan · [harunjonatan.com](https://harunjonatan.com)
   re-substitutes real names after mechanically validating the story — every
   number and label in the story must exist in the findings, or it is
   regenerated once and then withheld.
-- **Server guards**: strict schema validation, per-IP rate limit (Upstash REST,
-  fail-closed), provider chain Claude Haiku → DeepSeek.
-- **No storage**: no accounts, no sessions, no database. The only server-side
-  data is anonymous aggregate usage counts (Vercel Web Analytics).
+- **Server guards**: strict schema validation, per-IP rate limit (in-memory,
+  best-effort — `lib/ratelimit.ts`), provider chain Claude Haiku → DeepSeek.
+- **No persistent storage**: no accounts, no sessions, no database. The only
+  server-side state is a best-effort in-memory per-IP rate-limit counter (held
+  transiently on the warm function instance) plus anonymous aggregate usage
+  counts (Vercel Web Analytics).
 
 Docs: `docs/brainstorms/` (requirements) and `docs/plans/` (implementation plan).
 
@@ -41,9 +43,10 @@ assessment works fully; the drill section degrades gracefully.
 - Domain: `drdrill.harunjonatan.com` — add as a custom domain on the Vercel
   project; Vercel provides the CNAME to add to harunjonatan.com's DNS.
 - Environment variables (Vercel project settings): see `.env.example`.
-- Provision an Upstash Redis free-tier database for rate limiting
-  (`UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`). The narrative route
-  fails closed if the limiter errors, and logs a warning when unconfigured.
+- Rate limiting is in-memory (`lib/ratelimit.ts`) — no external store to
+  provision. It throttles per-IP on a warm Fluid Compute instance (best-effort,
+  not shared across instances); the hard cost ceiling is the provider spend cap
+  + `max_tokens`.
 
 ## Launch checklist (gates — do not announce before these pass)
 
