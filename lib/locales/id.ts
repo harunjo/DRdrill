@@ -94,6 +94,8 @@ export const id: Dictionary = {
   report: {
     newAssessment: "Asesmen baru",
     coverageShort: "Berdasarkan {n} workload yang Anda gambarkan",
+    lensesLabel: "Tampilan laporan",
+    lenses: { business: "Dampak bisnis", technical: "Teknis", investment: "Usulan investasi" },
     tiles: { readiness: "Kesiapan", workloads: "Workload", flags: "Tanda risiko", rule: "3-2-1" },
     scoreTitle: "Kesiapan pemulihan",
     scoreOutOf: "/100",

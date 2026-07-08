@@ -95,6 +95,8 @@ export const en = {
   report: {
     newAssessment: "New assessment",
     coverageShort: "Based on the {n} workloads you described",
+    lensesLabel: "Report view",
+    lenses: { business: "Business impact", technical: "Technical", investment: "Investment case" },
     tiles: { readiness: "Readiness", workloads: "Workloads", flags: "Risk flags", rule: "3-2-1" },
     scoreTitle: "Recovery readiness",
     scoreOutOf: "/100",
