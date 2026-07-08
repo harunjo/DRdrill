@@ -115,6 +115,13 @@ export const id: Dictionary = {
     investOne: "prioritas",
     investEmpty: "Tidak ada celah terbuka — hal-hal esensial sudah tertutup.",
     posture: { strong: "Tangguh", developing: "Berkembang", exposed: "Terekspos" },
+    business: {
+      title: "Dampak bisnis",
+      exposureHeadline: "Eksposur jika tidak ada perubahan",
+      perWorkload: "Per workload",
+      downtimeLabel: "downtime",
+      addCost: "Isi biaya downtime di intake untuk melihat eksposur dalam Rupiah. Postur dan kesenjangan tetap berlaku.",
+    },
     invest: {
       fundingCase: "Kelangsungan bisnis — usulan pendanaan",
       exposureAtRisk: "Eksposur berisiko",

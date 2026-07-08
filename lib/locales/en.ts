@@ -116,6 +116,13 @@ export const en = {
     investOne: "priority",
     investEmpty: "No open gaps — the essentials are covered.",
     posture: { strong: "Resilient", developing: "Developing", exposed: "Exposed" },
+    business: {
+      title: "Business impact",
+      exposureHeadline: "Exposure if nothing changes",
+      perWorkload: "Per workload",
+      downtimeLabel: "downtime",
+      addCost: "Add downtime cost in the intake to see exposure in Rupiah. Posture and gaps still apply.",
+    },
     invest: {
       fundingCase: "Business continuity — funding case",
       exposureAtRisk: "Exposure at risk",
