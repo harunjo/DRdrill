@@ -66,7 +66,7 @@ npm run lint     # eslint
 `/api/narrative` is the only server route and the only thing that calls an AI provider. It needs env vars; without them it fails and the drill shows an "unavailable"/"cap" notice **while the deterministic report above stays fully intact** (by design).
 
 - `ANTHROPIC_API_KEY` (primary, Haiku) or `DEEPSEEK_API_KEY` (fallback). No key → route returns 502.
-- `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` for per-IP rate limiting. **Fails closed in production** — if unset in prod, every request is rejected 429 before reaching the LLM (deliberate: never ship an unlimited paid endpoint). Skipped in dev.
+- Per-IP rate limiting is **in-memory** (`lib/ratelimit.ts`): a module-level `Map` in the route, which Fluid Compute keeps alive across requests on a warm instance. Always active, no env vars. It's a best-effort throttle (`ponytail:` — not shared across all instances); the real cost backstop is the provider spend cap + `max_tokens`. There is **no Upstash/Redis** — don't reintroduce it or "restore fail-closed" without discussing; the old fail-closed limiter caused the drill to 429 with no env set.
 - Copy `.env.example` → `.env.local` for local work; only the provider key is required in dev.
 - Client budget: `SESSION_BUDGET` generations per page session (`drill.tsx`), one story cached per `(scenario, lang)`.
 
