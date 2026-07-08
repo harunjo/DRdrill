@@ -9,8 +9,18 @@ export const en = {
   tagline: "Describe your environment. Get your recovery reality — the RPO/RTO you can actually achieve, not the one on the slide.",
   privacyLine:
     "Your environment details and workload names never leave this browser. The drill story is written from anonymized findings only (W1, W2, …), and nothing you enter is stored anywhere.",
+  trustIndicator: "Runs locally · data stays on device",
 
   intake: {
+    steps: {
+      model: "Environment",
+      workloads: "Workloads",
+      protection: "Protection",
+    },
+    empty: {
+      title: "No workloads yet",
+      body: "Add the systems whose recovery you want to check — start with the 5–10 the business can least afford to lose.",
+    },
     stepModel: "1. Where does your infrastructure run?",
     models: {
       onprem: "On-premise",
@@ -74,11 +84,16 @@ export const en = {
 
   report: {
     newAssessment: "New assessment",
+    coverageShort: "Based on the {n} workloads you described",
     tiles: { readiness: "Readiness", workloads: "Workloads", flags: "Risk flags", rule: "3-2-1" },
     scoreTitle: "Recovery readiness",
     scoreOutOf: "/100",
     coverage:
       "Based on the {n} workloads you described — readiness as described, computed from your answers, not an audit.",
+    gapsTitle: "Recovery gaps",
+    gapSummary: "{met}/{total} targets met",
+    gapPill: { meets: "MEETS", gap: "GAP", noPath: "NO PATH" },
+    tierTag: "Tier {n}",
     gapTitle: "RPO / RTO gap table",
     workload: "Workload",
     target: "Target RPO / RTO",
@@ -86,6 +101,10 @@ export const en = {
     achievableRto: "Achievable RTO",
     unrecoverable: "unrecoverable",
     units: { min: "min", h: "h", d: "d" },
+    investTitle: "Where to invest",
+    investLabel: "priorities",
+    investOne: "priority",
+    investEmpty: "No open gaps — the essentials are covered.",
     flagsTitle: "Risk flags",
     flags: {
       "no-immutable": {
@@ -142,8 +161,11 @@ export const en = {
   },
 
   drill: {
-    title: "Disaster drill",
+    title: "Live drill",
     pickScenario: "Pick the disaster to simulate:",
+    idlePrompt: "Choose a scenario, then run the drill to see how tonight would unfold — beat by beat.",
+    generate: "Run the drill",
+    regenerate: "Run again",
     scenarios: {
       ransomware: "Ransomware",
       siteloss: "Site loss (fire/flood)",

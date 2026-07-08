@@ -1,7 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import { track } from "@vercel/analytics";
+import {
+  Lock,
+  Flame,
+  CloudOff,
+  Trash2,
+  Play,
+  RotateCw,
+  AlertTriangle,
+  type LucideProps,
+} from "lucide-react";
 import type { Dictionary, Lang } from "@/lib/i18n";
 import type { FindingsPayload } from "@/lib/engine";
 import {
@@ -17,7 +27,27 @@ import {
 const SESSION_BUDGET = 8;
 let budgetUsed = 0;
 
-type Status = "idle" | "generating" | "unavailable" | "redacted" | "cap";
+type Status = "idle" | "generating" | "ready" | "unavailable" | "redacted" | "cap";
+
+const SCENARIO_ICON: Record<Scenario, ComponentType<LucideProps>> = {
+  ransomware: Lock,
+  siteloss: Flame,
+  outage: CloudOff,
+  deletion: Trash2,
+};
+
+// Split the validated story into timeline beats. A beat line looks like
+// "02:14 — …"; the clock prefix becomes the timestamp, the rest the text.
+function parseBeats(text: string): { time: string | null; text: string }[] {
+  return text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const m = line.match(/^(\d{1,2}[:.]\d{2})\s*[—\-–]\s*(.*)$/);
+      return m ? { time: m[1], text: m[2] } : { time: null, text: line };
+    });
+}
 
 export function Drill({
   t,
@@ -47,7 +77,7 @@ export function Drill({
     const cached = cache.current.get(key);
     if (cached) {
       setStory(cached);
-      setStatus("idle");
+      setStatus("ready");
       setStaleLang(false);
       return;
     }
@@ -57,7 +87,7 @@ export function Drill({
       const otherLang = cache.current.get(`${sc}:${lg === "id" ? "en" : "id"}`);
       if (otherLang) {
         setStory(otherLang);
-        setStatus("idle");
+        setStatus("ready");
         setStaleLang(true);
       } else {
         setStory(null);
@@ -85,7 +115,7 @@ export function Drill({
           cache.current.set(key, data.narrative);
           if (wanted.current === key) {
             setStory(data.narrative);
-            setStatus("idle");
+            setStatus("ready");
             setStaleLang(false);
           }
           track("narrative_generated"); // R24: anonymous count, no payload
@@ -112,64 +142,164 @@ export function Drill({
     }
   }
 
-  // First load: generate the default scenario automatically (F1 — the report
-  // renders instantly, the story arrives after). Language switch re-fires and
-  // regenerates within budget (R23).
+  // Language switch: show the cached story in the new language if we have one;
+  // otherwise, if a story is on screen, mark it stale and let the user rerun
+  // (R23). Manual generation means we never auto-spend budget on a switch.
+  const firstRender = useRef(true);
   useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    const cached = cache.current.get(`${scenario}:${lang}`);
+    if (cached) {
+      setStory(cached);
+      setStatus("ready");
+      setStaleLang(false);
+    } else if (story) {
+      setStaleLang(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
+
+  const selectScenario = (sc: Scenario) => {
+    setScenario(sc);
+    track("scenario_swapped"); // R24: anonymous count
+    const cached = cache.current.get(`${sc}:${lang}`);
+    if (cached) {
+      setStory(cached);
+      setStatus("ready");
+      setStaleLang(false);
+    } else {
+      setStory(null);
+      setStatus("idle");
+      setStaleLang(false);
+    }
+  };
+
+  const run = () => {
     wanted.current = `${scenario}:${lang}`;
     void generate(scenario, lang);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scenario, lang]);
+  };
 
   const generating = status === "generating";
+  const beats = story ? parseBeats(substituteLabels(story, labelMap)) : [];
 
   return (
     <div className="mt-3">
       <div className="text-[13px] text-muted">{t.drill.pickScenario}</div>
       <div className="mt-2.5 flex flex-wrap gap-2">
-        {SCENARIOS.map((sc) => (
-          <button
-            key={sc}
-            disabled={generating}
-            onClick={() => {
-              setScenario(sc);
-              track("scenario_swapped"); // R24: anonymous count
-            }}
-            className={`rounded-lg border px-3 py-1.5 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-              scenario === sc
-                ? "border-signal bg-signal-soft font-semibold text-signal"
-                : "border-line text-muted hover:border-faint hover:text-text"
-            }`}
-          >
-            {t.drill.scenarios[sc]}
-          </button>
-        ))}
+        {SCENARIOS.map((sc) => {
+          const Icon = SCENARIO_ICON[sc];
+          const active = scenario === sc;
+          return (
+            <button
+              key={sc}
+              disabled={generating}
+              onClick={() => selectScenario(sc)}
+              aria-pressed={active}
+              className={`flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3 py-2 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                active
+                  ? "border-signal bg-signal-soft font-semibold text-signal-ink"
+                  : "border-line text-muted hover:border-faint hover:text-text"
+              }`}
+            >
+              <Icon className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />
+              {t.drill.scenarios[sc]}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Drill readout — quoted incident appendix */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-line bg-well">
-        <div className="border-b border-line px-4 py-2 font-mono text-[11px] text-faint">
-          drill://{scenario}
+      {/* ── Drill readout ── */}
+      <div className="mt-4 overflow-hidden rounded-xl border border-line bg-well/40">
+        <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-2.5">
+          <span className="font-mono text-[11px] text-faint">drill://{scenario}</span>
+          {status === "ready" && !generating && (
+            <button
+              onClick={run}
+              className="btn-ghost h-8 gap-1.5 px-2 text-[12px] font-medium text-signal"
+            >
+              <RotateCw className="h-3.5 w-3.5" />
+              {t.drill.regenerate}
+            </button>
+          )}
         </div>
-        <div className="min-h-[7rem] border-l-2 border-l-signal p-4 font-mono text-[13px] leading-relaxed">
+
+        <div className="min-h-[9rem] p-4">
+          {/* Idle — prompt + run CTA */}
+          {status === "idle" && (
+            <div className="flex flex-col items-center gap-4 py-4 text-center">
+              <p className="max-w-sm text-[13px] leading-relaxed text-muted">{t.drill.idlePrompt}</p>
+              <button onClick={run} className="btn-primary px-5 text-sm">
+                <Play className="h-4 w-4" />
+                {t.drill.generate}
+              </button>
+            </div>
+          )}
+
+          {/* Generating — pulsing timeline skeleton */}
           {generating && (
-            <p className="text-muted motion-safe:animate-pulse">{t.drill.generating}</p>
+            <div>
+              <p className="mb-4 text-[13px] text-muted motion-safe:animate-pulse">
+                {t.drill.generating}
+              </p>
+              <div className="space-y-3 motion-safe:animate-pulse">
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className="flex gap-3">
+                    <span className="mt-1 h-3 w-3 shrink-0 rounded-full bg-line" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-2.5 w-14 rounded bg-line" />
+                      <div className="h-2.5 w-full rounded bg-line" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
-          {!generating && status === "unavailable" && (
-            <p className="text-muted">{t.drill.unavailable}</p>
+
+          {/* Degraded states — parts 1–3 above stay fully intact */}
+          {!generating && (status === "unavailable" || status === "redacted" || status === "cap") && (
+            <div className="flex flex-col items-center gap-3 py-4 text-center">
+              <AlertTriangle className="h-6 w-6 text-faint" strokeWidth={1.75} aria-hidden />
+              <p className="max-w-sm text-[13px] leading-relaxed text-muted">
+                {status === "unavailable"
+                  ? t.drill.unavailable
+                  : status === "redacted"
+                    ? t.drill.redacted
+                    : t.drill.capReached}
+              </p>
+              {status !== "cap" && budgetUsed < SESSION_BUDGET && (
+                <button onClick={run} className="btn-ghost h-9 gap-1.5 px-3 text-[13px] text-signal">
+                  <RotateCw className="h-4 w-4" />
+                  {t.drill.regenerate}
+                </button>
+              )}
+            </div>
           )}
-          {!generating && status === "redacted" && (
-            <p className="text-muted">{t.drill.redacted}</p>
-          )}
-          {!generating && status === "cap" && <p className="text-muted">{t.drill.capReached}</p>}
-          {!generating && story && status === "idle" && (
+
+          {/* Ready — the incident timeline */}
+          {!generating && status === "ready" && story && (
             <>
               {staleLang && (
-                <p className="mb-2 text-warn">{t.drill.languageNotice}</p>
+                <p className="mb-3 rounded-lg bg-warn-soft px-3 py-2 text-[12px] text-warn">
+                  {t.drill.languageNotice}
+                </p>
               )}
-              <div className="whitespace-pre-line text-text">
-                {substituteLabels(story, labelMap)}
-              </div>
+              <ol>
+                {beats.map((b, i) => (
+                  <li key={i} className="flex gap-3">
+                    <div className="flex flex-col items-center">
+                      <span className="mt-1 h-3 w-3 shrink-0 rounded-full bg-signal ring-4 ring-signal-soft" />
+                      {i < beats.length - 1 && <span className="mt-1 w-px flex-1 bg-line" />}
+                    </div>
+                    <div className="pb-4">
+                      {b.time && <span className="tag block leading-none">{b.time}</span>}
+                      <p className="mt-1 text-[13px] leading-relaxed text-text">{b.text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </>
           )}
         </div>

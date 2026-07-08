@@ -1,37 +1,37 @@
 @import "tailwindcss";
 
-/* ── Modern colorful SaaS ──────────────────────────────────────────────────
-   Light, bright, rounded. A vivid blue brand accent drives the chrome; a full
-   vibrant status palette (emerald / amber / rose) colors the data and the KPI
-   tiles. Clean sans throughout — no serif, no vintage document cues. */
+/* ── DR Drill — product-grade SaaS design system ───────────────────────────
+   Light, airy, cool-neutral. White surfaces on a cool #e9ebf0 canvas, soft 1px
+   borders, gentle elevation. One accent: indigo. Semantic status set kept in
+   calm tints — legible, never panicky. IBM Plex Sans for UI, IBM Plex Mono for
+   every number/label. Token NAMES are stable across components; only values
+   changed from earlier iterations. */
 @theme {
-  --color-ink: #f6f8fb;
-  --color-panel: #ffffff;
-  --color-well: #f1f5f9;
-  --color-line: #e6eaf0;
-  --color-line-soft: #eef2f7;
+  --color-ink: #e9ebf0; /* page canvas */
+  --color-panel: #ffffff; /* card / surface */
+  --color-well: #f4f5f8; /* inset well, tracks */
+  --color-line: #e6e8ee; /* soft hairline border */
+  --color-line-soft: #eef0f5; /* faint inner divider */
 
-  --color-text: #0f1729;
-  --color-muted: #5a6577;
-  --color-faint: #9aa4b2;
+  --color-text: #1a1d29;
+  --color-muted: #565b6b;
+  --color-faint: #878ca0;
 
-  /* brand accent = vivid blue */
-  --color-signal: #2563eb;
-  --color-signal-ink: #1d4ed8;
-  --color-signal-soft: #e7effe;
+  /* one accent: indigo */
+  --color-signal: #4b56d6;
+  --color-signal-ink: #3b45b5;
+  --color-signal-soft: #eef0fb;
 
-  /* vibrant verdict / status palette */
-  --color-ok: #059669;
-  --color-ok-soft: #d6f5e6;
-  --color-warn: #d97706;
-  --color-warn-soft: #fdefd6;
-  --color-crit: #e11d48;
-  --color-crit-soft: #fce1e7;
-  --color-accent: #7c3aed;
-  --color-accent-soft: #efe7fd;
+  /* semantic status — calm tints, always paired with a label */
+  --color-ok: #1f9d63;
+  --color-ok-soft: #e4f4ec;
+  --color-warn: #c98a1a;
+  --color-warn-soft: #f8efda;
+  --color-crit: #d94a3d;
+  --color-crit-soft: #fbe7e4;
 
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono), ui-monospace, monospace;
+  --font-mono: var(--font-mono), ui-monospace, "SF Mono", monospace;
   --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -41,41 +41,54 @@
 
 body {
   background-color: var(--color-ink);
-  background-image:
-    radial-gradient(60% 40% at 85% -5%, rgba(37, 99, 235, 0.08), transparent 70%),
-    radial-gradient(50% 40% at 0% 0%, rgba(124, 58, 237, 0.06), transparent 70%);
-  background-attachment: fixed;
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: 15px;
-  letter-spacing: -0.006em;
+  letter-spacing: -0.004em;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: rgba(37, 99, 235, 0.18);
+  background: rgba(75, 86, 214, 0.16);
 }
 
 *:focus-visible {
   outline: 2px solid var(--color-signal);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 input[type="checkbox"] {
   accent-color: var(--color-signal);
-  width: 0.95rem;
-  height: 0.95rem;
+  width: 1.05rem;
+  height: 1.05rem;
 }
 
-/* ── Component helpers ──────────────────────────────────────────────────── */
+/* ── Chrome decoration ───────────────────────────────────────────────────── */
+/* Faint indigo gridline motif for header/footer depth — no photography. */
+.grid-texture {
+  background-image:
+    linear-gradient(to right, rgba(75, 86, 214, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(75, 86, 214, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: center;
+}
+
+/* Tinted hero band behind the score gauge. */
+.hero-band {
+  background:
+    radial-gradient(115% 130% at 50% -10%, var(--color-signal-soft) 0%, rgba(238, 240, 251, 0) 68%),
+    linear-gradient(180deg, #f7f8fc 0%, var(--color-panel) 100%);
+}
+
+/* ── Component helpers ─────────────────────────────────────────────────────── */
 @layer components {
   .panel {
     background: var(--color-panel);
     border: 1px solid var(--color-line);
     border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -16px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 1px 3px rgba(26, 29, 41, 0.05), 0 10px 30px -20px rgba(26, 29, 41, 0.18);
   }
 
   .rule {
@@ -85,10 +98,11 @@ input[type="checkbox"] {
 
   .field {
     background: #ffffff;
-    border: 1px solid #d4dbe4;
-    border-radius: 9px;
+    border: 1px solid #d7dae3;
+    border-radius: 10px;
     color: var(--color-text);
     font-family: var(--font-sans);
+    min-height: 44px;
     transition: border-color 0.12s, box-shadow 0.12s;
   }
   .field::placeholder {
@@ -97,60 +111,97 @@ input[type="checkbox"] {
   .field:focus {
     outline: none;
     border-color: var(--color-signal);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+    box-shadow: 0 0 0 3px rgba(75, 86, 214, 0.16);
   }
 
   .btn-primary {
-    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 44px;
+    background: linear-gradient(180deg, #5b64df 0%, #4b56d6 100%);
     color: #ffffff;
-    border-radius: 10px;
+    border-radius: 11px;
     font-weight: 600;
-    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.35), 0 6px 16px -8px rgba(37, 99, 235, 0.5);
+    box-shadow: 0 1px 2px rgba(59, 69, 181, 0.35), 0 8px 20px -10px rgba(75, 86, 214, 0.55);
     transition: filter 0.12s, transform 0.05s;
   }
   .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.06);
+    filter: brightness(1.05);
   }
   .btn-primary:active:not(:disabled) {
     transform: translateY(1px);
   }
   .btn-primary:disabled {
-    background: #e4e9f0;
+    background: #dfe2ea;
     color: var(--color-faint);
     box-shadow: none;
     cursor: not-allowed;
   }
 
-  /* Pill chip: rounded, tinted, always labeled. */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 44px;
+    border-radius: 11px;
+    color: var(--color-muted);
+    font-weight: 500;
+    transition: color 0.12s, background 0.12s;
+  }
+  .btn-ghost:hover:not(:disabled) {
+    color: var(--color-text);
+    background: var(--color-well);
+  }
+  .btn-ghost:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Pill chip — always labeled, never color alone. */
   .chip {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
     border-radius: 999px;
-    padding: 0.15rem 0.65rem;
+    padding: 0.2rem 0.6rem;
     font-size: 12px;
     font-weight: 600;
-    line-height: 1.5;
+    line-height: 1.4;
+    white-space: nowrap;
   }
   .chip-ok { background: var(--color-ok-soft); color: var(--color-ok); }
   .chip-warn { background: var(--color-warn-soft); color: var(--color-warn); }
   .chip-crit { background: var(--color-crit-soft); color: var(--color-crit); }
   .chip-neutral { background: var(--color-well); color: var(--color-muted); }
+  .chip-accent { background: var(--color-signal-soft); color: var(--color-signal-ink); }
 
-  /* Bold solid verdict pill (replaces the rubber stamp). */
+  /* Solid verdict pill, colored inline to the band. */
   .verdict {
     display: inline-flex;
     align-items: center;
     border-radius: 999px;
-    padding: 0.4rem 1rem;
+    padding: 0.38rem 0.95rem;
     font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.02em;
+    font-size: 0.85rem;
+    letter-spacing: 0.01em;
     color: #ffffff;
-    box-shadow: 0 6px 16px -8px currentColor;
+    white-space: nowrap;
+  }
+
+  /* Mono data tag (RPO/RTO, tier, timestamps). */
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--color-faint);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * { transition-duration: 0.001ms !important; }
+  * { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
 }

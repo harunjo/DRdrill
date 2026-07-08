@@ -8,8 +8,18 @@ export const id: Dictionary = {
   tagline: "Gambarkan lingkungan IT Anda. Lihat kenyataan pemulihannya — RPO/RTO yang benar-benar bisa dicapai, bukan yang ada di slide.",
   privacyLine:
     "Detail lingkungan dan nama workload Anda tidak pernah meninggalkan browser ini. Cerita simulasi ditulis hanya dari temuan yang dianonimkan (W1, W2, …), dan tidak ada input yang disimpan di mana pun.",
+  trustIndicator: "Berjalan lokal · data tetap di perangkat",
 
   intake: {
+    steps: {
+      model: "Lingkungan",
+      workloads: "Workload",
+      protection: "Proteksi",
+    },
+    empty: {
+      title: "Belum ada workload",
+      body: "Tambahkan sistem yang ingin Anda periksa kesiapannya — mulai dari 5–10 yang paling tidak boleh hilang bagi bisnis.",
+    },
     stepModel: "1. Di mana infrastruktur Anda berjalan?",
     models: {
       onprem: "On-premise",
@@ -73,11 +83,16 @@ export const id: Dictionary = {
 
   report: {
     newAssessment: "Asesmen baru",
+    coverageShort: "Berdasarkan {n} workload yang Anda gambarkan",
     tiles: { readiness: "Kesiapan", workloads: "Workload", flags: "Tanda risiko", rule: "3-2-1" },
     scoreTitle: "Kesiapan pemulihan",
     scoreOutOf: "/100",
     coverage:
       "Berdasarkan {n} workload yang Anda gambarkan — kesiapan sesuai deskripsi, dihitung dari jawaban Anda, bukan hasil audit.",
+    gapsTitle: "Kesenjangan pemulihan",
+    gapSummary: "{met}/{total} target tercapai",
+    gapPill: { meets: "SESUAI", gap: "SELISIH", noPath: "BUNTU" },
+    tierTag: "Tier {n}",
     gapTitle: "Tabel kesenjangan RPO / RTO",
     workload: "Workload",
     target: "Target RPO / RTO",
@@ -85,6 +100,10 @@ export const id: Dictionary = {
     achievableRto: "RTO tercapai",
     unrecoverable: "tidak dapat dipulihkan",
     units: { min: "mnt", h: "jam", d: "hari" },
+    investTitle: "Di mana berinvestasi",
+    investLabel: "prioritas",
+    investOne: "prioritas",
+    investEmpty: "Tidak ada celah terbuka — hal-hal esensial sudah tertutup.",
     flagsTitle: "Tanda risiko",
     flags: {
       "no-immutable": {
@@ -141,8 +160,11 @@ export const id: Dictionary = {
   },
 
   drill: {
-    title: "Simulasi bencana",
+    title: "Simulasi langsung",
     pickScenario: "Pilih bencana yang disimulasikan:",
+    idlePrompt: "Pilih skenario, lalu jalankan simulasi untuk melihat bagaimana malam ini berjalan — beat demi beat.",
+    generate: "Jalankan simulasi",
+    regenerate: "Jalankan lagi",
     scenarios: {
       ransomware: "Ransomware",
       siteloss: "Kehilangan lokasi (kebakaran/banjir)",
