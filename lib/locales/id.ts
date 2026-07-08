@@ -66,9 +66,13 @@ export const id: Dictionary = {
     },
     run: "Jalankan asesmen",
     zeroWorkloads: "Tambahkan minimal satu workload bernama untuk menjalankan asesmen.",
+    back: "Kembali",
+    next: "Lanjut",
+    stepCounter: "Langkah {n} dari {total}",
   },
 
   report: {
+    newAssessment: "Asesmen baru",
     scoreTitle: "Kesiapan pemulihan",
     scoreOutOf: "/100",
     coverage:

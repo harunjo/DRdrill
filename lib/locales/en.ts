@@ -67,9 +67,13 @@ export const en = {
     },
     run: "Run assessment",
     zeroWorkloads: "Add at least one named workload to run the assessment.",
+    back: "Back",
+    next: "Continue",
+    stepCounter: "Step {n} of {total}",
   },
 
   report: {
+    newAssessment: "New assessment",
     scoreTitle: "Recovery readiness",
     scoreOutOf: "/100",
     coverage:

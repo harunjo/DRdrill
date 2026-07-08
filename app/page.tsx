@@ -56,55 +56,67 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Thesis */}
-      <h1 className="mt-11 max-w-[24ch] font-display text-[2rem] font-medium leading-[1.18] tracking-[-0.01em] text-balance sm:text-[2.6rem]">
-        {t.tagline}
-      </h1>
+      {assessment ? (
+        /* ── Results screen: the intake is replaced, not appended ── */
+        <div>
+          <button
+            onClick={() => setAssessment(null)}
+            className="mt-10 inline-flex items-center gap-1.5 text-[13px] font-medium text-muted transition-colors hover:text-text"
+          >
+            ← {t.report.newAssessment}
+          </button>
+          <Report
+            t={t}
+            assessment={assessment}
+            drill={
+              <Drill
+                key={runId}
+                t={t}
+                lang={lang}
+                findings={assessment.findings}
+                labelMap={assessment.labelMap}
+              />
+            }
+          />
+        </div>
+      ) : (
+        /* ── Intake screen: thesis + wizard ── */
+        <>
+          {/* Thesis */}
+          <h1 className="mt-11 max-w-[24ch] font-display text-[2rem] font-medium leading-[1.18] tracking-[-0.01em] text-balance sm:text-[2.6rem]">
+            {t.tagline}
+          </h1>
 
-      {/* Trust note — runs local */}
-      <div className="mt-6 flex max-w-2xl items-start gap-3 border-l-2 border-text bg-well px-4 py-3 text-[13px] leading-relaxed text-muted">
-        <svg
-          aria-hidden
-          viewBox="0 0 24 24"
-          className="mt-0.5 h-4 w-4 shrink-0 text-text"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-          <path d="m9 12 2 2 4-4" />
-        </svg>
-        <span>{t.privacyLine}</span>
-      </div>
+          {/* Trust note — runs local */}
+          <div className="mt-6 flex max-w-2xl items-start gap-3 border-l-2 border-text bg-well px-4 py-3 text-[13px] leading-relaxed text-muted">
+            <svg
+              aria-hidden
+              viewBox="0 0 24 24"
+              className="mt-0.5 h-4 w-4 shrink-0 text-text"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+              <path d="m9 12 2 2 4-4" />
+            </svg>
+            <span>{t.privacyLine}</span>
+          </div>
 
-      <Intake
-        t={t}
-        env={env}
-        onChange={setEnv}
-        onRun={() => {
-          setAssessment(assess(env));
-          setRunId((r) => r + 1);
-          // R24: anonymous event counts only — no environment data attached.
-          track("assessment_completed");
-        }}
-      />
-
-      {assessment && (
-        <Report
-          t={t}
-          assessment={assessment}
-          drill={
-            <Drill
-              key={runId}
-              t={t}
-              lang={lang}
-              findings={assessment.findings}
-              labelMap={assessment.labelMap}
-            />
-          }
-        />
+          <Intake
+            t={t}
+            env={env}
+            onChange={setEnv}
+            onRun={() => {
+              setAssessment(assess(env));
+              setRunId((r) => r + 1);
+              // R24: anonymous event counts only — no environment data attached.
+              track("assessment_completed");
+            }}
+          />
+        </>
       )}
 
       <footer className="mt-20 border-t border-line pt-5 text-[12px] text-faint">

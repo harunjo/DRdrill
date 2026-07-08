@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
-import type { Dictionary } from "@/lib/i18n";
+import { useState } from "react";
+import { fmt, type Dictionary } from "@/lib/i18n";
 import {
   MAX_NAME_LENGTH,
   MAX_WORKLOADS,
@@ -38,44 +38,12 @@ export function workloadValid(w: Workload): boolean {
 
 const MODELS: DeploymentModel[] = ["onprem", "cloud", "hybrid", "private"];
 const TYPES: WorkloadType[] = ["database", "vm", "files", "saas"];
-
-// The localized step titles carry their own "1. " / "2. " prefix; the console
-// renders the index as a chip, so strip the leading number for the heading.
-const stripNum = (s: string) => s.replace(/^\s*\d+\.\s*/, "");
-
-function Step({
-  index,
-  title,
-  hint,
-  children,
-}: {
-  index: number;
-  title: string;
-  hint?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="panel mt-4 p-5 sm:p-6">
-      <div className="flex items-baseline gap-3">
-        <span className="font-display text-sm font-semibold text-muted">
-          {romanNumerals[index - 1] ?? index}.
-        </span>
-        <div className="min-w-0">
-          <h2 className="font-display text-[17px] font-semibold tracking-tight">
-            {stripNum(title)}
-          </h2>
-          {hint && <p className="mt-0.5 text-[13px] text-muted">{hint}</p>}
-        </div>
-      </div>
-      <div className="mt-3 rule" />
-      <div className="mt-5">{children}</div>
-    </section>
-  );
-}
-
-const romanNumerals = ["I", "II", "III", "IV", "V", "VI"];
-
+const romanNumerals = ["I", "II", "III"];
 const selectCls = "field px-2.5 py-2 text-sm";
+
+// Localized step titles carry a "1. " prefix; the stepper renders its own
+// numeral, so strip the leading number from the heading.
+const stripNum = (s: string) => s.replace(/^\s*\d+\.\s*/, "");
 
 export function Intake({
   t,
@@ -88,6 +56,9 @@ export function Intake({
   onChange: (env: Environment) => void;
   onRun: () => void;
 }) {
+  const TOTAL = 3;
+  const [step, setStep] = useState(0);
+
   const groups: Placement[] =
     env.model === "hybrid" ? ["onprem", "cloud"] : env.model === "cloud" ? ["cloud"] : ["onprem"];
 
@@ -118,203 +89,253 @@ export function Intake({
           : "border-line text-muted hover:border-faint hover:text-text"
       }`}
     >
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onToggle(e.target.checked)}
-      />
+      <input type="checkbox" checked={checked} onChange={(e) => onToggle(e.target.checked)} />
       <span>{label}</span>
     </label>
   );
 
+  const titles = [t.intake.stepModel, t.intake.stepWorkloads, t.intake.stepProtection];
+  const hints = [undefined, t.intake.workloadsHint, undefined];
+  // Only the workloads step gates advancing; model always has a value and
+  // protection is optional.
+  const canAdvance = step === 1 ? canRun : true;
+
   return (
     <div className="mt-12">
-      <Step index={1} title={t.intake.stepModel}>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {MODELS.map((m) => {
-            const active = env.model === m;
-            return (
-              <button
-                key={m}
-                onClick={() => onChange({ ...env, model: m })}
-                aria-pressed={active}
-                className={`rounded-[3px] border px-3 py-2.5 text-[13px] transition-colors ${
-                  active
-                    ? "border-text bg-signal-soft font-medium text-text"
-                    : "border-line text-muted hover:border-faint hover:text-text"
-                }`}
-              >
-                {t.intake.models[m]}
-              </button>
-            );
-          })}
+      <section className="panel p-5 sm:p-7">
+        {/* Progress */}
+        <div className="flex items-center gap-1.5">
+          {Array.from({ length: TOTAL }).map((_, i) => (
+            <div
+              key={i}
+              className={`h-1 flex-1 rounded-sm transition-colors ${i <= step ? "bg-text" : "bg-line"}`}
+            />
+          ))}
         </div>
-      </Step>
+        <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
+          {fmt(t.intake.stepCounter, { n: step + 1, total: TOTAL })}
+        </div>
 
-      <Step index={2} title={t.intake.stepWorkloads} hint={t.intake.workloadsHint}>
-        {env.workloads.map((w) => {
-          const nameMissing = w.name.trim().length === 0;
-          const sizeInvalid = !Number.isFinite(w.sizeGB) || w.sizeGB <= 0;
-          return (
-            <div key={w.id} className="mt-3 rounded-[3px] border border-line bg-well p-4 first:mt-0">
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                <div className="col-span-2">
-                  <input
-                    className="field w-full px-3 py-2 text-sm"
-                    placeholder={t.intake.workloadName}
-                    maxLength={MAX_NAME_LENGTH}
-                    value={w.name}
-                    onChange={(e) => updateWorkload(w.id, { name: e.target.value })}
-                  />
-                  <div className="mt-1 flex justify-between font-mono text-[11px] text-faint">
-                    <span className="text-crit">
-                      {nameMissing ? t.intake.errors.nameRequired : ""}
-                    </span>
-                    <span>
-                      {w.name.length >= MAX_NAME_LENGTH - 10
-                        ? t.intake.nameCounter.replace("{n}", String(w.name.length))
-                        : ""}
-                    </span>
+        {/* Step title */}
+        <div className="mt-2 flex items-baseline gap-3">
+          <span className="font-display text-sm font-semibold text-muted">{romanNumerals[step]}.</span>
+          <div className="min-w-0">
+            <h2 className="font-display text-[19px] font-semibold tracking-tight">
+              {stripNum(titles[step])}
+            </h2>
+            {hints[step] && <p className="mt-0.5 text-[13px] text-muted">{hints[step]}</p>}
+          </div>
+        </div>
+        <div className="mt-4 rule" />
+
+        {/* Step body */}
+        <div className="mt-6 min-h-[9rem]">
+          {step === 0 && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {MODELS.map((m) => {
+                const active = env.model === m;
+                return (
+                  <button
+                    key={m}
+                    onClick={() => onChange({ ...env, model: m })}
+                    aria-pressed={active}
+                    className={`rounded-[3px] border px-3 py-3 text-[13px] transition-colors ${
+                      active
+                        ? "border-text bg-signal-soft font-medium text-text"
+                        : "border-line text-muted hover:border-faint hover:text-text"
+                    }`}
+                  >
+                    {t.intake.models[m]}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {step === 1 && (
+            <>
+              {env.workloads.map((w) => {
+                const nameMissing = w.name.trim().length === 0;
+                const sizeInvalid = !Number.isFinite(w.sizeGB) || w.sizeGB <= 0;
+                return (
+                  <div key={w.id} className="mt-3 rounded-[3px] border border-line bg-well p-4 first:mt-0">
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      <div className="col-span-2">
+                        <input
+                          className="field w-full px-3 py-2 text-sm"
+                          placeholder={t.intake.workloadName}
+                          maxLength={MAX_NAME_LENGTH}
+                          value={w.name}
+                          onChange={(e) => updateWorkload(w.id, { name: e.target.value })}
+                        />
+                        <div className="mt-1 flex justify-between font-mono text-[11px] text-faint">
+                          <span className="text-crit">
+                            {nameMissing ? t.intake.errors.nameRequired : ""}
+                          </span>
+                          <span>
+                            {w.name.length >= MAX_NAME_LENGTH - 10
+                              ? t.intake.nameCounter.replace("{n}", String(w.name.length))
+                              : ""}
+                          </span>
+                        </div>
+                      </div>
+                      <select
+                        className={selectCls}
+                        value={w.type}
+                        onChange={(e) => updateWorkload(w.id, { type: e.target.value as WorkloadType })}
+                      >
+                        {TYPES.map((ty) => (
+                          <option key={ty} value={ty}>
+                            {t.intake.types[ty]}
+                          </option>
+                        ))}
+                      </select>
+                      <div>
+                        <input
+                          type="number"
+                          min={1}
+                          className="field w-full px-3 py-2 text-sm"
+                          title={t.intake.sizeLabel}
+                          value={Number.isFinite(w.sizeGB) ? w.sizeGB : ""}
+                          onChange={(e) => updateWorkload(w.id, { sizeGB: Number(e.target.value) })}
+                        />
+                        {sizeInvalid && (
+                          <div className="mt-1 font-mono text-[11px] text-crit">
+                            {t.intake.errors.sizeInvalid}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <select
+                        className={selectCls}
+                        value={w.tier}
+                        onChange={(e) => updateWorkload(w.id, { tier: Number(e.target.value) as Tier })}
+                      >
+                        {([1, 2, 3] as Tier[]).map((tier) => (
+                          <option key={tier} value={tier}>
+                            {t.intake.tiers[tier]}
+                          </option>
+                        ))}
+                      </select>
+                      {env.model === "hybrid" && (
+                        <select
+                          className={selectCls}
+                          value={w.placement ?? "onprem"}
+                          onChange={(e) =>
+                            updateWorkload(w.id, { placement: e.target.value as Placement })
+                          }
+                        >
+                          <option value="onprem">{t.intake.placement.onprem}</option>
+                          <option value="cloud">{t.intake.placement.cloud}</option>
+                        </select>
+                      )}
+                      <button
+                        className="ml-auto font-mono text-xs text-faint transition-colors hover:text-crit"
+                        onClick={() =>
+                          onChange({ ...env, workloads: env.workloads.filter((x) => x.id !== w.id) })
+                        }
+                      >
+                        {t.intake.remove}
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <select
-                  className={selectCls}
-                  value={w.type}
-                  onChange={(e) => updateWorkload(w.id, { type: e.target.value as WorkloadType })}
+                );
+              })}
+              {env.workloads.length < MAX_WORKLOADS ? (
+                <button
+                  className="mt-3 w-full rounded-[3px] border border-dashed border-line py-2.5 text-[13px] text-muted transition-colors hover:border-faint hover:text-text"
+                  onClick={() => onChange({ ...env, workloads: [...env.workloads, emptyWorkload()] })}
                 >
-                  {TYPES.map((ty) => (
-                    <option key={ty} value={ty}>
-                      {t.intake.types[ty]}
-                    </option>
-                  ))}
-                </select>
-                <div>
-                  <input
-                    type="number"
-                    min={1}
-                    className="field w-full px-3 py-2 text-sm"
-                    title={t.intake.sizeLabel}
-                    value={Number.isFinite(w.sizeGB) ? w.sizeGB : ""}
-                    onChange={(e) => updateWorkload(w.id, { sizeGB: Number(e.target.value) })}
-                  />
-                  {sizeInvalid && (
-                    <div className="mt-1 font-mono text-[11px] text-crit">
-                      {t.intake.errors.sizeInvalid}
+                  {t.intake.addWorkload}
+                </button>
+              ) : (
+                <p className="mt-3 text-[13px] text-muted">{t.intake.errors.maxWorkloads}</p>
+              )}
+            </>
+          )}
+
+          {step === 2 &&
+            groups.map((g) => {
+              const p = env.protection[g] ?? emptyProtection;
+              return (
+                <div key={g} className="mt-3 rounded-[3px] border border-line bg-well p-4 first:mt-0">
+                  {groups.length > 1 && (
+                    <div className="mb-3 text-[13px] font-medium text-text">
+                      {t.intake.protectionGroups[g]}
                     </div>
                   )}
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <label className="flex items-center gap-2 rounded-[3px] border border-line px-3 py-2.5 text-sm text-muted">
+                      <span className="flex-1">{t.intake.freqLabel[g]}</span>
+                      <input
+                        type="number"
+                        min={0}
+                        className="field w-20 px-2 py-1 text-sm"
+                        value={p.frequencyHours}
+                        onChange={(e) => updateProtection(g, { frequencyHours: Number(e.target.value) })}
+                      />
+                    </label>
+                    {toggle(p.replication, t.intake.replication, (v) =>
+                      updateProtection(g, { replication: v }),
+                    )}
+                    {p.replication && (
+                      <label className="flex items-center gap-2 rounded-[3px] border border-line px-3 py-2.5 text-sm text-muted">
+                        <span className="flex-1">{t.intake.replicationLag}</span>
+                        <input
+                          type="number"
+                          min={0}
+                          className="field w-20 px-2 py-1 text-sm"
+                          value={p.replicationLagMin}
+                          onChange={(e) =>
+                            updateProtection(g, { replicationLagMin: Number(e.target.value) })
+                          }
+                        />
+                      </label>
+                    )}
+                    {toggle(p.offsiteCopy, t.intake.offsite[g], (v) =>
+                      updateProtection(g, { offsiteCopy: v }),
+                    )}
+                    {toggle(p.immutableCopy, t.intake.immutable, (v) =>
+                      updateProtection(g, { immutableCopy: v }),
+                    )}
+                    {toggle(p.secondSite, t.intake.secondSite[g], (v) =>
+                      updateProtection(g, { secondSite: v }),
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <select
-                  className={selectCls}
-                  value={w.tier}
-                  onChange={(e) => updateWorkload(w.id, { tier: Number(e.target.value) as Tier })}
-                >
-                  {([1, 2, 3] as Tier[]).map((tier) => (
-                    <option key={tier} value={tier}>
-                      {t.intake.tiers[tier]}
-                    </option>
-                  ))}
-                </select>
-                {env.model === "hybrid" && (
-                  <select
-                    className={selectCls}
-                    value={w.placement ?? "onprem"}
-                    onChange={(e) =>
-                      updateWorkload(w.id, { placement: e.target.value as Placement })
-                    }
-                  >
-                    <option value="onprem">{t.intake.placement.onprem}</option>
-                    <option value="cloud">{t.intake.placement.cloud}</option>
-                  </select>
-                )}
-                <button
-                  className="ml-auto font-mono text-xs text-faint transition-colors hover:text-crit"
-                  onClick={() =>
-                    onChange({ ...env, workloads: env.workloads.filter((x) => x.id !== w.id) })
-                  }
-                >
-                  {t.intake.remove}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-        {env.workloads.length < MAX_WORKLOADS ? (
+              );
+            })}
+        </div>
+
+        {/* Navigation */}
+        <div className="mt-7 rule" />
+        <div className="mt-4 flex items-center justify-between gap-3">
           <button
-            className="mt-3 w-full rounded-[3px] border border-dashed border-line py-2.5 text-[13px] text-muted transition-colors hover:border-faint hover:text-text"
-            onClick={() => onChange({ ...env, workloads: [...env.workloads, emptyWorkload()] })}
+            onClick={() => setStep((s) => Math.max(0, s - 1))}
+            disabled={step === 0}
+            className="rounded-[3px] px-3 py-2 text-[13px] font-medium text-muted transition-colors hover:text-text disabled:pointer-events-none disabled:opacity-0"
           >
-            {t.intake.addWorkload}
+            ← {t.intake.back}
           </button>
-        ) : (
-          <p className="mt-3 text-[13px] text-muted">{t.intake.errors.maxWorkloads}</p>
+          {step < TOTAL - 1 ? (
+            <button
+              onClick={() => setStep((s) => Math.min(TOTAL - 1, s + 1))}
+              disabled={!canAdvance}
+              className="btn-primary px-5 py-2 text-sm"
+            >
+              {t.intake.next} →
+            </button>
+          ) : (
+            <button onClick={onRun} disabled={!canRun} className="btn-primary px-5 py-2 text-sm">
+              {t.intake.run}
+            </button>
+          )}
+        </div>
+        {step === 1 && !canRun && (
+          <p className="mt-3 text-right text-[13px] text-muted">{t.intake.zeroWorkloads}</p>
         )}
-      </Step>
-
-      <Step index={3} title={t.intake.stepProtection}>
-        {groups.map((g) => {
-          const p = env.protection[g] ?? emptyProtection;
-          return (
-            <div key={g} className="mt-3 rounded-[3px] border border-line bg-well p-4 first:mt-0">
-              {groups.length > 1 && (
-                <div className="mb-3 text-[13px] font-medium text-text">
-                  {t.intake.protectionGroups[g]}
-                </div>
-              )}
-              <div className="grid gap-2 sm:grid-cols-2">
-                <label className="flex items-center gap-2 rounded-[3px] border border-line px-3 py-2.5 text-sm text-muted">
-                  <span className="flex-1">{t.intake.freqLabel[g]}</span>
-                  <input
-                    type="number"
-                    min={0}
-                    className="field w-20 px-2 py-1 text-sm"
-                    value={p.frequencyHours}
-                    onChange={(e) => updateProtection(g, { frequencyHours: Number(e.target.value) })}
-                  />
-                </label>
-                {toggle(p.replication, t.intake.replication, (v) =>
-                  updateProtection(g, { replication: v }),
-                )}
-                {p.replication && (
-                  <label className="flex items-center gap-2 rounded-[3px] border border-line px-3 py-2.5 text-sm text-muted">
-                    <span className="flex-1">{t.intake.replicationLag}</span>
-                    <input
-                      type="number"
-                      min={0}
-                      className="field w-20 px-2 py-1 text-sm"
-                      value={p.replicationLagMin}
-                      onChange={(e) =>
-                        updateProtection(g, { replicationLagMin: Number(e.target.value) })
-                      }
-                    />
-                  </label>
-                )}
-                {toggle(p.offsiteCopy, t.intake.offsite[g], (v) =>
-                  updateProtection(g, { offsiteCopy: v }),
-                )}
-                {toggle(p.immutableCopy, t.intake.immutable, (v) =>
-                  updateProtection(g, { immutableCopy: v }),
-                )}
-                {toggle(p.secondSite, t.intake.secondSite[g], (v) =>
-                  updateProtection(g, { secondSite: v }),
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </Step>
-
-      <div className="mt-8">
-        <button
-          className="btn-primary w-full px-5 py-2.5 text-sm sm:w-auto sm:px-7"
-          disabled={!canRun}
-          onClick={onRun}
-        >
-          {t.intake.run}
-        </button>
-        {!canRun && <p className="mt-3 text-[13px] text-muted">{t.intake.zeroWorkloads}</p>}
-      </div>
+      </section>
     </div>
   );
 }
