@@ -146,7 +146,7 @@ export const id: Dictionary = {
       closesQual: "Menutup eksposur yang dilindungi kontrol ini",
       makesRecoverable: "Membuat {n} workload dapat dipulihkan",
       strengthens: "Memperkuat ketahanan",
-      preparedBy: "Disiapkan oleh IT · tidak ada yang disimpan",
+      preparedBy: "Disiapkan oleh harunjonatan.com · Data Anda aman — tidak ada data yang disimpan di server ini, semua data hanya tersimpan di browser Anda",
       copy: "Salin ringkasan",
       copied: "Tersalin",
       copyFailed: "Salin tidak tersedia — pilih teks di bawah untuk menyalin manual:",

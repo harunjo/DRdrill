@@ -147,7 +147,7 @@ export const en = {
       closesQual: "Closes the exposure this control protects",
       makesRecoverable: "Makes {n} workload(s) recoverable",
       strengthens: "Strengthens resilience posture",
-      preparedBy: "Prepared by IT · nothing stored",
+      preparedBy: "Prepared by harunjonatan.com · Your data is safe — nothing is stored on this server, everything stays in your browser",
       copy: "Copy summary",
       copied: "Copied",
       copyFailed: "Copy unavailable — select the text below to copy manually:",
