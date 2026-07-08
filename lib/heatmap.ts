@@ -30,10 +30,15 @@ export function criticalInScope(
   flags: RiskFlag[],
   model: DeploymentModel,
 ): boolean {
+  // Only group-scoped critical flags raise a peer workload's gap. Env-wide
+  // "all" flags (e.g. unprotected-workloads) fire when ANY workload is
+  // unprotected and would otherwise drag compliant workloads to At-risk — the
+  // unprotected ones are already at gap 2 via their own null RTO.
   return flags.some(
     (f) =>
       f.severity === "critical" &&
-      (f.scope === "all" || placementOf(r.workload, model) === f.scope),
+      f.scope !== "all" &&
+      placementOf(r.workload, model) === f.scope,
   );
 }
 
@@ -45,13 +50,15 @@ export function gapLevel(r: WorkloadResult, hasCriticalInScope: boolean): Level 
   return 1;
 }
 
-/** Impact axis: exposure bands when any workload carries a cost, else tier. */
+/** Impact axis: exposure bands when any workload carries a cost, else tier. A
+ *  workload with no cost of its own falls back to its tier band rather than
+ *  sinking to Low, so a partially-costed intake never hides a critical system. */
 export function impactLevel(r: WorkloadResult, useExposureAxis: boolean): Level {
   if (r.achievableRtoMin === null) return 2; // catastrophic → top impact
   if (useExposureAxis) {
     const e = workloadExposure(r);
-    if (e === null) return 0; // no cost on this workload
-    return e >= EXP_HIGH ? 2 : e >= EXP_MED ? 1 : 0;
+    if (e !== null) return e >= EXP_HIGH ? 2 : e >= EXP_MED ? 1 : 0;
+    // no cost on this workload → fall through to the tier band below
   }
   return r.workload.tier === 1 ? 2 : r.workload.tier === 2 ? 1 : 0;
 }

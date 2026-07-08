@@ -78,6 +78,17 @@ describe("aggregateExposure", () => {
     expect(agg.hasCost).toBe(false);
     expect(agg.total).toBe(0);
   });
+
+  it("keeps total 0 with monetizedCount 0 when every costed workload is catastrophic", () => {
+    // guards the 'Rp 0' headline bug — hero must key off monetizedCount, not hasCost
+    const agg = aggregateExposure([
+      result({ achievableRtoMin: null, workload: { costPerHourDowntime: 5_000_000 } }),
+    ]);
+    expect(agg.total).toBe(0);
+    expect(agg.monetizedCount).toBe(0);
+    expect(agg.catastrophicCount).toBe(1);
+    expect(agg.hasCost).toBe(true);
+  });
 });
 
 describe("postureBand", () => {
@@ -161,6 +172,12 @@ describe("formatIDR", () => {
     expect(formatIDR(1_500_000_000)).toBe("Rp 1.5 miliar");
     expect(formatIDR(750_000)).toBe("Rp 750 rb");
     expect(formatIDR(500)).toBe("Rp 500");
+  });
+
+  it("guards non-finite and non-positive input", () => {
+    expect(formatIDR(0)).toBe("Rp 0");
+    expect(formatIDR(NaN)).toBe("Rp 0");
+    expect(formatIDR(Infinity)).toBe("Rp 0");
   });
 });
 

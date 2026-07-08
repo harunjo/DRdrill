@@ -25,7 +25,8 @@ export function workloadExposure(r: WorkloadResult): number | null {
   const cost = r.workload.costPerHourDowntime;
   if (r.achievableRtoMin === null) return null;
   if (cost == null || !Number.isFinite(cost) || cost <= 0) return null;
-  return Math.round((r.achievableRtoMin / 60) * cost);
+  const exposure = Math.round((r.achievableRtoMin / 60) * cost);
+  return Number.isFinite(exposure) ? exposure : null; // guard absurd overflow
 }
 
 export interface AggregateExposure {
@@ -135,6 +136,7 @@ export function riskBoughtDown(
 // --- Currency (IDR, compact Indonesian units: rb / jt / miliar) ---
 
 export function formatIDR(amount: number): string {
+  if (!Number.isFinite(amount) || amount <= 0) return "Rp 0";
   const unit = (n: number, u: string) => {
     const s = n >= 100 || Number.isInteger(n) ? String(Math.round(n)) : n.toFixed(1);
     return `Rp ${s} ${u}`;

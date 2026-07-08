@@ -129,6 +129,7 @@ export const en = {
       fundingCase: "Business continuity — funding case",
       exposureAtRisk: "Exposure at risk",
       plusUnrecoverable: "plus {n} unrecoverable",
+      allUnrecoverable: "{n} workload(s) unrecoverable",
       noCost: "Add downtime cost in the intake to quantify exposure.",
       posture: "Posture",
       bia: "BIA · self-assessment aligned with ISO 22301 / NIST CSF",
@@ -140,6 +141,7 @@ export const en = {
       copy: "Copy summary",
       copied: "Copied",
       copyFailed: "Copy unavailable — select the text below to copy manually:",
+      scope: { onprem: "on-premise", cloud: "cloud" },
     },
     flagsTitle: "Risk flags",
     flags: {

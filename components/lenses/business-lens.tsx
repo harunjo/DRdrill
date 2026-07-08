@@ -31,7 +31,7 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
 
         <div className="mt-4">
           <div className="tag text-[10px]">{b.exposureHeadline}</div>
-          {agg.hasCost ? (
+          {agg.monetizedCount > 0 ? (
             <div className="mt-1 font-mono text-[2rem] font-semibold tracking-tight text-crit">
               {formatIDR(agg.total)}
               {agg.catastrophicCount > 0 && (
@@ -39,6 +39,10 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
                   · {fmt(inv.plusUnrecoverable, { n: agg.catastrophicCount })}
                 </span>
               )}
+            </div>
+          ) : agg.catastrophicCount > 0 ? (
+            <div className="mt-1 font-mono text-[1.35rem] font-semibold tracking-tight text-crit">
+              {fmt(inv.allUnrecoverable, { n: agg.catastrophicCount })}
             </div>
           ) : (
             <p className="mt-1 max-w-sm text-[13px] leading-relaxed text-muted">{b.addCost}</p>

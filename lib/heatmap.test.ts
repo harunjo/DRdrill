@@ -30,6 +30,9 @@ describe("gapLevel", () => {
   it("is 2 when a target is missed and a critical flag applies", () => {
     expect(gapLevel(result({ rpoMeets: true, rtoMeets: false }), true)).toBe(2);
   });
+  it("is 1 (partial) when one target is missed and no critical flag applies", () => {
+    expect(gapLevel(result({ rpoMeets: true, rtoMeets: false }), false)).toBe(1);
+  });
   it("is 2 for a catastrophic workload", () => {
     expect(gapLevel(result({ achievableRtoMin: null }), false)).toBe(2);
   });
@@ -47,6 +50,11 @@ describe("impactLevel", () => {
   it("pins catastrophic workloads to the top impact band", () => {
     expect(impactLevel(result({ achievableRtoMin: null }), true)).toBe(2);
   });
+  it("falls back to tier for an uncosted workload even in exposure mode", () => {
+    // a Tier-1 workload with no cost must not sink to Low next to costed peers
+    expect(impactLevel(result({ achievableRtoMin: 60, workload: { tier: 1 } }), true)).toBe(2);
+    expect(impactLevel(result({ achievableRtoMin: 60, workload: { tier: 3 } }), true)).toBe(0);
+  });
 });
 
 describe("criticalInScope", () => {
@@ -59,9 +67,12 @@ describe("criticalInScope", () => {
     const r = result({ workload: { placement: "cloud" } });
     expect(criticalInScope(r, flags, "hybrid")).toBe(false);
   });
-  it("an all-scoped flag covers everyone", () => {
+  it("an all-scoped critical flag does NOT drag peer workloads to at-risk", () => {
+    // unprotected-workloads (scope 'all') fires when ANY workload is unprotected;
+    // it must not raise a compliant peer's gap — the unprotected one is already
+    // at gap 2 via its own null RTO.
     const all: RiskFlag[] = [{ code: "unprotected-workloads", severity: "critical", scope: "all" }];
-    expect(criticalInScope(result({ workload: { placement: "cloud" } }), all, "hybrid")).toBe(true);
+    expect(criticalInScope(result({ workload: { placement: "cloud" } }), all, "hybrid")).toBe(false);
   });
 });
 

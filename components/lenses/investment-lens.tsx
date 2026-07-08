@@ -19,14 +19,26 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
   const posture = postureBand(a.results, a.flags);
   const asks = orderAsks(a.flags, a.results, model);
   const coverage = fmt(t.report.coverageShort, { n });
+  // When the same flag code appears in more than one placement group (hybrid),
+  // label each ask with its group so the two don't read as duplicates.
+  const dupCodes = new Set(
+    a.flags.map((f) => f.code).filter((c, _i, arr) => arr.indexOf(c) !== arr.lastIndexOf(c)),
+  );
+  const scopeSuffix = (ask: Ask): string =>
+    dupCodes.has(ask.flag.code) && ask.flag.scope !== "all" ? ` (${inv.scope[ask.flag.scope]})` : "";
 
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const [fallback, setFallback] = useState("");
 
-  const exposureText = agg.hasCost
-    ? formatIDR(agg.total) +
-      (agg.catastrophicCount > 0 ? ` · ${fmt(inv.plusUnrecoverable, { n: agg.catastrophicCount })}` : "")
-    : inv.noCost;
+  const exposureText =
+    agg.monetizedCount > 0
+      ? formatIDR(agg.total) +
+        (agg.catastrophicCount > 0 ? ` · ${fmt(inv.plusUnrecoverable, { n: agg.catastrophicCount })}` : "")
+      : agg.catastrophicCount > 0
+        ? fmt(inv.allUnrecoverable, { n: agg.catastrophicCount })
+        : inv.noCost;
+  const hasFigure = agg.monetizedCount > 0;
+  const critHeadline = hasFigure || agg.catastrophicCount > 0;
 
   const effectLine = (ask: Ask): string => {
     const bd = ask.boughtDown;
@@ -41,7 +53,9 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
       title: inv.fundingCase,
       exposure: `${inv.exposureAtRisk}: ${exposureText}`,
       posture: `${inv.posture}: ${t.report.posture[posture]} — ${inv.bia}`,
-      asks: asks.map((ask) => `${t.report.flags[ask.flag.code].title} — ${effectLine(ask)}`),
+      asks: asks.map(
+        (ask) => `${t.report.flags[ask.flag.code].title}${scopeSuffix(ask)} — ${effectLine(ask)}`,
+      ),
       coverage,
     });
 
@@ -73,8 +87,8 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
         <div className="mt-4">
           <div className="tag text-[10px]">{inv.exposureAtRisk}</div>
           <div
-            className={`mt-1 font-mono font-semibold tracking-tight ${agg.hasCost ? "text-[2rem]" : "text-[15px]"}`}
-            style={{ color: agg.hasCost ? "var(--color-crit)" : "var(--color-muted)" }}
+            className={`mt-1 font-mono font-semibold tracking-tight ${hasFigure ? "text-[2rem]" : critHeadline ? "text-[1.35rem]" : "text-[15px]"}`}
+            style={{ color: critHeadline ? "var(--color-crit)" : "var(--color-muted)" }}
           >
             {exposureText}
           </div>
@@ -113,7 +127,10 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
                         <span className={critical ? "chip chip-crit" : "chip chip-warn"}>
                           {critical ? t.report.severity.critical : t.report.severity.warning}
                         </span>
-                        <span className="text-[14px] font-semibold text-text">{copy.title}</span>
+                        <span className="text-[14px] font-semibold text-text">
+                          {copy.title}
+                          {scopeSuffix(ask)}
+                        </span>
                       </div>
                       <p className="mt-1.5 text-[13px] font-semibold" style={{ color: rail }}>
                         {effectLine(ask)}

@@ -128,6 +128,7 @@ export const id: Dictionary = {
       fundingCase: "Kelangsungan bisnis — usulan pendanaan",
       exposureAtRisk: "Eksposur berisiko",
       plusUnrecoverable: "plus {n} tak terpulihkan",
+      allUnrecoverable: "{n} workload tak terpulihkan",
       noCost: "Isi biaya downtime di intake untuk mengukur eksposur.",
       posture: "Postur",
       bia: "BIA · asesmen mandiri selaras dengan ISO 22301 / NIST CSF",
@@ -139,6 +140,7 @@ export const id: Dictionary = {
       copy: "Salin ringkasan",
       copied: "Tersalin",
       copyFailed: "Salin tidak tersedia — pilih teks di bawah untuk menyalin manual:",
+      scope: { onprem: "on-premise", cloud: "cloud" },
     },
     flagsTitle: "Tanda risiko",
     flags: {
