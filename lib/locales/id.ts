@@ -123,6 +123,15 @@ export const id: Dictionary = {
       overrun: "melebihi",
       target: "target",
     },
+    statusLabel: {
+      good: "Siap",
+      fair: "Perlu perhatian",
+      poor: "Berisiko",
+    },
+    severity: {
+      critical: "Kritis",
+      warning: "Perhatian",
+    },
   },
 
   drill: {

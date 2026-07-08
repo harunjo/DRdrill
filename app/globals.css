@@ -1,55 +1,51 @@
 @import "tailwindcss";
 
-/* ── Precision instrument — Linear/Vercel school ──────────────────────────
-   Near-black substrate, hairline borders, flat surfaces, one restrained
-   indigo accent used sparingly. Contrast and type hierarchy do the work;
-   no gradients, no glows, no decoration. Green/red are reserved for the
-   data's verdict only. */
+/* ── Audit-grade light SaaS ───────────────────────────────────────────────
+   Consulting-report aesthetic: warm paper page, white cards with hairline
+   borders and soft shadows, navy ink, one deep-teal brand color used with
+   restraint. Green/amber/red are verdict colors calibrated for light
+   surfaces and always paired with a text label. */
 @theme {
-  --color-ink: #08090a;
-  --color-panel: #0e1012;
-  --color-well: #101316;
-  --color-line: rgba(255, 255, 255, 0.07);
-  --color-line-soft: rgba(255, 255, 255, 0.045);
+  --color-ink: #f7f7f5;
+  --color-panel: #ffffff;
+  --color-well: #f6f7f8;
+  --color-line: #e5e7ea;
+  --color-line-soft: #eef0f2;
 
-  --color-text: #ededef;
-  --color-muted: #8b9299;
-  --color-faint: #5c6370;
+  --color-text: #191d24;
+  --color-muted: #5d6472;
+  --color-faint: #99a0ab;
 
-  /* No brand accent — chrome is monochrome; the only color on the page is
-     the data's verdict (ok/warn/crit). "signal" = neutral white for
-     selected/active/focus states. */
-  --color-signal: #ededef;
-  --color-ok: #3dd68c;
-  --color-warn: #d9a13c;
-  --color-crit: #f2555a;
+  --color-signal: #0d6d63;
+  --color-signal-soft: #e7f2f0;
+  --color-ok: #17803f;
+  --color-ok-soft: #e9f5ed;
+  --color-warn: #96660a;
+  --color-warn-soft: #fbf2df;
+  --color-crit: #bd3a30;
+  --color-crit-soft: #fcedeb;
 
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
-  /* single family: display IS the sans — hierarchy comes from size/weight */
   --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
   background-color: var(--color-ink);
-  /* Blueprint grid: barely-there dots, the only texture on the page */
-  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 28px 28px;
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: 15px;
-  letter-spacing: -0.006em;
+  letter-spacing: -0.004em;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: rgba(13, 109, 99, 0.16);
 }
 
 *:focus-visible {
@@ -64,54 +60,66 @@ input[type="checkbox"] {
   height: 0.95rem;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
-}
-
 /* ── Component helpers ──────────────────────────────────────────────────── */
 @layer components {
-  /* Flat surface, hairline border. Separation via border + surface delta,
-     never shadow or gradient. */
   .panel {
     background: var(--color-panel);
     border: 1px solid var(--color-line);
-    border-radius: 10px;
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
   }
 
   .field {
-    background: var(--color-ink);
-    border: 1px solid var(--color-line);
-    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #d7dade;
+    border-radius: 8px;
     color: var(--color-text);
     font-family: var(--font-sans);
-    transition: border-color 0.12s;
+    transition: border-color 0.12s, box-shadow 0.12s;
   }
   .field::placeholder {
-    color: #55595f;
+    color: var(--color-faint);
   }
   .field:focus {
     outline: none;
-    border-color: rgba(255, 255, 255, 0.35);
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+    border-color: var(--color-signal);
+    box-shadow: 0 0 0 3px rgba(13, 109, 99, 0.12);
   }
 
-  /* Linear-style primary action: light button on dark ground */
   .btn-primary {
-    background: #ededef;
-    color: #101114;
+    background: var(--color-signal);
+    color: #ffffff;
     border-radius: 8px;
     font-weight: 500;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
     transition: background 0.12s;
   }
   .btn-primary:hover:not(:disabled) {
-    background: #ffffff;
+    background: #0a5a52;
   }
   .btn-primary:disabled {
-    background: #1a1d21;
-    color: #55595f;
+    background: #e8eaed;
+    color: var(--color-faint);
+    box-shadow: none;
     cursor: not-allowed;
   }
+
+  /* Status chip: tinted background + strong label. Color never stands alone —
+     every chip carries text. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    padding: 0.125rem 0.625rem;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .chip-ok { background: var(--color-ok-soft); color: var(--color-ok); }
+  .chip-warn { background: var(--color-warn-soft); color: var(--color-warn); }
+  .chip-crit { background: var(--color-crit-soft); color: var(--color-crit); }
+  .chip-neutral { background: var(--color-well); color: var(--color-muted); border: 1px solid var(--color-line); }
 
   .rule-fade {
     height: 1px;

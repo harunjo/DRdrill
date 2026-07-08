@@ -124,6 +124,15 @@ export const en = {
       overrun: "overrun",
       target: "target",
     },
+    statusLabel: {
+      good: "Ready",
+      fair: "Needs attention",
+      poor: "At risk",
+    },
+    severity: {
+      critical: "Critical",
+      warning: "Attention",
+    },
   },
 
   drill: {

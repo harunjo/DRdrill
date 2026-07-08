@@ -56,10 +56,12 @@ function Step({
 }) {
   return (
     <section className="panel mt-4 p-5 sm:p-6">
-      <div className="flex items-baseline gap-3">
-        <span className="font-mono text-xs text-faint">{String(index).padStart(2, "0")}</span>
+      <div className="flex items-start gap-3">
+        <span className="mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-well text-xs font-semibold text-muted ring-1 ring-line">
+          {index}
+        </span>
         <div>
-          <h2 className="text-[15px] font-medium tracking-tight">{stripNum(title)}</h2>
+          <h2 className="text-[15px] font-semibold tracking-tight">{stripNum(title)}</h2>
           {hint && <p className="mt-1 text-[13px] text-muted">{hint}</p>}
         </div>
       </div>
@@ -107,8 +109,8 @@ export function Intake({
     <label
       className={`flex cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2.5 text-[13px] transition-colors ${
         checked
-          ? "border-signal/50 bg-signal/[0.06] text-text"
-          : "border-line text-muted hover:text-text"
+          ? "border-signal bg-signal-soft text-text"
+          : "border-line text-muted hover:border-[#c9cdd3] hover:text-text"
       }`}
     >
       <input
@@ -133,8 +135,8 @@ export function Intake({
                 aria-pressed={active}
                 className={`rounded-md border px-3 py-2.5 text-[13px] transition-colors ${
                   active
-                    ? "border-signal/60 bg-signal/[0.08] font-medium text-text"
-                    : "border-line text-muted hover:text-text"
+                    ? "border-signal bg-signal-soft font-medium text-signal"
+                    : "border-line text-muted hover:border-[#c9cdd3] hover:text-text"
                 }`}
               >
                 {t.intake.models[m]}
