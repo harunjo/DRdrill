@@ -159,6 +159,15 @@ export const en = {
       overrun: "overrun",
       target: "target",
     },
+    heatmap: {
+      impact: "Business impact",
+      readiness: "Recovery readiness",
+      impactLevels: ["Low", "Moderate", "High"] as [string, string, string],
+      gapLevels: ["On track", "Partial", "At risk"] as [string, string, string],
+      more: "+{n}",
+      catastrophic: "Unrecoverable",
+      tierAxis: "by tier (no cost entered)",
+    },
     statusLabel: {
       good: "Ready",
       fair: "Needs attention",

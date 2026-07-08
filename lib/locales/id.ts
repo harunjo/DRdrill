@@ -158,6 +158,15 @@ export const id: Dictionary = {
       overrun: "melebihi",
       target: "target",
     },
+    heatmap: {
+      impact: "Dampak bisnis",
+      readiness: "Kesiapan pemulihan",
+      impactLevels: ["Rendah", "Sedang", "Tinggi"] as [string, string, string],
+      gapLevels: ["Sesuai", "Sebagian", "Berisiko"] as [string, string, string],
+      more: "+{n}",
+      catastrophic: "Tak dapat dipulihkan",
+      tierAxis: "per tier (biaya belum diisi)",
+    },
     statusLabel: {
       good: "Siap",
       fair: "Perlu perhatian",
