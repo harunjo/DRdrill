@@ -3,7 +3,7 @@
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import { fmtMinutes, type Assessment, type DurationLabels } from "@/lib/engine";
-import { aggregateExposure, formatIDR, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
+import { aggregateExposure, formatMoney, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
 import { Heatmap } from "@/components/heatmap";
 import { PostureChip } from "@/components/lenses/shared";
 
@@ -33,7 +33,7 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
           <div className="tag text-[10px]">{b.exposureHeadline}</div>
           {agg.monetizedCount > 0 ? (
             <div className="mt-1 font-mono text-[2rem] font-semibold tracking-tight text-crit">
-              {formatIDR(agg.total)}
+              {formatMoney(agg.total, t.currency)}
               {agg.catastrophicCount > 0 && (
                 <span className="ml-2 align-middle text-[13px] font-semibold text-crit">
                   · {fmt(inv.plusUnrecoverable, { n: agg.catastrophicCount })}
@@ -70,7 +70,7 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
                   {cat ? (
                     <span className="chip chip-crit shrink-0">{t.report.unrecoverable}</span>
                   ) : e != null ? (
-                    <span className="shrink-0 font-mono font-semibold text-crit">{formatIDR(e)}</span>
+                    <span className="shrink-0 font-mono font-semibold text-crit">{formatMoney(e, t.currency)}</span>
                   ) : (
                     <span className="shrink-0 font-mono text-faint">
                       {fmtMinutes(r.achievableRtoMin, dur)} {b.downtimeLabel}

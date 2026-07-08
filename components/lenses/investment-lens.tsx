@@ -6,7 +6,7 @@ import { AlertOctagon, AlertTriangle, Copy, Check } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import type { Assessment } from "@/lib/engine";
-import { aggregateExposure, formatIDR, postureBand } from "@/lib/exposure";
+import { aggregateExposure, formatMoney, postureBand } from "@/lib/exposure";
 import { buildSummary, orderAsks, type Ask } from "@/lib/investment";
 import { PostureChip } from "@/components/lenses/shared";
 
@@ -32,7 +32,7 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
 
   const exposureText =
     agg.monetizedCount > 0
-      ? formatIDR(agg.total) +
+      ? formatMoney(agg.total, t.currency) +
         (agg.catastrophicCount > 0 ? ` · ${fmt(inv.plusUnrecoverable, { n: agg.catastrophicCount })}` : "")
       : agg.catastrophicCount > 0
         ? fmt(inv.allUnrecoverable, { n: agg.catastrophicCount })
@@ -44,7 +44,7 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
     const bd = ask.boughtDown;
     if (bd.kind === "catastrophic") return fmt(inv.makesRecoverable, { n: bd.amount ?? 0 });
     if (bd.kind === "loss")
-      return bd.amount != null ? fmt(inv.closes, { amount: formatIDR(bd.amount) }) : inv.closesQual;
+      return bd.amount != null ? fmt(inv.closes, { amount: formatMoney(bd.amount, t.currency) }) : inv.closesQual;
     return inv.strengthens;
   };
 

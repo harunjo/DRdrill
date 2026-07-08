@@ -4,6 +4,7 @@ import type { Dictionary } from "./en";
 
 export const id: Dictionary = {
   appName: "DR Drill",
+  currency: { code: "IDR", rate: 1 },
   masthead: "Asesmen business continuity",
   tagline: "Gambarkan lingkungan IT Anda, lalu lihat kesiapan recovery yang sebenarnya — RPO/RTO yang benar-benar bisa dicapai, bukan sekadar angka di slide.",
   privacyLine:

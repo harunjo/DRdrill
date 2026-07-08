@@ -3,8 +3,15 @@
 // fmt() in lib/i18n.ts. Flag copy is business-framed by requirement (R18):
 // investment asks, never operator fault.
 
+import type { Currency } from "../exposure";
+import { IDR_PER_USD } from "../calibration";
+
 export const en = {
   appName: "DR Drill",
+  // Report money display currency. Values are stored in IDR; English readers
+  // (C-level, foreign stakeholders) see USD. `as Currency` widens `code` so the
+  // ID dictionary can supply its own without a type clash.
+  currency: { code: "USD", rate: IDR_PER_USD } as Currency,
   masthead: "Business-continuity assessment",
   tagline: "Describe your environment. Get your recovery reality — the RPO/RTO you can actually achieve, not the one on the slide.",
   privacyLine:

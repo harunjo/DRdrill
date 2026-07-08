@@ -133,16 +133,36 @@ export function riskBoughtDown(
   }
 }
 
-// --- Currency (IDR, compact Indonesian units: rb / jt / miliar) ---
+// --- Currency (report display) ---
+// Stored exposure is ALWAYS IDR; only the display currency tracks language:
+// IDR uses compact Indonesian units (rb/jt/miliar), USD uses K/M/B.
 
+export interface Currency {
+  code: "IDR" | "USD";
+  /** IDR per 1 unit of this currency (IDR = 1; USD ≈ calibration IDR_PER_USD). */
+  rate: number;
+}
+
+export function formatMoney(amountIDR: number, cur: Currency): string {
+  const zero = cur.code === "USD" ? "$0" : "Rp 0";
+  if (!Number.isFinite(amountIDR) || amountIDR <= 0) return zero;
+  const v = amountIDR / cur.rate;
+  const n = (x: number) => (x >= 100 || Number.isInteger(x) ? String(Math.round(x)) : x.toFixed(1));
+  if (cur.code === "USD") {
+    if (v >= 1e9) return `$${n(v / 1e9)}B`;
+    if (v >= 1e6) return `$${n(v / 1e6)}M`;
+    if (v >= 1e3) return `$${n(v / 1e3)}K`;
+    return `$${Math.round(v)}`;
+  }
+  if (v >= 1e9) return `Rp ${n(v / 1e9)} miliar`;
+  if (v >= 1e6) return `Rp ${n(v / 1e6)} jt`;
+  if (v >= 1e3) return `Rp ${n(v / 1e3)} rb`;
+  return `Rp ${Math.round(v)}`;
+}
+
+const IDR: Currency = { code: "IDR", rate: 1 };
+
+/** IDR-only convenience (intake input aid — the Rp value the user types). */
 export function formatIDR(amount: number): string {
-  if (!Number.isFinite(amount) || amount <= 0) return "Rp 0";
-  const unit = (n: number, u: string) => {
-    const s = n >= 100 || Number.isInteger(n) ? String(Math.round(n)) : n.toFixed(1);
-    return `Rp ${s} ${u}`;
-  };
-  if (amount >= 1e9) return unit(amount / 1e9, "miliar");
-  if (amount >= 1e6) return unit(amount / 1e6, "jt");
-  if (amount >= 1e3) return unit(amount / 1e3, "rb");
-  return `Rp ${Math.round(amount)}`;
+  return formatMoney(amount, IDR);
 }

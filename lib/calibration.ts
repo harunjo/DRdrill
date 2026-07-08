@@ -27,3 +27,8 @@ export const RESTORE_OVERHEAD_MIN = 30;
 // Failover to a warm replica (either direction): detection + DNS/redirect +
 // verification. Not zero — nobody fails over in seconds outside a demo.
 export const REPLICA_FAILOVER_MIN = 60;
+
+// Display FX rate: the English report shows business loss in USD (the ID report
+// keeps IDR). ponytail: fixed rate — it drifts; wire to a live FX feed only if
+// finance ever needs report-grade precision. Rough 2026 IDR per 1 USD.
+export const IDR_PER_USD = 16_000;

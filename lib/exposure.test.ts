@@ -3,6 +3,7 @@ import { assess, type Environment, type Protection, type Workload, type Workload
 import {
   aggregateExposure,
   formatIDR,
+  formatMoney,
   isCatastrophic,
   postureBand,
   riskBoughtDown,
@@ -178,6 +179,19 @@ describe("formatIDR", () => {
     expect(formatIDR(0)).toBe("Rp 0");
     expect(formatIDR(NaN)).toBe("Rp 0");
     expect(formatIDR(Infinity)).toBe("Rp 0");
+  });
+});
+
+describe("formatMoney (USD display converts from IDR)", () => {
+  const usd = { code: "USD" as const, rate: 16_000 };
+  it("converts IDR to USD with compact units", () => {
+    expect(formatMoney(160_000_000, usd)).toBe("$10K"); // 160M / 16k = 10,000
+    expect(formatMoney(16_000_000_000, usd)).toBe("$1M"); // 16bn / 16k = 1,000,000
+    expect(formatMoney(1_600_000, usd)).toBe("$100"); // 1.6M / 16k = 100
+  });
+  it("guards non-positive with a $ zero", () => {
+    expect(formatMoney(0, usd)).toBe("$0");
+    expect(formatMoney(NaN, usd)).toBe("$0");
   });
 });
 
