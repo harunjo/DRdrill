@@ -219,4 +219,7 @@ input[type="checkbox"] {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+  /* Keep tables whole where they fit and repeat their header row if they split. */
+  .print-root table { break-inside: avoid; }
+  .print-root thead { display: table-header-group; }
 }
