@@ -8,7 +8,7 @@ export const id: Dictionary = {
   tagline: "Gambarkan lingkungan IT Anda, lalu lihat kesiapan recovery yang sebenarnya — RPO/RTO yang benar-benar bisa dicapai, bukan sekadar angka di slide.",
   privacyLine:
     "Detail lingkungan dan nama workload Anda tidak pernah meninggalkan browser ini. Cerita simulasi ditulis hanya dari temuan yang dianonimkan (W1, W2, …), dan tidak ada input atau data Anda yang disimpan di server ini.",
-  trustIndicator: "Berjalan lokal · data tetap di perangkat",
+  trustIndicator: "Laporan berjalan di perangkat · nama tidak pernah meninggalkan browser",
 
   intake: {
     steps: {
@@ -146,7 +146,7 @@ export const id: Dictionary = {
       closesQual: "Menutup eksposur yang dilindungi kontrol ini",
       makesRecoverable: "Membuat {n} workload dapat dipulihkan",
       strengthens: "Memperkuat ketahanan",
-      preparedBy: "Disiapkan oleh harunjonatan.com · Data Anda aman — tidak ada data yang disimpan di server ini, semua data hanya tersimpan di browser Anda",
+      preparedBy: "Disiapkan oleh harunjonatan.com · Data Anda aman — kami tidak menyimpan apa pun, dan nama workload Anda tidak pernah meninggalkan browser. Simulasi hanya mengirim temuan yang dianonimkan (W1, W2, …).",
       copy: "Salin ringkasan",
       copied: "Tersalin",
       copyFailed: "Salin tidak tersedia — pilih teks di bawah untuk menyalin manual:",

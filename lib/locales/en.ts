@@ -9,7 +9,7 @@ export const en = {
   tagline: "Describe your environment. Get your recovery reality — the RPO/RTO you can actually achieve, not the one on the slide.",
   privacyLine:
     "Your environment details and workload names never leave this browser. The drill story is written from anonymized findings only (W1, W2, …), and nothing you enter is stored anywhere.",
-  trustIndicator: "Runs locally · data stays on device",
+  trustIndicator: "Report runs on-device · names never leave your browser",
 
   intake: {
     steps: {
@@ -147,7 +147,7 @@ export const en = {
       closesQual: "Closes the exposure this control protects",
       makesRecoverable: "Makes {n} workload(s) recoverable",
       strengthens: "Strengthens resilience posture",
-      preparedBy: "Prepared by harunjonatan.com · Your data is safe — nothing is stored on this server, everything stays in your browser",
+      preparedBy: "Prepared by harunjonatan.com · Your data is safe — we store nothing, and your workload names never leave your browser. The drill sends anonymized findings only (W1, W2, …).",
       copy: "Copy summary",
       copied: "Copied",
       copyFailed: "Copy unavailable — select the text below to copy manually:",
