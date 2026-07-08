@@ -20,12 +20,41 @@ function Panel({
   return (
     <section className="panel mt-4 p-5 sm:p-6">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-display text-[17px] font-semibold tracking-tight">{title}</h2>
+        <h2 className="text-[16px] font-semibold tracking-tight">{title}</h2>
         <span className="font-mono text-[10px] uppercase tracking-wider text-faint">{caption}</span>
       </div>
       <div className="mt-3 rule" />
       {children}
     </section>
+  );
+}
+
+function StatTile({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: string;
+  tone: "signal" | "ok" | "warn" | "crit" | "accent";
+}) {
+  const map: Record<string, [string, string]> = {
+    signal: ["var(--color-signal-soft)", "var(--color-signal-ink)"],
+    ok: ["var(--color-ok-soft)", "var(--color-ok)"],
+    warn: ["var(--color-warn-soft)", "var(--color-warn)"],
+    crit: ["var(--color-crit-soft)", "var(--color-crit)"],
+    accent: ["var(--color-accent-soft)", "var(--color-accent)"],
+  };
+  const [bg, fg] = map[tone];
+  return (
+    <div className="rounded-xl p-3.5" style={{ background: bg }}>
+      <div className="font-mono text-[10px] font-semibold uppercase tracking-wider" style={{ color: fg }}>
+        {label}
+      </div>
+      <div className="mt-1 text-2xl font-bold tracking-tight" style={{ color: fg }}>
+        {value}
+      </div>
+    </div>
   );
 }
 
@@ -135,24 +164,35 @@ export function Report({
     [a.rule321.twoMedia, t.report.rule321.twoMedia],
     [a.rule321.oneOffsite, t.report.rule321.oneOffsite],
   ] as const;
+  const rulePass = [a.rule321.threeCopies, a.rule321.twoMedia, a.rule321.oneOffsite].filter(
+    Boolean,
+  ).length;
 
   return (
-    <div className="mt-10">
+    <div className="mt-8">
+      {/* KPI tiles */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatTile label={t.report.tiles.readiness} value={`${count}`} tone={tier === "good" ? "ok" : tier === "fair" ? "warn" : "crit"} />
+        <StatTile label={t.report.tiles.workloads} value={`${a.results.length}`} tone="signal" />
+        <StatTile label={t.report.tiles.flags} value={`${a.flags.length}`} tone={a.flags.length > 0 ? "crit" : "ok"} />
+        <StatTile label={t.report.tiles.rule} value={`${rulePass}/3`} tone={rulePass === 3 ? "ok" : "warn"} />
+      </div>
+
       <Panel title={t.report.scoreTitle} caption={caption}>
         <div className="mt-5 flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-baseline gap-1.5">
               <span
-                className="font-display text-[4rem] font-semibold leading-none tracking-tight"
+                className="text-[4rem] font-bold leading-none tracking-tight"
                 style={{ color: band }}
               >
                 {count}
               </span>
-              <span className="font-display text-2xl text-faint">{t.report.scoreOutOf}</span>
+              <span className="text-2xl font-medium text-faint">{t.report.scoreOutOf}</span>
             </div>
           </div>
-          {/* Signature: the verdict stamped onto the sheet */}
-          <span className="stamp mr-1 mt-2 shrink-0" style={{ color: band }}>
+          {/* Bold verdict pill */}
+          <span className="verdict mt-2 shrink-0" style={{ background: band }}>
             {t.report.statusLabel[tier]}
           </span>
         </div>

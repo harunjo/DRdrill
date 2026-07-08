@@ -28,31 +28,35 @@ export default function Home() {
 
   return (
     <main className="mx-auto w-full max-w-3xl grow px-5 pb-16 pt-8 sm:pt-12">
-      {/* Letterhead masthead */}
-      <header className="border-b-[3px] border-double border-text pb-3">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <div className="font-display text-2xl font-semibold tracking-[0.02em]">
-              {t.appName}
-            </div>
-            <div className="mt-1 text-[11px] uppercase tracking-[0.22em] text-muted">
+      {/* App bar */}
+      <header className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span
+            aria-hidden
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-b from-[#3b82f6] to-[#2563eb] text-[13px] font-bold text-white shadow-[0_6px_16px_-8px_rgba(37,99,235,0.7)]"
+          >
+            DR
+          </span>
+          <div className="leading-tight">
+            <div className="text-[15px] font-semibold tracking-tight">{t.appName}</div>
+            <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-faint">
               {t.masthead}
             </div>
           </div>
-          <div className="flex overflow-hidden rounded-[3px] border border-line text-xs font-medium">
-            {(["id", "en"] as Lang[]).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                aria-pressed={lang === l}
-                className={`px-3 py-1.5 transition-colors ${
-                  lang === l ? "bg-well text-text" : "text-faint hover:text-muted"
-                }`}
-              >
-                {l.toUpperCase()}
-              </button>
-            ))}
-          </div>
+        </div>
+        <div className="flex overflow-hidden rounded-lg border border-line bg-panel text-xs font-semibold shadow-sm">
+          {(["id", "en"] as Lang[]).map((l) => (
+            <button
+              key={l}
+              onClick={() => setLang(l)}
+              aria-pressed={lang === l}
+              className={`px-3 py-1.5 transition-colors ${
+                lang === l ? "bg-signal text-white" : "text-faint hover:text-muted"
+              }`}
+            >
+              {l.toUpperCase()}
+            </button>
+          ))}
         </div>
       </header>
 
@@ -61,7 +65,7 @@ export default function Home() {
         <div>
           <button
             onClick={() => setAssessment(null)}
-            className="mt-10 inline-flex items-center gap-1.5 text-[13px] font-medium text-muted transition-colors hover:text-text"
+            className="mt-8 inline-flex items-center gap-1.5 rounded-lg border border-line bg-panel px-3 py-1.5 text-[13px] font-semibold text-signal shadow-sm transition-colors hover:bg-signal-soft"
           >
             ← {t.report.newAssessment}
           </button>
@@ -88,11 +92,11 @@ export default function Home() {
           </h1>
 
           {/* Trust note — runs local */}
-          <div className="mt-6 flex max-w-2xl items-start gap-3 border-l-2 border-text bg-well px-4 py-3 text-[13px] leading-relaxed text-muted">
+          <div className="mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-signal-soft bg-signal-soft/60 px-4 py-3.5 text-[13px] leading-relaxed text-[#2b4a86]">
             <svg
               aria-hidden
               viewBox="0 0 24 24"
-              className="mt-0.5 h-4 w-4 shrink-0 text-text"
+              className="mt-0.5 h-4 w-4 shrink-0 text-signal"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.75"

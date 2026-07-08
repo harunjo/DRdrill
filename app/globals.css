@@ -1,34 +1,38 @@
 @import "tailwindcss";
 
-/* ── Audit Stamp — assessment as a document, not a dashboard ───────────────
-   Ivory paper, white sheets, warm near-black ink, ruled dividers, serif
-   masthead. Chrome is monochrome ink; the ONLY color on the page is the
-   verdict (the rotated stamp and the gap bars) — color = computed truth. */
+/* ── Modern colorful SaaS ──────────────────────────────────────────────────
+   Light, bright, rounded. A vivid blue brand accent drives the chrome; a full
+   vibrant status palette (emerald / amber / rose) colors the data and the KPI
+   tiles. Clean sans throughout — no serif, no vintage document cues. */
 @theme {
-  --color-ink: #f6f7f8;
+  --color-ink: #f6f8fb;
   --color-panel: #ffffff;
-  --color-well: #eef1f4;
-  --color-line: #dde2e8;
-  --color-line-soft: #e8ebef;
+  --color-well: #f1f5f9;
+  --color-line: #e6eaf0;
+  --color-line-soft: #eef2f7;
 
-  --color-text: #1b1e24;
-  --color-muted: #5b6673;
-  --color-faint: #96a1ad;
+  --color-text: #0f1729;
+  --color-muted: #5a6577;
+  --color-faint: #9aa4b2;
 
-  /* accent = ink (monochrome document) */
-  --color-signal: #1b1e24;
-  --color-signal-soft: #e6eaef;
+  /* brand accent = vivid blue */
+  --color-signal: #2563eb;
+  --color-signal-ink: #1d4ed8;
+  --color-signal-soft: #e7effe;
 
-  --color-ok: #1f7a43;
-  --color-ok-soft: #e6f2ea;
-  --color-warn: #8a5e0f;
-  --color-warn-soft: #f4ecd9;
-  --color-crit: #c03a2e;
-  --color-crit-soft: #f7e6e3;
+  /* vibrant verdict / status palette */
+  --color-ok: #059669;
+  --color-ok-soft: #d6f5e6;
+  --color-warn: #d97706;
+  --color-warn-soft: #fdefd6;
+  --color-crit: #e11d48;
+  --color-crit-soft: #fce1e7;
+  --color-accent: #7c3aed;
+  --color-accent-soft: #efe7fd;
 
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
-  --font-display: var(--font-serif), Georgia, "Times New Roman", serif;
+  --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -37,41 +41,43 @@
 
 body {
   background-color: var(--color-ink);
+  background-image:
+    radial-gradient(60% 40% at 85% -5%, rgba(37, 99, 235, 0.08), transparent 70%),
+    radial-gradient(50% 40% at 0% 0%, rgba(124, 58, 237, 0.06), transparent 70%);
+  background-attachment: fixed;
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: 15px;
-  letter-spacing: -0.003em;
+  letter-spacing: -0.006em;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: rgba(27, 30, 36, 0.14);
+  background: rgba(37, 99, 235, 0.18);
 }
 
 *:focus-visible {
-  outline: 2px solid var(--color-text);
+  outline: 2px solid var(--color-signal);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: 6px;
 }
 
 input[type="checkbox"] {
-  accent-color: var(--color-text);
+  accent-color: var(--color-signal);
   width: 0.95rem;
   height: 0.95rem;
 }
 
 /* ── Component helpers ──────────────────────────────────────────────────── */
 @layer components {
-  /* A sheet of paper: white, warm hairline, crisp small radius, faint shadow. */
   .panel {
     background: var(--color-panel);
     border: 1px solid var(--color-line);
-    border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    border-radius: 16px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -16px rgba(15, 23, 42, 0.12);
   }
 
-  /* Ruled divider under a panel/section title. */
   .rule {
     height: 1px;
     background: var(--color-line);
@@ -79,8 +85,8 @@ input[type="checkbox"] {
 
   .field {
     background: #ffffff;
-    border: 1px solid #ccd3db;
-    border-radius: 3px;
+    border: 1px solid #d4dbe4;
+    border-radius: 9px;
     color: var(--color-text);
     font-family: var(--font-sans);
     transition: border-color 0.12s, box-shadow 0.12s;
@@ -90,62 +96,58 @@ input[type="checkbox"] {
   }
   .field:focus {
     outline: none;
-    border-color: var(--color-text);
-    box-shadow: 0 0 0 3px rgba(27, 30, 36, 0.08);
+    border-color: var(--color-signal);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
   }
 
-  /* Primary action: ink stamp of a button. */
   .btn-primary {
-    background: var(--color-text);
-    color: var(--color-ink);
-    border-radius: 3px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    transition: background 0.12s;
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    border-radius: 10px;
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.35), 0 6px 16px -8px rgba(37, 99, 235, 0.5);
+    transition: filter 0.12s, transform 0.05s;
   }
   .btn-primary:hover:not(:disabled) {
-    background: #2c313a;
+    filter: brightness(1.06);
+  }
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(1px);
   }
   .btn-primary:disabled {
-    background: #ded8c9;
+    background: #e4e9f0;
     color: var(--color-faint);
+    box-shadow: none;
     cursor: not-allowed;
   }
 
-  /* Status chip: tinted, always carries a text label (never color alone). */
+  /* Pill chip: rounded, tinted, always labeled. */
   .chip {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    border-radius: 3px;
-    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    padding: 0.15rem 0.65rem;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.5;
   }
   .chip-ok { background: var(--color-ok-soft); color: var(--color-ok); }
   .chip-warn { background: var(--color-warn-soft); color: var(--color-warn); }
   .chip-crit { background: var(--color-crit-soft); color: var(--color-crit); }
-  .chip-neutral { background: var(--color-well); color: var(--color-muted); border: 1px solid var(--color-line); }
+  .chip-neutral { background: var(--color-well); color: var(--color-muted); }
 
-  /* The signature: a rotated rubber ink-stamp of the verdict. Color is set
-     inline to the verdict band; multiply blends it into the paper. */
-  .stamp {
+  /* Bold solid verdict pill (replaces the rubber stamp). */
+  .verdict {
     display: inline-flex;
     align-items: center;
-    border: 2px solid currentColor;
-    border-radius: 6px;
-    box-shadow: inset 0 0 0 1.5px currentColor;
-    padding: 0.3rem 0.85rem;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.95rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    transform: rotate(-5deg);
-    opacity: 0.9;
-    mix-blend-mode: multiply;
+    border-radius: 999px;
+    padding: 0.4rem 1rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+    box-shadow: 0 6px 16px -8px currentColor;
   }
 }
 

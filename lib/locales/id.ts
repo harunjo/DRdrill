@@ -73,6 +73,7 @@ export const id: Dictionary = {
 
   report: {
     newAssessment: "Asesmen baru",
+    tiles: { readiness: "Kesiapan", workloads: "Workload", flags: "Tanda risiko", rule: "3-2-1" },
     scoreTitle: "Kesiapan pemulihan",
     scoreOutOf: "/100",
     coverage:
