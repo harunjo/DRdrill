@@ -19,18 +19,25 @@ export function applyByTier(
   );
 }
 
+/** Working hours in a month (~22 days × 8h) — turns a monthly salary, which a
+ *  manager actually knows, into the hourly cost the BIA needs. ponytail: fixed
+ *  constant; move to calibration if payroll models ever need to vary it. */
+export const WORK_HOURS_PER_MONTH = 176;
+
 /** Teach-by-doing estimator: many managers can't name a downtime cost but can
  *  answer its inputs. Standard BIA decomposition — one hour of downtime costs
  *  the lost staff productivity plus the revenue not earned:
- *    cost/hr ≈ (staff blocked × their loaded hourly cost) + revenue lost/hr
- *  Negatives and NaN clamp to 0 so partial/blank inputs still return a usable
- *  number. Revenue term is 0 for internal-only systems. */
+ *    cost/hr ≈ (staff blocked × their salary/hour) + revenue lost/hr
+ *  Salary is taken monthly (the number people know) and divided down. Negatives
+ *  and NaN clamp to 0 so partial/blank inputs still return a usable number.
+ *  Revenue term is 0 for internal-only systems. */
 export function estimateDowntimeCost(input: {
   staffAffected: number;
-  hourlyCostPerStaff: number;
+  monthlySalaryPerStaff: number;
   revenuePerHour: number;
 }): number {
   const pos = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
-  const productivity = pos(input.staffAffected) * pos(input.hourlyCostPerStaff);
+  const hourly = pos(input.monthlySalaryPerStaff) / WORK_HOURS_PER_MONTH;
+  const productivity = pos(input.staffAffected) * hourly;
   return Math.round(productivity + pos(input.revenuePerHour));
 }

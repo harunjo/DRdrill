@@ -38,22 +38,23 @@ describe("applyByTier", () => {
 });
 
 describe("estimateDowntimeCost", () => {
-  it("sums staff productivity and lost revenue", () => {
-    // 20 staff × Rp150k/hr + Rp2M/hr revenue = 5M
+  it("sums staff productivity and lost revenue (salary ÷ 176 → hourly)", () => {
+    // 20 staff × (Rp13.2M/176 = Rp75k/hr) + Rp2M/hr revenue = 3.5M
     expect(
-      estimateDowntimeCost({ staffAffected: 20, hourlyCostPerStaff: 150_000, revenuePerHour: 2_000_000 }),
-    ).toBe(5_000_000);
+      estimateDowntimeCost({ staffAffected: 20, monthlySalaryPerStaff: 13_200_000, revenuePerHour: 2_000_000 }),
+    ).toBe(3_500_000);
   });
 
   it("works from productivity alone for internal systems", () => {
+    // 10 staff × (Rp17.6M/176 = Rp100k/hr) = 1M
     expect(
-      estimateDowntimeCost({ staffAffected: 10, hourlyCostPerStaff: 100_000, revenuePerHour: 0 }),
+      estimateDowntimeCost({ staffAffected: 10, monthlySalaryPerStaff: 17_600_000, revenuePerHour: 0 }),
     ).toBe(1_000_000);
   });
 
   it("clamps blank/negative/NaN inputs to zero", () => {
     expect(
-      estimateDowntimeCost({ staffAffected: NaN, hourlyCostPerStaff: -5, revenuePerHour: 0 }),
+      estimateDowntimeCost({ staffAffected: NaN, monthlySalaryPerStaff: -5, revenuePerHour: 0 }),
     ).toBe(0);
   });
 });

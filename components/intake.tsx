@@ -88,7 +88,7 @@ export function Intake({
   const [est, setEst] = useState({ staff: "", staffCost: "", revenue: "" });
   const estValue = estimateDowntimeCost({
     staffAffected: Number(est.staff),
-    hourlyCostPerStaff: Number(est.staffCost),
+    monthlySalaryPerStaff: Number(est.staffCost),
     revenuePerHour: Number(est.revenue),
   });
 
@@ -333,17 +333,18 @@ export function Intake({
                         <div className="mt-3 grid gap-2 sm:grid-cols-3">
                           {(
                             [
-                              ["staff", t.intake.cost.estStaff],
-                              ["staffCost", t.intake.cost.estStaffCost],
-                              ["revenue", t.intake.cost.estRevenue],
+                              ["staff", t.intake.cost.estStaff, t.intake.cost.estStaffPh],
+                              ["staffCost", t.intake.cost.estStaffCost, t.intake.cost.estSalaryPh],
+                              ["revenue", t.intake.cost.estRevenue, t.intake.cost.estRevenuePh],
                             ] as const
-                          ).map(([key, lbl]) => (
+                          ).map(([key, lbl, ph]) => (
                             <label key={key} className="flex flex-col gap-1 text-[11px] text-faint">
                               {lbl}
                               <input
                                 type="number"
                                 min={0}
                                 className="field w-full px-2 py-1.5 text-sm"
+                                placeholder={ph}
                                 value={est[key]}
                                 onChange={(e) => setEst((s) => ({ ...s, [key]: e.target.value }))}
                               />
