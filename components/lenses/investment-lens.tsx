@@ -8,8 +8,7 @@ import { fmt } from "@/lib/i18n";
 import type { Assessment } from "@/lib/engine";
 import { aggregateExposure, formatIDR, postureBand } from "@/lib/exposure";
 import { buildSummary, orderAsks, type Ask } from "@/lib/investment";
-
-const POSTURE_TONE = { strong: "ok", developing: "warn", exposed: "crit" } as const;
+import { PostureChip } from "@/components/lenses/shared";
 
 export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: Assessment }) {
   const a = assessment;
@@ -60,13 +59,6 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
     }
   };
 
-  const postureTone = POSTURE_TONE[posture];
-  const TONE: Record<string, string> = {
-    ok: "var(--color-ok)",
-    warn: "var(--color-warn)",
-    crit: "var(--color-crit)",
-  };
-
   return (
     <section className="panel mt-4 overflow-hidden">
       {/* One-pager header */}
@@ -76,12 +68,7 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
             <h2 className="text-[16px] font-semibold tracking-tight">{inv.fundingCase}</h2>
             <p className="mt-0.5 text-[12px] text-faint">{coverage}</p>
           </div>
-          <span
-            className="chip shrink-0"
-            style={{ background: `${TONE[postureTone]}18`, color: TONE[postureTone] }}
-          >
-            {t.report.posture[posture]}
-          </span>
+          <PostureChip t={t} posture={posture} />
         </div>
         <div className="mt-4">
           <div className="tag text-[10px]">{inv.exposureAtRisk}</div>

@@ -5,13 +5,7 @@ import { fmt } from "@/lib/i18n";
 import { fmtMinutes, type Assessment, type DurationLabels } from "@/lib/engine";
 import { aggregateExposure, formatIDR, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
 import { Heatmap } from "@/components/heatmap";
-
-const POSTURE_TONE = { strong: "ok", developing: "warn", exposed: "crit" } as const;
-const TONE: Record<string, string> = {
-  ok: "var(--color-ok)",
-  warn: "var(--color-warn)",
-  crit: "var(--color-crit)",
-};
+import { PostureChip } from "@/components/lenses/shared";
 
 export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Assessment }) {
   const a = assessment;
@@ -20,7 +14,6 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
   const n = a.results.length;
   const agg = aggregateExposure(a.results);
   const posture = postureBand(a.results, a.flags);
-  const postureTone = POSTURE_TONE[posture];
   const coverage = fmt(t.report.coverageShort, { n });
   const dur: DurationLabels = { unrecoverable: t.report.unrecoverable, ...t.report.units };
 
@@ -33,12 +26,7 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
             <h2 className="text-[16px] font-semibold tracking-tight">{b.title}</h2>
             <p className="mt-0.5 text-[12px] text-faint">{coverage}</p>
           </div>
-          <span
-            className="chip shrink-0"
-            style={{ background: `${TONE[postureTone]}18`, color: TONE[postureTone] }}
-          >
-            {t.report.posture[posture]}
-          </span>
+          <PostureChip t={t} posture={posture} />
         </div>
 
         <div className="mt-4">
