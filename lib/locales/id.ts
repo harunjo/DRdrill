@@ -147,7 +147,7 @@ export const id: Dictionary = {
       closesQual: "Menutup eksposur yang dilindungi kontrol ini",
       makesRecoverable: "Membuat {n} workload dapat dipulihkan",
       strengthens: "Memperkuat ketahanan",
-      preparedBy: "Disiapkan oleh harunjonatan.com · Data Anda aman — kami tidak menyimpan apa pun, dan nama workload Anda tidak pernah meninggalkan browser. Simulasi hanya mengirim temuan yang dianonimkan (W1, W2, …).",
+      preparedBy: "Disiapkan oleh harunjonatan.com · Data Anda aman — kami tidak menyimpan detail lingkungan Anda, dan nama workload Anda tidak pernah meninggalkan browser. Simulasi hanya mengirim temuan yang dianonimkan (W1, W2, …).",
       copy: "Salin ringkasan",
       copied: "Tersalin",
       copyFailed: "Salin tidak tersedia — pilih teks di bawah untuk menyalin manual:",
