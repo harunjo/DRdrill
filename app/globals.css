@@ -5,26 +5,26 @@
    masthead. Chrome is monochrome ink; the ONLY color on the page is the
    verdict (the rotated stamp and the gap bars) — color = computed truth. */
 @theme {
-  --color-ink: #f4f1e9;
-  --color-panel: #fbfaf6;
-  --color-well: #f1ede2;
-  --color-line: #ddd7c8;
-  --color-line-soft: #e8e3d6;
+  --color-ink: #f6f7f8;
+  --color-panel: #ffffff;
+  --color-well: #eef1f4;
+  --color-line: #dde2e8;
+  --color-line-soft: #e8ebef;
 
-  --color-text: #1f1c16;
-  --color-muted: #6b6456;
-  --color-faint: #9a927f;
+  --color-text: #1b1e24;
+  --color-muted: #5b6673;
+  --color-faint: #96a1ad;
 
   /* accent = ink (monochrome document) */
-  --color-signal: #1f1c16;
-  --color-signal-soft: #ece7da;
+  --color-signal: #1b1e24;
+  --color-signal-soft: #e6eaef;
 
-  --color-ok: #2f7a43;
-  --color-ok-soft: #e6efe4;
-  --color-warn: #97680f;
-  --color-warn-soft: #f4ecd6;
-  --color-crit: #b0392c;
-  --color-crit-soft: #f4e3df;
+  --color-ok: #1f7a43;
+  --color-ok-soft: #e6f2ea;
+  --color-warn: #8a5e0f;
+  --color-warn-soft: #f4ecd9;
+  --color-crit: #c03a2e;
+  --color-crit-soft: #f7e6e3;
 
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
@@ -46,7 +46,7 @@ body {
 }
 
 ::selection {
-  background: rgba(31, 28, 22, 0.14);
+  background: rgba(27, 30, 36, 0.14);
 }
 
 *:focus-visible {
@@ -68,7 +68,7 @@ input[type="checkbox"] {
     background: var(--color-panel);
     border: 1px solid var(--color-line);
     border-radius: 4px;
-    box-shadow: 0 1px 1px rgba(31, 28, 22, 0.03);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
   }
 
   /* Ruled divider under a panel/section title. */
@@ -79,7 +79,7 @@ input[type="checkbox"] {
 
   .field {
     background: #ffffff;
-    border: 1px solid #cfc9ba;
+    border: 1px solid #ccd3db;
     border-radius: 3px;
     color: var(--color-text);
     font-family: var(--font-sans);
@@ -91,7 +91,7 @@ input[type="checkbox"] {
   .field:focus {
     outline: none;
     border-color: var(--color-text);
-    box-shadow: 0 0 0 3px rgba(31, 28, 22, 0.08);
+    box-shadow: 0 0 0 3px rgba(27, 30, 36, 0.08);
   }
 
   /* Primary action: ink stamp of a button. */
@@ -104,7 +104,7 @@ input[type="checkbox"] {
     transition: background 0.12s;
   }
   .btn-primary:hover:not(:disabled) {
-    background: #322e24;
+    background: #2c313a;
   }
   .btn-primary:disabled {
     background: #ded8c9;
