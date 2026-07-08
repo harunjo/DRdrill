@@ -113,7 +113,7 @@ function GapMeter({
         </span>
       </div>
       <div className="relative">
-        <div className="flex h-2 w-full overflow-hidden rounded-sm bg-well">
+        <div className="flex h-2 w-full overflow-hidden rounded-full bg-well">
           <div
             className="h-full bg-ok transition-[width] duration-700 ease-out"
             style={{ width: lit ? `${greenW}%` : "0%" }}
@@ -198,7 +198,7 @@ export function Report({
         </div>
 
         <div className="relative mt-5 max-w-xl">
-          <div className="h-2 overflow-hidden rounded-sm bg-well">
+          <div className="h-2 overflow-hidden rounded-full bg-well">
             <div
               className="h-full transition-[width] duration-1000 ease-out"
               style={{ width: lit ? `${a.score}%` : "0%", background: band }}

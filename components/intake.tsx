@@ -38,7 +38,6 @@ export function workloadValid(w: Workload): boolean {
 
 const MODELS: DeploymentModel[] = ["onprem", "cloud", "hybrid", "private"];
 const TYPES: WorkloadType[] = ["database", "vm", "files", "saas"];
-const romanNumerals = ["I", "II", "III"];
 const selectCls = "field px-2.5 py-2 text-sm";
 
 // Localized step titles carry a "1. " prefix; the stepper renders its own
@@ -83,7 +82,7 @@ export function Intake({
 
   const toggle = (checked: boolean, label: string, onToggle: (v: boolean) => void) => (
     <label
-      className={`flex cursor-pointer items-center gap-2.5 rounded-[3px] border px-3 py-2.5 text-[13px] transition-colors ${
+      className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-[13px] transition-colors ${
         checked
           ? "border-signal bg-signal-soft text-signal"
           : "border-line text-muted hover:border-faint hover:text-text"
@@ -108,7 +107,7 @@ export function Intake({
           {Array.from({ length: TOTAL }).map((_, i) => (
             <div
               key={i}
-              className={`h-1 flex-1 rounded-sm transition-colors ${i <= step ? "bg-signal" : "bg-line"}`}
+              className={`h-1 flex-1 rounded-full transition-colors ${i <= step ? "bg-signal" : "bg-line"}`}
             />
           ))}
         </div>
@@ -117,10 +116,12 @@ export function Intake({
         </div>
 
         {/* Step title */}
-        <div className="mt-2 flex items-baseline gap-3">
-          <span className="font-display text-sm font-semibold text-muted">{romanNumerals[step]}.</span>
+        <div className="mt-2 flex items-center gap-3">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-signal-soft text-[13px] font-bold text-signal-ink">
+            {step + 1}
+          </span>
           <div className="min-w-0">
-            <h2 className="font-display text-[19px] font-semibold tracking-tight">
+            <h2 className="text-[19px] font-semibold tracking-tight">
               {stripNum(titles[step])}
             </h2>
             {hints[step] && <p className="mt-0.5 text-[13px] text-muted">{hints[step]}</p>}
@@ -139,7 +140,7 @@ export function Intake({
                     key={m}
                     onClick={() => onChange({ ...env, model: m })}
                     aria-pressed={active}
-                    className={`rounded-[3px] border px-3 py-3 text-[13px] transition-colors ${
+                    className={`rounded-lg border px-3 py-3 text-[13px] transition-colors ${
                       active
                         ? "border-signal bg-signal-soft font-semibold text-signal"
                         : "border-line text-muted hover:border-faint hover:text-text"
@@ -158,7 +159,7 @@ export function Intake({
                 const nameMissing = w.name.trim().length === 0;
                 const sizeInvalid = !Number.isFinite(w.sizeGB) || w.sizeGB <= 0;
                 return (
-                  <div key={w.id} className="mt-3 rounded-[3px] border border-line bg-well p-4 first:mt-0">
+                  <div key={w.id} className="mt-3 rounded-xl border border-line bg-well p-4 first:mt-0">
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                       <div className="col-span-2">
                         <input
@@ -244,7 +245,7 @@ export function Intake({
               })}
               {env.workloads.length < MAX_WORKLOADS ? (
                 <button
-                  className="mt-3 w-full rounded-[3px] border border-dashed border-line py-2.5 text-[13px] text-muted transition-colors hover:border-faint hover:text-text"
+                  className="mt-3 w-full rounded-lg border border-dashed border-line py-2.5 text-[13px] text-muted transition-colors hover:border-faint hover:text-text"
                   onClick={() => onChange({ ...env, workloads: [...env.workloads, emptyWorkload()] })}
                 >
                   {t.intake.addWorkload}
@@ -259,14 +260,14 @@ export function Intake({
             groups.map((g) => {
               const p = env.protection[g] ?? emptyProtection;
               return (
-                <div key={g} className="mt-3 rounded-[3px] border border-line bg-well p-4 first:mt-0">
+                <div key={g} className="mt-3 rounded-xl border border-line bg-well p-4 first:mt-0">
                   {groups.length > 1 && (
                     <div className="mb-3 text-[13px] font-medium text-text">
                       {t.intake.protectionGroups[g]}
                     </div>
                   )}
                   <div className="grid gap-2 sm:grid-cols-2">
-                    <label className="flex items-center gap-2 rounded-[3px] border border-line px-3 py-2.5 text-sm text-muted">
+                    <label className="flex items-center gap-2 rounded-lg border border-line px-3 py-2.5 text-sm text-muted">
                       <span className="flex-1">{t.intake.freqLabel[g]}</span>
                       <input
                         type="number"
@@ -280,7 +281,7 @@ export function Intake({
                       updateProtection(g, { replication: v }),
                     )}
                     {p.replication && (
-                      <label className="flex items-center gap-2 rounded-[3px] border border-line px-3 py-2.5 text-sm text-muted">
+                      <label className="flex items-center gap-2 rounded-lg border border-line px-3 py-2.5 text-sm text-muted">
                         <span className="flex-1">{t.intake.replicationLag}</span>
                         <input
                           type="number"
@@ -314,7 +315,7 @@ export function Intake({
           <button
             onClick={() => setStep((s) => Math.max(0, s - 1))}
             disabled={step === 0}
-            className="rounded-[3px] px-3 py-2 text-[13px] font-medium text-muted transition-colors hover:text-text disabled:pointer-events-none disabled:opacity-0"
+            className="rounded-lg px-3 py-2 text-[13px] font-medium text-muted transition-colors hover:text-text disabled:pointer-events-none disabled:opacity-0"
           >
             ← {t.intake.back}
           </button>
