@@ -4,10 +4,10 @@ import type { Dictionary } from "./en";
 
 export const id: Dictionary = {
   appName: "DR Drill",
-  masthead: "Asesmen kelangsungan bisnis",
-  tagline: "Gambarkan lingkungan IT Anda. Lihat kenyataan pemulihannya — RPO/RTO yang benar-benar bisa dicapai, bukan yang ada di slide.",
+  masthead: "Asesmen business continuity",
+  tagline: "Gambarkan lingkungan IT Anda, lalu lihat kesiapan recovery yang sebenarnya — RPO/RTO yang benar-benar bisa dicapai, bukan sekadar angka di slide.",
   privacyLine:
-    "Detail lingkungan dan nama workload Anda tidak pernah meninggalkan browser ini. Cerita simulasi ditulis hanya dari temuan yang dianonimkan (W1, W2, …), dan tidak ada input yang disimpan di mana pun.",
+    "Detail lingkungan dan nama workload Anda tidak pernah meninggalkan browser ini. Cerita simulasi ditulis hanya dari temuan yang dianonimkan (W1, W2, …), dan tidak ada input atau data Anda yang disimpan di server ini.",
   trustIndicator: "Berjalan lokal · data tetap di perangkat",
 
   intake: {
@@ -97,11 +97,11 @@ export const id: Dictionary = {
     lensesLabel: "Tampilan laporan",
     lenses: { business: "Dampak bisnis", technical: "Teknis", investment: "Usulan investasi" },
     tiles: { readiness: "Kesiapan", workloads: "Workload", flags: "Tanda risiko", rule: "3-2-1" },
-    scoreTitle: "Kesiapan pemulihan",
+    scoreTitle: "Kesiapan recovery",
     scoreOutOf: "/100",
     coverage:
       "Berdasarkan {n} workload yang Anda gambarkan — kesiapan sesuai deskripsi, dihitung dari jawaban Anda, bukan hasil audit.",
-    gapsTitle: "Kesenjangan pemulihan",
+    gapsTitle: "Kesenjangan recovery",
     gapSummary: "{met}/{total} target tercapai",
     gapPill: { meets: "SESUAI", gap: "SELISIH", noPath: "BUNTU" },
     tierTag: "Tier {n}",
@@ -112,11 +112,11 @@ export const id: Dictionary = {
     achievableRto: "RTO tercapai",
     unrecoverable: "tidak dapat dipulihkan",
     units: { min: "mnt", h: "jam", d: "hari" },
-    investTitle: "Di mana berinvestasi",
+    investTitle: "Prioritas investasi",
     investLabel: "prioritas",
     investOne: "prioritas",
     investEmpty: "Tidak ada celah terbuka — hal-hal esensial sudah tertutup.",
-    posture: { strong: "Tangguh", developing: "Berkembang", exposed: "Terekspos" },
+    posture: { strong: "Tangguh", developing: "Berkembang", exposed: "Rentan" },
     business: {
       title: "Dampak bisnis",
       exposureHeadline: "Eksposur jika tidak ada perubahan",
@@ -125,7 +125,7 @@ export const id: Dictionary = {
       addCost: "Isi biaya downtime di intake untuk melihat eksposur dalam Rupiah. Postur dan kesenjangan tetap berlaku.",
     },
     invest: {
-      fundingCase: "Kelangsungan bisnis — usulan pendanaan",
+      fundingCase: "Business continuity — usulan pendanaan",
       exposureAtRisk: "Eksposur berisiko",
       plusUnrecoverable: "plus {n} tak terpulihkan",
       allUnrecoverable: "{n} workload tak terpulihkan",
@@ -135,7 +135,7 @@ export const id: Dictionary = {
       closes: "Menutup ~{amount} eksposur",
       closesQual: "Menutup eksposur yang dilindungi kontrol ini",
       makesRecoverable: "Membuat {n} workload dapat dipulihkan",
-      strengthens: "Memperkuat postur ketahanan",
+      strengthens: "Memperkuat ketahanan",
       preparedBy: "Disiapkan oleh IT · tidak ada yang disimpan",
       copy: "Salin ringkasan",
       copied: "Tersalin",
@@ -188,7 +188,7 @@ export const id: Dictionary = {
     },
     heatmap: {
       impact: "Dampak bisnis",
-      readiness: "Kesiapan pemulihan",
+      readiness: "Kesiapan recovery",
       impactLevels: ["Rendah", "Sedang", "Tinggi"] as [string, string, string],
       gapLevels: ["Sesuai", "Sebagian", "Berisiko"] as [string, string, string],
       more: "+{n}",
@@ -208,8 +208,8 @@ export const id: Dictionary = {
 
   drill: {
     title: "Simulasi langsung",
-    pickScenario: "Pilih bencana yang disimulasikan:",
-    idlePrompt: "Pilih skenario, lalu jalankan simulasi untuk melihat bagaimana malam ini berjalan — beat demi beat.",
+    pickScenario: "Pilih bencana yang ingin disimulasikan:",
+    idlePrompt: "Pilih skenario, lalu jalankan simulasi untuk melihat bagaimana malam ini berjalan — menit demi menit.",
     generate: "Jalankan simulasi",
     regenerate: "Jalankan lagi",
     scenarios: {
