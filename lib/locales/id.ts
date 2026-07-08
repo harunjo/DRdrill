@@ -114,6 +114,23 @@ export const id: Dictionary = {
     investLabel: "prioritas",
     investOne: "prioritas",
     investEmpty: "Tidak ada celah terbuka — hal-hal esensial sudah tertutup.",
+    posture: { strong: "Tangguh", developing: "Berkembang", exposed: "Terekspos" },
+    invest: {
+      fundingCase: "Kelangsungan bisnis — usulan pendanaan",
+      exposureAtRisk: "Eksposur berisiko",
+      plusUnrecoverable: "plus {n} tak terpulihkan",
+      noCost: "Isi biaya downtime di intake untuk mengukur eksposur.",
+      posture: "Postur",
+      bia: "BIA · asesmen mandiri selaras dengan ISO 22301 / NIST CSF",
+      closes: "Menutup ~{amount} eksposur",
+      closesQual: "Menutup eksposur yang dilindungi kontrol ini",
+      makesRecoverable: "Membuat {n} workload dapat dipulihkan",
+      strengthens: "Memperkuat postur ketahanan",
+      preparedBy: "Disiapkan oleh IT · tidak ada yang disimpan",
+      copy: "Salin ringkasan",
+      copied: "Tersalin",
+      copyFailed: "Salin tidak tersedia — pilih teks di bawah untuk menyalin manual:",
+    },
     flagsTitle: "Tanda risiko",
     flags: {
       "no-immutable": {

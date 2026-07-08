@@ -115,6 +115,23 @@ export const en = {
     investLabel: "priorities",
     investOne: "priority",
     investEmpty: "No open gaps — the essentials are covered.",
+    posture: { strong: "Resilient", developing: "Developing", exposed: "Exposed" },
+    invest: {
+      fundingCase: "Business continuity — funding case",
+      exposureAtRisk: "Exposure at risk",
+      plusUnrecoverable: "plus {n} unrecoverable",
+      noCost: "Add downtime cost in the intake to quantify exposure.",
+      posture: "Posture",
+      bia: "BIA · self-assessment aligned with ISO 22301 / NIST CSF",
+      closes: "Closes ~{amount} exposure",
+      closesQual: "Closes the exposure this control protects",
+      makesRecoverable: "Makes {n} workload(s) recoverable",
+      strengthens: "Strengthens resilience posture",
+      preparedBy: "Prepared by IT · nothing stored",
+      copy: "Copy summary",
+      copied: "Copied",
+      copyFailed: "Copy unavailable — select the text below to copy manually:",
+    },
     flagsTitle: "Risk flags",
     flags: {
       "no-immutable": {
