@@ -4,6 +4,7 @@ import type { Dictionary } from "./en";
 
 export const id: Dictionary = {
   appName: "DR Drill",
+  masthead: "Asesmen kelangsungan bisnis",
   tagline: "Gambarkan lingkungan IT Anda. Lihat kenyataan pemulihannya — RPO/RTO yang benar-benar bisa dicapai, bukan yang ada di slide.",
   privacyLine:
     "Detail lingkungan dan nama workload Anda tidak pernah meninggalkan browser ini. Cerita simulasi ditulis hanya dari temuan yang dianonimkan (W1, W2, …), dan tidak ada input yang disimpan di mana pun.",

@@ -135,10 +135,10 @@ export function Drill({
               setScenario(sc);
               track("scenario_swapped"); // R24: anonymous count
             }}
-            className={`rounded-md border px-3 py-1.5 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`rounded-[3px] border px-3 py-1.5 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
               scenario === sc
-                ? "border-signal bg-signal-soft font-medium text-signal"
-                : "border-line text-muted hover:border-[#c9cdd3] hover:text-text"
+                ? "border-text bg-signal-soft font-medium text-text"
+                : "border-line text-muted hover:border-faint hover:text-text"
             }`}
           >
             {t.drill.scenarios[sc]}
@@ -146,12 +146,12 @@ export function Drill({
         ))}
       </div>
 
-      {/* Drill readout — reads like a quoted incident report */}
-      <div className="mt-4 overflow-hidden rounded-lg border border-line bg-well">
+      {/* Drill readout — reads like a quoted incident appendix */}
+      <div className="mt-4 overflow-hidden rounded-[3px] border border-line bg-well">
         <div className="border-b border-line px-4 py-2 font-mono text-[11px] text-faint">
           drill://{scenario}
         </div>
-        <div className="min-h-[7rem] border-l-2 border-l-signal p-4 font-mono text-[13px] leading-relaxed">
+        <div className="min-h-[7rem] border-l-2 border-l-text p-4 font-mono text-[13px] leading-relaxed">
           {generating && (
             <p className="text-muted motion-safe:animate-pulse">{t.drill.generating}</p>
           )}

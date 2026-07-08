@@ -56,19 +56,24 @@ function Step({
 }) {
   return (
     <section className="panel mt-4 p-5 sm:p-6">
-      <div className="flex items-start gap-3">
-        <span className="mt-px flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-well text-xs font-semibold text-muted ring-1 ring-line">
-          {index}
+      <div className="flex items-baseline gap-3">
+        <span className="font-display text-sm font-semibold text-muted">
+          {romanNumerals[index - 1] ?? index}.
         </span>
-        <div>
-          <h2 className="text-[15px] font-semibold tracking-tight">{stripNum(title)}</h2>
-          {hint && <p className="mt-1 text-[13px] text-muted">{hint}</p>}
+        <div className="min-w-0">
+          <h2 className="font-display text-[17px] font-semibold tracking-tight">
+            {stripNum(title)}
+          </h2>
+          {hint && <p className="mt-0.5 text-[13px] text-muted">{hint}</p>}
         </div>
       </div>
+      <div className="mt-3 rule" />
       <div className="mt-5">{children}</div>
     </section>
   );
 }
+
+const romanNumerals = ["I", "II", "III", "IV", "V", "VI"];
 
 const selectCls = "field px-2.5 py-2 text-sm";
 
@@ -107,10 +112,10 @@ export function Intake({
 
   const toggle = (checked: boolean, label: string, onToggle: (v: boolean) => void) => (
     <label
-      className={`flex cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2.5 text-[13px] transition-colors ${
+      className={`flex cursor-pointer items-center gap-2.5 rounded-[3px] border px-3 py-2.5 text-[13px] transition-colors ${
         checked
-          ? "border-signal bg-signal-soft text-text"
-          : "border-line text-muted hover:border-[#c9cdd3] hover:text-text"
+          ? "border-text bg-signal-soft text-text"
+          : "border-line text-muted hover:border-faint hover:text-text"
       }`}
     >
       <input
@@ -133,10 +138,10 @@ export function Intake({
                 key={m}
                 onClick={() => onChange({ ...env, model: m })}
                 aria-pressed={active}
-                className={`rounded-md border px-3 py-2.5 text-[13px] transition-colors ${
+                className={`rounded-[3px] border px-3 py-2.5 text-[13px] transition-colors ${
                   active
-                    ? "border-signal bg-signal-soft font-medium text-signal"
-                    : "border-line text-muted hover:border-[#c9cdd3] hover:text-text"
+                    ? "border-text bg-signal-soft font-medium text-text"
+                    : "border-line text-muted hover:border-faint hover:text-text"
                 }`}
               >
                 {t.intake.models[m]}
@@ -151,7 +156,7 @@ export function Intake({
           const nameMissing = w.name.trim().length === 0;
           const sizeInvalid = !Number.isFinite(w.sizeGB) || w.sizeGB <= 0;
           return (
-            <div key={w.id} className="mt-3 rounded-xl border border-line bg-well p-4 first:mt-0">
+            <div key={w.id} className="mt-3 rounded-[3px] border border-line bg-well p-4 first:mt-0">
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 <div className="col-span-2">
                   <input
@@ -237,7 +242,7 @@ export function Intake({
         })}
         {env.workloads.length < MAX_WORKLOADS ? (
           <button
-            className="mt-3 w-full rounded-md border border-dashed border-line py-2.5 text-[13px] text-muted transition-colors hover:border-signal/40 hover:text-text"
+            className="mt-3 w-full rounded-[3px] border border-dashed border-line py-2.5 text-[13px] text-muted transition-colors hover:border-faint hover:text-text"
             onClick={() => onChange({ ...env, workloads: [...env.workloads, emptyWorkload()] })}
           >
             {t.intake.addWorkload}
@@ -251,14 +256,14 @@ export function Intake({
         {groups.map((g) => {
           const p = env.protection[g] ?? emptyProtection;
           return (
-            <div key={g} className="mt-3 rounded-xl border border-line bg-well p-4 first:mt-0">
+            <div key={g} className="mt-3 rounded-[3px] border border-line bg-well p-4 first:mt-0">
               {groups.length > 1 && (
                 <div className="mb-3 text-[13px] font-medium text-text">
                   {t.intake.protectionGroups[g]}
                 </div>
               )}
               <div className="grid gap-2 sm:grid-cols-2">
-                <label className="flex items-center gap-2 rounded-lg border border-line px-3 py-2.5 text-sm text-muted">
+                <label className="flex items-center gap-2 rounded-[3px] border border-line px-3 py-2.5 text-sm text-muted">
                   <span className="flex-1">{t.intake.freqLabel[g]}</span>
                   <input
                     type="number"
@@ -272,7 +277,7 @@ export function Intake({
                   updateProtection(g, { replication: v }),
                 )}
                 {p.replication && (
-                  <label className="flex items-center gap-2 rounded-lg border border-line px-3 py-2.5 text-sm text-muted">
+                  <label className="flex items-center gap-2 rounded-[3px] border border-line px-3 py-2.5 text-sm text-muted">
                     <span className="flex-1">{t.intake.replicationLag}</span>
                     <input
                       type="number"

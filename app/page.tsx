@@ -27,21 +27,19 @@ export default function Home() {
   }, [lang]);
 
   return (
-    <>
-      {/* App bar */}
-      <header className="border-b border-line bg-panel">
-        <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 py-3.5">
-          <div className="flex items-center gap-2.5">
-            <span
-              aria-hidden
-              className="flex h-6 w-6 items-center justify-center rounded-md bg-signal text-[11px] font-semibold text-white"
-            >
-              DR
-            </span>
-            <span className="text-[15px] font-semibold tracking-tight">{t.appName}</span>
+    <main className="mx-auto w-full max-w-3xl grow px-5 pb-16 pt-8 sm:pt-12">
+      {/* Letterhead masthead */}
+      <header className="border-b-[3px] border-double border-text pb-3">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <div className="font-display text-2xl font-semibold tracking-[0.02em]">
+              {t.appName}
+            </div>
+            <div className="mt-1 text-[11px] uppercase tracking-[0.22em] text-muted">
+              {t.masthead}
+            </div>
           </div>
-
-          <div className="flex overflow-hidden rounded-md border border-line text-xs font-medium">
+          <div className="flex overflow-hidden rounded-[3px] border border-line text-xs font-medium">
             {(["id", "en"] as Lang[]).map((l) => (
               <button
                 key={l}
@@ -58,29 +56,28 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl grow px-5 pb-14 pt-12 sm:pt-16">
-        {/* Thesis */}
-        <h1 className="max-w-[28ch] text-[1.7rem] font-semibold leading-[1.22] tracking-[-0.02em] text-balance sm:text-[2.05rem]">
-          {t.tagline}
-        </h1>
+      {/* Thesis */}
+      <h1 className="mt-11 max-w-[24ch] font-display text-[2rem] font-medium leading-[1.18] tracking-[-0.01em] text-balance sm:text-[2.6rem]">
+        {t.tagline}
+      </h1>
 
-        {/* Trust callout — runs local */}
-        <div className="mt-6 flex max-w-2xl items-start gap-3 rounded-lg border border-[#cde4e1] bg-signal-soft px-4 py-3.5 text-[13px] leading-relaxed text-[#2a4d48]">
-          <svg
-            aria-hidden
-            viewBox="0 0 24 24"
-            className="mt-0.5 h-4 w-4 shrink-0 text-signal"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-            <path d="m9 12 2 2 4-4" />
-          </svg>
-          <span>{t.privacyLine}</span>
-        </div>
+      {/* Trust note — runs local */}
+      <div className="mt-6 flex max-w-2xl items-start gap-3 border-l-2 border-text bg-well px-4 py-3 text-[13px] leading-relaxed text-muted">
+        <svg
+          aria-hidden
+          viewBox="0 0 24 24"
+          className="mt-0.5 h-4 w-4 shrink-0 text-text"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+        <span>{t.privacyLine}</span>
+      </div>
 
       <Intake
         t={t}
@@ -110,16 +107,15 @@ export default function Home() {
         />
       )}
 
-        <footer className="mt-20 border-t border-line pt-5 text-[12px] text-faint">
-          {t.footer.attribution}{" "}
-          <a
-            className="text-muted underline decoration-line underline-offset-2 hover:text-signal"
-            href="https://harunjonatan.com"
-          >
-            harunjonatan.com
-          </a>
-        </footer>
-      </main>
-    </>
+      <footer className="mt-20 border-t border-line pt-5 text-[12px] text-faint">
+        {t.footer.attribution}{" "}
+        <a
+          className="text-muted underline decoration-line underline-offset-2 hover:text-text"
+          href="https://harunjonatan.com"
+        >
+          harunjonatan.com
+        </a>
+      </footer>
+    </main>
   );
 }

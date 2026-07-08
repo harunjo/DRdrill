@@ -5,6 +5,7 @@
 
 export const en = {
   appName: "DR Drill",
+  masthead: "Business-continuity assessment",
   tagline: "Describe your environment. Get your recovery reality — the RPO/RTO you can actually achieve, not the one on the slide.",
   privacyLine:
     "Your environment details and workload names never leave this browser. The drill story is written from anonymized findings only (W1, W2, …), and nothing you enter is stored anywhere.",

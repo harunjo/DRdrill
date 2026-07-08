@@ -20,9 +20,10 @@ function Panel({
   return (
     <section className="panel mt-4 p-5 sm:p-6">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-[15px] font-semibold tracking-tight">{title}</h2>
+        <h2 className="font-display text-[17px] font-semibold tracking-tight">{title}</h2>
         <span className="font-mono text-[10px] uppercase tracking-wider text-faint">{caption}</span>
       </div>
+      <div className="mt-3 rule" />
       {children}
     </section>
   );
@@ -83,7 +84,7 @@ function GapMeter({
         </span>
       </div>
       <div className="relative">
-        <div className="flex h-2 w-full overflow-hidden rounded-full bg-[#eceef1]">
+        <div className="flex h-2 w-full overflow-hidden rounded-sm bg-well">
           <div
             className="h-full bg-ok transition-[width] duration-700 ease-out"
             style={{ width: lit ? `${greenW}%` : "0%" }}
@@ -128,7 +129,6 @@ export function Report({
   const tier = a.score >= 70 ? "good" : a.score >= 40 ? "fair" : "poor";
   const band =
     tier === "good" ? "var(--color-ok)" : tier === "fair" ? "var(--color-warn)" : "var(--color-crit)";
-  const chipCls = tier === "good" ? "chip chip-ok" : tier === "fair" ? "chip chip-warn" : "chip chip-crit";
 
   const rule = [
     [a.rule321.threeCopies, t.report.rule321.threeCopies],
@@ -139,23 +139,28 @@ export function Report({
   return (
     <div className="mt-10">
       <Panel title={t.report.scoreTitle} caption={caption}>
-        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <div className="flex items-baseline gap-1">
-            <span
-              className="text-[3.25rem] font-semibold leading-none tracking-tight"
-              style={{ color: band }}
-            >
-              {count}
-            </span>
-            <span className="text-lg text-faint">{t.report.scoreOutOf}</span>
+        <div className="mt-5 flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="flex items-baseline gap-1.5">
+              <span
+                className="font-display text-[4rem] font-semibold leading-none tracking-tight"
+                style={{ color: band }}
+              >
+                {count}
+              </span>
+              <span className="font-display text-2xl text-faint">{t.report.scoreOutOf}</span>
+            </div>
           </div>
-          <span className={chipCls}>{t.report.statusLabel[tier]}</span>
+          {/* Signature: the verdict stamped onto the sheet */}
+          <span className="stamp mr-1 mt-2 shrink-0" style={{ color: band }}>
+            {t.report.statusLabel[tier]}
+          </span>
         </div>
 
-        <div className="relative mt-4 max-w-xl">
-          <div className="h-2 overflow-hidden rounded-full bg-[#eceef1]">
+        <div className="relative mt-5 max-w-xl">
+          <div className="h-2 overflow-hidden rounded-sm bg-well">
             <div
-              className="h-full rounded-full transition-[width] duration-1000 ease-out"
+              className="h-full transition-[width] duration-1000 ease-out"
               style={{ width: lit ? `${a.score}%` : "0%", background: band }}
             />
           </div>
@@ -163,7 +168,7 @@ export function Report({
             <span
               key={tick}
               aria-hidden
-              className="absolute top-1/2 h-3 w-px -translate-y-1/2 bg-faint/60"
+              className="absolute top-1/2 h-3.5 w-px -translate-y-1/2 bg-faint"
               style={{ left: `${tick}%` }}
             />
           ))}
@@ -173,11 +178,11 @@ export function Report({
           {fmt(t.report.coverage, { n: a.results.length })}
         </p>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-line-soft pt-4">
           <span className="text-[12px] font-medium text-muted">{t.report.rule321Title}</span>
           {rule.map(([pass, label]) => (
             <span key={label} className={pass ? "chip chip-ok" : "chip chip-neutral"}>
-              {pass ? "✓" : "○"} {label}
+              {pass ? "✓" : "✕"} {label}
             </span>
           ))}
         </div>
@@ -237,22 +242,27 @@ export function Report({
       </Panel>
 
       <Panel title={t.report.flagsTitle} caption={caption}>
-        <div className="mt-4 space-y-3">
+        <div className="mt-1">
           {a.flags.map((f, i) => {
             const copy = t.report.flags[f.code];
             const critical = f.severity === "critical";
             return (
               <div
                 key={`${f.code}-${f.scope}-${i}`}
-                className="rounded-lg border border-line bg-well p-4 text-[13px]"
+                className="flex gap-4 border-t border-line-soft py-4 text-[13px] first:border-t-0"
               >
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className={critical ? "chip chip-crit" : "chip chip-warn"}>
-                    {critical ? t.report.severity.critical : t.report.severity.warning}
-                  </span>
-                  <span className="font-medium text-text">{copy.title}</span>
+                <span className="mt-0.5 font-mono text-xs text-faint">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={critical ? "chip chip-crit" : "chip chip-warn"}>
+                      {critical ? t.report.severity.critical : t.report.severity.warning}
+                    </span>
+                    <span className="font-medium text-text">{copy.title}</span>
+                  </div>
+                  <p className="mt-1.5 leading-relaxed text-muted">{copy.detail}</p>
                 </div>
-                <p className="mt-2 leading-relaxed text-muted">{copy.detail}</p>
               </div>
             );
           })}
