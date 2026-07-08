@@ -126,7 +126,7 @@ export function buildPrompt(req: NarrativeRequest): string {
   const langName = req.lang === "id" ? "Indonesian (Bahasa Indonesia)" : "English";
 
   return [
-    `Write a short business-continuity drill story in ${langName}: ${SCENARIO_TEXT[req.scenario][req.lang]} hits tonight.`,
+    `Write a short business-continuity drill story, written ENTIRELY in ${langName}: ${SCENARIO_TEXT[req.scenario][req.lang]} hits tonight.`,
     ``,
     `FACTS (the only facts that exist — computed findings):`,
     `Deployment model: ${req.findings.model}`,
@@ -135,6 +135,7 @@ export function buildPrompt(req: NarrativeRequest): string {
     `Readiness score: ${req.findings.score}/100`,
     ``,
     `RULES:`,
+    `- LANGUAGE (most important): these instructions are in English, but your entire output — every beat, every word — MUST be written in ${langName}. Do not mix in another language.`,
     `- Output 6 to 10 beats, one per line, each starting with a clock time like "02:14 — ".`,
     `- Refer to workloads ONLY by their labels (W1, W2, ...). Never invent system names.`,
     `- Every duration or quantity you mention MUST come from the facts above (you may convert minutes to hours). Do not invent any number except the clock times.`,
@@ -142,6 +143,8 @@ export function buildPrompt(req: NarrativeRequest): string {
     `- Do not introduce any fact, system, person, or outcome not derivable from the facts above.`,
     `- Tone: sober incident log, addressed to management; end with the state of the business at the end of the timeline.`,
     `- Output only the beats, no title, no preamble.`,
+    ``,
+    `Now write the timeline, entirely in ${langName}:`,
   ].join("\n");
 }
 

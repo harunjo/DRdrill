@@ -73,6 +73,14 @@ describe("buildPrompt (R21 — no raw user text reaches the prompt)", () => {
     expect(prompt).not.toContain("SIMRS");
     expect(prompt).toContain("660");
   });
+
+  it("names the target language emphatically for id (model kept flipping to English)", () => {
+    const prompt = buildPrompt({ findings, scenario: "ransomware", lang: "id" });
+    // Directive appears more than once (top + rule + closing line) so the
+    // English facts/rules block can't drown it out.
+    const hits = prompt.match(/Indonesian \(Bahasa Indonesia\)/g) ?? [];
+    expect(hits.length).toBeGreaterThanOrEqual(3);
+  });
 });
 
 describe("validateNarrative (R20, AE3)", () => {
