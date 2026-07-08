@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { assess, type Environment, type Protection, type Workload, type WorkloadResult } from "./engine";
 import {
   aggregateExposure,
+  catastrophicList,
   formatIDR,
   formatMoney,
   isCatastrophic,
@@ -39,6 +40,23 @@ const result = (
   achievableRtoMin: over.achievableRtoMin === undefined ? 120 : over.achievableRtoMin,
   rpoMeets: over.rpoMeets ?? false,
   rtoMeets: over.rtoMeets ?? false,
+});
+
+describe("catastrophicList", () => {
+  const crit = (tier: 1 | 2 | 3) => ({ 1: "Critical", 2: "Important", 3: "Standard" })[tier];
+
+  it("names only unrecoverable workloads, tagged with their criticality", () => {
+    const results = [
+      result({ workload: { name: "ERP", tier: 1 }, achievableRtoMin: null }),
+      result({ workload: { name: "CRM", tier: 2 }, achievableRtoMin: 120 }), // recoverable → excluded
+      result({ workload: { name: "Files", tier: 3 }, achievableRtoMin: null }),
+    ];
+    expect(catastrophicList(results, crit)).toBe("ERP (Critical), Files (Standard)");
+  });
+
+  it("is empty when nothing is catastrophic", () => {
+    expect(catastrophicList([result({ achievableRtoMin: 60 })], crit)).toBe("");
+  });
 });
 
 describe("workloadExposure", () => {

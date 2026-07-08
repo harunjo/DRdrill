@@ -9,12 +9,27 @@ import {
   type FlagCode,
   type Placement,
   type RiskFlag,
+  type Tier,
   type WorkloadResult,
 } from "./engine";
 
 /** A workload with no recovery path — its loss is unbounded, never a number. */
 export function isCatastrophic(r: WorkloadResult): boolean {
   return r.achievableRtoMin === null;
+}
+
+/** Human list of unrecoverable workloads with their criticality, e.g.
+ *  "ERP (Critical), CRM (Important)". The criticality label is supplied by the
+ *  caller so this stays i18n-free. Browser-only (real names) — never enters the
+ *  findings payload. Shared by both lenses so their wording can't drift. */
+export function catastrophicList(
+  results: WorkloadResult[],
+  critLabel: (tier: Tier) => string,
+): string {
+  return results
+    .filter(isCatastrophic)
+    .map((r) => `${r.workload.name} (${critLabel(r.workload.tier)})`)
+    .join(", ");
 }
 
 /** Money exposure for one workload = downtime hours × cost/hour. Returns null

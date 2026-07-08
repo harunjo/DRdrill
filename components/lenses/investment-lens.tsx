@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { track } from "@vercel/analytics";
 import { AlertOctagon, AlertTriangle, Copy, Check, FileDown } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
@@ -8,9 +9,14 @@ import { fmt } from "@/lib/i18n";
 import type { Assessment } from "@/lib/engine";
 import { fmtMinutes } from "@/lib/engine";
 import { TIER_TARGETS } from "@/lib/calibration";
-import { aggregateExposure, formatMoney, isCatastrophic, postureBand } from "@/lib/exposure";
+import { aggregateExposure, catastrophicList, formatMoney, isCatastrophic, postureBand } from "@/lib/exposure";
 import { buildSummary, orderAsks, type Ask } from "@/lib/investment";
 import { PostureChip } from "@/components/lenses/shared";
+
+// Stable args for a client-only flag via useSyncExternalStore (no re-subscribe).
+const subscribeNoop = () => () => {};
+const getTrue = () => true;
+const getFalse = () => false;
 
 export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: Assessment }) {
   const a = assessment;
@@ -31,15 +37,16 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
 
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const [fallback, setFallback] = useState("");
+  // Portal the print doc to <body>, but only on the client (no document on the
+  // server). useSyncExternalStore returns false during SSR + first hydration.
+  const mounted = useSyncExternalStore(subscribeNoop, getTrue, getFalse);
   const printDate = new Date().toLocaleDateString();
 
   // Name the unrecoverable workloads with their criticality (e.g. "ERP (Kritis)")
   // instead of a bare count — browser-only, real names never leave here.
   const critLabel = (tier: 1 | 2 | 3) => inv.pdf.crit[tier];
   const catWorkloads = a.results.filter(isCatastrophic);
-  const catNames = catWorkloads
-    .map((r) => `${r.workload.name} (${critLabel(r.workload.tier)})`)
-    .join(", ");
+  const catNames = catastrophicList(a.results, critLabel);
 
   const exposureText =
     agg.monetizedCount > 0
@@ -220,11 +227,13 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
     </section>
 
     {/* Print-only C-level justification — native window.print() → Save as PDF.
-        Rendered outside the on-screen section so no positioned/overflow ancestor
-        clips it; hidden on screen, revealed by the .print-root rules in globals.css.
+        Portaled to <body> so it prints as a top-level element in normal flow:
+        @page margins then apply on every page and content paginates cleanly
+        (an absolutely-positioned box ignores page margins and can't). Hidden on
+        screen; the app is display:none'd in print by the .print-root rules.
         Data sections are computed by the engine; sections tagged as a guide are
         skeletons the sponsoring team completes (the app never prices a fix / R2). */}
-    <div className="print-root">{renderPrintDoc()}</div>
+    {mounted && createPortal(<div className="print-root">{renderPrintDoc()}</div>, document.body)}
     </>
   );
 

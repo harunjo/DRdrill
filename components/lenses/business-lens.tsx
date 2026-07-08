@@ -3,7 +3,7 @@
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import { fmtMinutes, type Assessment, type DurationLabels } from "@/lib/engine";
-import { aggregateExposure, formatMoney, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
+import { aggregateExposure, catastrophicList, formatMoney, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
 import { Heatmap } from "@/components/heatmap";
 import { PostureChip } from "@/components/lenses/shared";
 
@@ -16,6 +16,7 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
   const posture = postureBand(a.results, a.flags);
   const coverage = fmt(t.report.coverageShort, { n });
   const dur: DurationLabels = { unrecoverable: t.report.unrecoverable, ...t.report.units };
+  const catNames = catastrophicList(a.results, (tier) => inv.pdf.crit[tier]);
 
   return (
     <section className="panel mt-4 overflow-hidden">
@@ -36,13 +37,13 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
               {formatMoney(agg.total, t.currency)}
               {agg.catastrophicCount > 0 && (
                 <span className="ml-2 align-middle text-[13px] font-semibold text-crit">
-                  · {fmt(inv.plusUnrecoverable, { n: agg.catastrophicCount })}
+                  · {fmt(inv.plusUnrecoverable, { names: catNames })}
                 </span>
               )}
             </div>
           ) : agg.catastrophicCount > 0 ? (
             <div className="mt-1 font-mono text-[1.35rem] font-semibold tracking-tight text-crit">
-              {fmt(inv.allUnrecoverable, { n: agg.catastrophicCount })}
+              {fmt(inv.allUnrecoverable, { names: catNames })}
             </div>
           ) : (
             <p className="mt-1 max-w-sm text-[13px] leading-relaxed text-muted">{b.addCost}</p>

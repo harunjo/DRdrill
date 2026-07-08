@@ -206,16 +206,20 @@ input[type="checkbox"] {
   * { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
 }
 
-/* ── Print: C-level investment one-pager (native window.print → Save as PDF) ──
-   Classic print-one-element pattern: hide the whole app, reveal only the
-   .print-root. Kept in-browser so no report data ever egresses. */
+/* ── Print: C-level investment justification (native window.print → Save as PDF)
+   The .print-root is portaled to <body> (see investment-lens.tsx). In print we
+   hide every other top-level element and let the print doc flow normally, so the
+   @page margins apply on EVERY page and long content paginates cleanly (an
+   absolutely-positioned box would ignore page margins). Stays in-browser so no
+   report data ever egresses. */
 .print-root { display: none; }
-@page { margin: 18mm 16mm; }
+@page { margin: 16mm 14mm; }
 @media print {
-  .print-root { display: block; position: absolute; left: 0; top: 0; width: 100%; }
-  body * { visibility: hidden; }
-  .print-root, .print-root * {
-    visibility: visible;
+  body > *:not(.print-root) { display: none !important; }
+  body { background: #fff; }
+  .print-root {
+    display: block;
+    background: #fff;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
