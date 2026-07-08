@@ -125,10 +125,8 @@ export function Drill({
 
   return (
     <div className="mt-3">
-      <div className="font-mono text-[11px] uppercase tracking-wider text-faint">
-        {t.drill.pickScenario}
-      </div>
-      <div className="mt-2 flex flex-wrap gap-2">
+      <div className="text-[13px] text-muted">{t.drill.pickScenario}</div>
+      <div className="mt-2.5 flex flex-wrap gap-2">
         {SCENARIOS.map((sc) => (
           <button
             key={sc}
@@ -137,10 +135,10 @@ export function Drill({
               setScenario(sc);
               track("scenario_swapped"); // R24: anonymous count
             }}
-            className={`rounded-lg border px-3 py-1.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+            className={`rounded-md border px-3 py-1.5 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
               scenario === sc
-                ? "border-signal bg-signal/12 font-medium text-signal"
-                : "border-line text-muted hover:border-signal/50 hover:text-text"
+                ? "border-signal/60 bg-signal/[0.08] font-medium text-text"
+                : "border-line text-muted hover:text-text"
             }`}
           >
             {t.drill.scenarios[sc]}
@@ -148,23 +146,14 @@ export function Drill({
         ))}
       </div>
 
-      {/* Terminal frame — the drill readout */}
-      <div className="mt-4 overflow-hidden rounded-xl border border-line bg-well">
-        <div className="flex items-center gap-2 border-b border-line-soft px-3 py-2">
-          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-crit/70" />
-          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-signal/70" />
-          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-ok/70" />
-          <span className="ml-2 truncate font-mono text-[11px] text-faint">
-            drill://{scenario}
-          </span>
+      {/* Drill readout */}
+      <div className="mt-4 overflow-hidden rounded-md border border-line bg-well">
+        <div className="border-b border-line-soft px-4 py-2 font-mono text-[11px] text-faint">
+          drill://{scenario}
         </div>
-
         <div className="min-h-[7rem] p-4 font-mono text-[13px] leading-relaxed">
           {generating && (
-            <p className="text-muted">
-              {t.drill.generating}
-              <span className="term-cursor" />
-            </p>
+            <p className="text-muted motion-safe:animate-pulse">{t.drill.generating}</p>
           )}
           {!generating && status === "unavailable" && (
             <p className="text-muted">{t.drill.unavailable}</p>
@@ -176,7 +165,7 @@ export function Drill({
           {!generating && story && status === "idle" && (
             <>
               {staleLang && (
-                <p className="mb-2 not-italic text-signal">{t.drill.languageNotice}</p>
+                <p className="mb-2 text-warn">{t.drill.languageNotice}</p>
               )}
               <div className="whitespace-pre-line text-text">
                 {substituteLabels(story, labelMap)}

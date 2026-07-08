@@ -55,14 +55,12 @@ function Step({
   children: ReactNode;
 }) {
   return (
-    <section className="panel mt-6 p-5 sm:p-6">
+    <section className="panel mt-4 p-5 sm:p-6">
       <div className="flex items-baseline gap-3">
-        <span className="font-mono text-sm font-semibold text-signal">
-          {String(index).padStart(2, "0")}
-        </span>
+        <span className="font-mono text-xs text-faint">{String(index).padStart(2, "0")}</span>
         <div>
-          <h2 className="font-display text-lg font-semibold tracking-tight">{stripNum(title)}</h2>
-          {hint && <p className="mt-1 text-sm text-muted">{hint}</p>}
+          <h2 className="text-[15px] font-medium tracking-tight">{stripNum(title)}</h2>
+          {hint && <p className="mt-1 text-[13px] text-muted">{hint}</p>}
         </div>
       </div>
       <div className="mt-5">{children}</div>
@@ -107,10 +105,10 @@ export function Intake({
 
   const toggle = (checked: boolean, label: string, onToggle: (v: boolean) => void) => (
     <label
-      className={`flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-sm transition-colors ${
+      className={`flex cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2.5 text-[13px] transition-colors ${
         checked
-          ? "border-signal/40 bg-signal/[0.07] text-text"
-          : "border-line text-muted hover:border-line hover:text-text"
+          ? "border-signal/50 bg-signal/[0.06] text-text"
+          : "border-line text-muted hover:text-text"
       }`}
     >
       <input
@@ -133,10 +131,10 @@ export function Intake({
                 key={m}
                 onClick={() => onChange({ ...env, model: m })}
                 aria-pressed={active}
-                className={`rounded-lg border px-3 py-3 text-sm font-medium transition-colors ${
+                className={`rounded-md border px-3 py-2.5 text-[13px] transition-colors ${
                   active
-                    ? "border-signal bg-signal/12 text-signal shadow-[0_0_0_1px_var(--color-signal)]"
-                    : "border-line text-muted hover:border-signal/50 hover:text-text"
+                    ? "border-signal/60 bg-signal/[0.08] font-medium text-text"
+                    : "border-line text-muted hover:text-text"
                 }`}
               >
                 {t.intake.models[m]}
@@ -237,13 +235,13 @@ export function Intake({
         })}
         {env.workloads.length < MAX_WORKLOADS ? (
           <button
-            className="mt-3 w-full rounded-xl border border-dashed border-line py-2.5 text-sm font-medium text-signal transition-colors hover:border-signal/50 hover:bg-signal/[0.04]"
+            className="mt-3 w-full rounded-md border border-dashed border-line py-2.5 text-[13px] text-muted transition-colors hover:border-signal/40 hover:text-text"
             onClick={() => onChange({ ...env, workloads: [...env.workloads, emptyWorkload()] })}
           >
             {t.intake.addWorkload}
           </button>
         ) : (
-          <p className="mt-3 font-mono text-xs text-muted">{t.intake.errors.maxWorkloads}</p>
+          <p className="mt-3 text-[13px] text-muted">{t.intake.errors.maxWorkloads}</p>
         )}
       </Step>
 
@@ -253,7 +251,7 @@ export function Intake({
           return (
             <div key={g} className="mt-3 rounded-xl border border-line bg-well p-4 first:mt-0">
               {groups.length > 1 && (
-                <div className="mb-3 font-mono text-xs uppercase tracking-wider text-signal">
+                <div className="mb-3 text-[13px] font-medium text-text">
                   {t.intake.protectionGroups[g]}
                 </div>
               )}
@@ -302,13 +300,13 @@ export function Intake({
 
       <div className="mt-8">
         <button
-          className="btn-primary w-full px-5 py-3.5 font-display text-base font-semibold sm:w-auto sm:px-9"
+          className="btn-primary w-full px-5 py-2.5 text-sm sm:w-auto sm:px-7"
           disabled={!canRun}
           onClick={onRun}
         >
           {t.intake.run}
         </button>
-        {!canRun && <p className="mt-3 font-mono text-xs text-muted">{t.intake.zeroWorkloads}</p>}
+        {!canRun && <p className="mt-3 text-[13px] text-muted">{t.intake.zeroWorkloads}</p>}
       </div>
     </div>
   );

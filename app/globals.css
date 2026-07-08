@@ -1,28 +1,31 @@
 @import "tailwindcss";
 
-/* ── Incident Console — refined dark instrument theme ─────────────────────
-   Depth comes from layered surfaces (page < panel > well) with an inset top
-   highlight and a soft drop shadow — not from hard borders. Amber is a spark,
-   not a flood: the live dot, the CTA, active states, good scores. */
+/* ── Precision instrument — Linear/Vercel school ──────────────────────────
+   Near-black substrate, hairline borders, flat surfaces, one restrained
+   indigo accent used sparingly. Contrast and type hierarchy do the work;
+   no gradients, no glows, no decoration. Green/red are reserved for the
+   data's verdict only. */
 @theme {
-  --color-ink: #090e13;
-  --color-panel: #111a22;
-  --color-well: #0b1218;
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-soft: rgba(255, 255, 255, 0.05);
+  --color-ink: #08090a;
+  --color-panel: #0e1012;
+  --color-well: #101316;
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line-soft: rgba(255, 255, 255, 0.045);
 
-  --color-text: #e9eff4;
-  --color-muted: #9caebb;
-  --color-faint: #61758699;
+  --color-text: #ededef;
+  --color-muted: #8b9299;
+  --color-faint: #5c6370;
 
-  --color-signal: #f5a524;
-  --color-signal-dim: #b57d1f;
-  --color-ok: #2fce93;
-  --color-crit: #f2593f;
+  --color-signal: #8b8bf4;
+  --color-signal-dim: #6465b0;
+  --color-ok: #3dd68c;
+  --color-warn: #d9a13c;
+  --color-crit: #f2555a;
 
-  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
+  /* single family: display IS the sans — hierarchy comes from size/weight */
+  --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -30,122 +33,90 @@
 }
 
 body {
-  background-color: #090e13;
-  background-image:
-    radial-gradient(130% 80% at 50% -25%, rgba(245, 165, 36, 0.1), transparent 55%),
-    radial-gradient(100% 60% at 50% 120%, rgba(47, 206, 147, 0.05), transparent 60%),
-    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  background-size: auto, auto, 34px 34px, 34px 34px;
-  background-attachment: fixed;
+  background-color: var(--color-ink);
+  /* Blueprint grid: barely-there dots, the only texture on the page */
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
   color: var(--color-text);
   font-family: var(--font-sans);
+  font-size: 15px;
+  letter-spacing: -0.006em;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: rgba(245, 165, 36, 0.26);
+  background: rgba(139, 139, 244, 0.3);
   color: #fff;
 }
 
 *:focus-visible {
   outline: 2px solid var(--color-signal);
   outline-offset: 2px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 input[type="checkbox"] {
   accent-color: var(--color-signal);
-  width: 1rem;
-  height: 1rem;
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
 
 /* ── Component helpers ──────────────────────────────────────────────────── */
 @layer components {
-  /* Elevated surface: gradient fill + inset top highlight + soft shadow.
-     This layered depth is the main prototype→product upgrade. */
+  /* Flat surface, hairline border. Separation via border + surface delta,
+     never shadow or gradient. */
   .panel {
-    background: linear-gradient(180deg, #131f28 0%, #0f1820 100%);
-    border: 1px solid var(--color-line);
-    border-radius: 18px;
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.05) inset,
-      0 20px 40px -28px rgba(0, 0, 0, 0.9);
-  }
-
-  /* Inset control well */
-  .field {
-    background: #0a1016;
+    background: var(--color-panel);
     border: 1px solid var(--color-line);
     border-radius: 10px;
+  }
+
+  .field {
+    background: var(--color-ink);
+    border: 1px solid var(--color-line);
+    border-radius: 6px;
     color: var(--color-text);
     font-family: var(--font-sans);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35) inset;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.12s;
   }
   .field::placeholder {
-    color: #5f7482;
+    color: #55595f;
   }
   .field:focus {
     outline: none;
     border-color: var(--color-signal);
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.35) inset,
-      0 0 0 3px rgba(245, 165, 36, 0.16);
+    box-shadow: 0 0 0 3px rgba(139, 139, 244, 0.14);
   }
 
-  /* Tactile primary CTA */
+  /* Linear-style primary action: light button on dark ground */
   .btn-primary {
-    background: linear-gradient(180deg, #ffc960 0%, #f5a524 100%);
-    color: #1c1206;
-    border-radius: 12px;
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.45) inset,
-      0 10px 24px -10px rgba(245, 165, 36, 0.55);
-    transition: filter 0.15s, box-shadow 0.15s, transform 0.05s;
+    background: #ededef;
+    color: #101114;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: background 0.12s;
   }
   .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.05);
-  }
-  .btn-primary:active:not(:disabled) {
-    transform: translateY(1px);
+    background: #ffffff;
   }
   .btn-primary:disabled {
-    background: #16212a;
-    color: #536672;
-    box-shadow: none;
+    background: #1a1d21;
+    color: #55595f;
     cursor: not-allowed;
   }
 
-  /* Hairline that fades at the ends — refined divider */
   .rule-fade {
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.09), transparent);
+    background: var(--color-line-soft);
   }
 }
 
-/* ── Motion ─────────────────────────────────────────────────────────────── */
-@keyframes term-blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-.term-cursor {
-  display: inline-block;
-  width: 0.5ch;
-  height: 1.05em;
-  margin-left: 2px;
-  translate: 0 0.14em;
-  background: var(--color-signal);
-  animation: term-blink 1.05s steps(1) infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .term-cursor { animation: none; opacity: 1; }
   * { transition-duration: 0.001ms !important; }
 }

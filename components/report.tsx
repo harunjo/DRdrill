@@ -18,11 +18,9 @@ function Panel({
   children: ReactNode;
 }) {
   return (
-    <section className="panel mt-5 p-5 sm:p-6">
+    <section className="panel mt-4 p-5 sm:p-6">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-[0.15em] text-signal">
-          {title}
-        </h2>
+        <h2 className="text-[15px] font-medium tracking-tight">{title}</h2>
         <span className="font-mono text-[10px] uppercase tracking-wider text-faint">{caption}</span>
       </div>
       {children}
@@ -85,7 +83,7 @@ function GapMeter({
         </span>
       </div>
       <div className="relative">
-        <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-well">
+        <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-white/[0.06]">
           <div
             className="h-full bg-ok transition-[width] duration-700 ease-out"
             style={{ width: lit ? `${greenW}%` : "0%" }}
@@ -98,7 +96,7 @@ function GapMeter({
         {tickPos >= 0 && tickPos < 100 && (
           <span
             aria-hidden
-            className="absolute -top-1 h-4.5 w-0.5 rounded-full bg-text/80"
+            className="absolute -top-[3px] h-3 w-px bg-text/70"
             style={{ left: `${tickPos}%` }}
           />
         )}
@@ -108,28 +106,27 @@ function GapMeter({
 }
 
 function ScoreRing({ value, band, label }: { value: number; band: string; label: string }) {
-  const r = 54;
+  const r = 56;
   const c = 2 * Math.PI * r;
   const off = c * (1 - Math.max(0, Math.min(100, value)) / 100);
   return (
     <div className="relative h-32 w-32 shrink-0">
       <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
-        <circle cx="64" cy="64" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="9" />
+        <circle cx="64" cy="64" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="4" />
         <circle
           cx="64"
           cy="64"
           r={r}
           fill="none"
           stroke={band}
-          strokeWidth="9"
+          strokeWidth="4"
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={off}
-          style={{ filter: "drop-shadow(0 0 6px color-mix(in srgb, " + band + " 45%, transparent))" }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-display text-4xl font-bold leading-none" style={{ color: band }}>
+        <span className="text-4xl font-medium tracking-tight leading-none" style={{ color: band }}>
           {value}
         </span>
         <span className="mt-1.5 font-mono text-[10px] uppercase tracking-wider text-faint">
@@ -258,19 +255,19 @@ export function Report({
             return (
               <div
                 key={`${f.code}-${f.scope}-${i}`}
-                className="flex gap-3 rounded-lg border border-line bg-well p-3.5 text-sm"
+                className="flex gap-3 rounded-md border border-line bg-well p-3.5 text-[13px]"
               >
                 <span
                   aria-hidden
-                  className={`mt-0.5 w-1 shrink-0 self-stretch rounded-full ${
-                    critical ? "bg-crit" : "bg-signal"
+                  className={`mt-0.5 w-0.5 shrink-0 self-stretch rounded-full ${
+                    critical ? "bg-crit" : "bg-warn"
                   }`}
                 />
                 <div>
                   <div className="flex items-center gap-2 font-medium text-text">
                     <span
                       className={`font-mono text-[10px] uppercase tracking-wider ${
-                        critical ? "text-crit" : "text-signal"
+                        critical ? "text-crit" : "text-warn"
                       }`}
                     >
                       {critical ? "crit" : "warn"}

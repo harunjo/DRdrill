@@ -28,35 +28,21 @@ export default function Home() {
 
   return (
     <main className="mx-auto w-full max-w-3xl grow px-5 py-10 sm:py-14">
-      {/* Console header bar */}
+      {/* Header */}
       <header className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span
-            aria-hidden
-            className="relative flex h-2.5 w-2.5"
-            title="online"
-          >
-            <span className="absolute inline-flex h-full w-full rounded-full bg-signal/50 motion-safe:animate-ping" />
-            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-signal" />
-          </span>
-          <div className="leading-none">
-            <div className="font-display text-xl font-bold tracking-tight">{t.appName}</div>
-            <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
-              business-continuity readout
-            </div>
-          </div>
+        <div className="flex items-center gap-2.5">
+          <span aria-hidden className="h-2 w-2 rounded-full bg-signal" />
+          <span className="text-[15px] font-medium tracking-tight">{t.appName}</span>
         </div>
 
-        <div className="flex overflow-hidden rounded-lg border border-line font-mono text-xs">
+        <div className="flex overflow-hidden rounded-md border border-line font-mono text-xs">
           {(["id", "en"] as Lang[]).map((l) => (
             <button
               key={l}
               onClick={() => setLang(l)}
               aria-pressed={lang === l}
               className={`px-3 py-1.5 transition-colors ${
-                lang === l
-                  ? "bg-signal/15 font-semibold text-signal"
-                  : "text-muted hover:text-text"
+                lang === l ? "bg-well text-text" : "text-faint hover:text-muted"
               }`}
             >
               {l.toUpperCase()}
@@ -65,38 +51,29 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="mt-6 rule-fade" />
-
       {/* Thesis */}
-      <div className="mt-12">
-        <div className="flex items-center gap-3">
-          <span className="h-px w-8 bg-signal/70" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-signal">
-            {t.appName}
-          </span>
-        </div>
-        <h1 className="mt-4 max-w-[24ch] font-display text-[1.9rem] font-semibold leading-[1.14] tracking-[-0.01em] text-balance sm:text-[2.35rem]">
+      <div className="mt-16">
+        <h1 className="max-w-[26ch] text-[1.75rem] font-medium leading-[1.2] tracking-[-0.02em] text-balance sm:text-[2.15rem]">
           {t.tagline}
         </h1>
+        {/* Trust line — runs local */}
+        <p className="mt-5 flex max-w-2xl items-start gap-2.5 text-[13px] leading-relaxed text-muted">
+          <svg
+            aria-hidden
+            viewBox="0 0 24 24"
+            className="mt-0.5 h-3.5 w-3.5 shrink-0 text-signal"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+          <span>{t.privacyLine}</span>
+        </p>
       </div>
-
-      {/* Trust chip — runs local */}
-      <p className="mt-7 flex max-w-2xl items-start gap-3 rounded-xl border border-line bg-well/60 px-4 py-3.5 text-[13px] leading-relaxed text-muted">
-        <svg
-          aria-hidden
-          viewBox="0 0 24 24"
-          className="mt-px h-4 w-4 shrink-0 text-signal"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" />
-          <path d="m9 12 2 2 4-4" />
-        </svg>
-        <span>{t.privacyLine}</span>
-      </p>
 
       <Intake
         t={t}
@@ -126,9 +103,9 @@ export default function Home() {
         />
       )}
 
-      <footer className="mt-20 border-t border-line-soft pt-5 font-mono text-[11px] text-faint">
+      <footer className="mt-20 border-t border-line-soft pt-5 text-[12px] text-faint">
         {t.footer.attribution}{" "}
-        <a className="text-muted underline decoration-line hover:text-signal" href="https://harunjonatan.com">
+        <a className="text-muted underline decoration-line underline-offset-2 hover:text-text" href="https://harunjonatan.com">
           harunjonatan.com
         </a>
       </footer>
