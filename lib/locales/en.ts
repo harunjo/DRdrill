@@ -159,6 +159,16 @@ export const en = {
       copied: "Copied",
       copyFailed: "Copy unavailable — select the text below to copy manually:",
       scope: { onprem: "on-premise", cloud: "cloud" },
+      pdf: {
+        download: "Download PDF",
+        docTitle: "Business Continuity — Investment Justification",
+        forC: "Prepared for executive review",
+        intro:
+          "This one page quantifies the business loss the organization faces if a disaster strikes today, and the specific investments that reduce it. Figures combine the assessment's computed recovery times with the downtime-cost inputs provided.",
+        lossHeading: "Business loss at risk (per incident)",
+        asksHeading: "Recommended investments, by priority",
+        whatItBuys: "What it protects",
+      },
     },
     flagsTitle: "Risk flags",
     flags: {

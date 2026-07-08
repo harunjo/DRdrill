@@ -152,6 +152,16 @@ export const id: Dictionary = {
       copied: "Tersalin",
       copyFailed: "Salin tidak tersedia — pilih teks di bawah untuk menyalin manual:",
       scope: { onprem: "on-premise", cloud: "cloud" },
+      pdf: {
+        download: "Unduh PDF",
+        docTitle: "Business Continuity — Justifikasi Investasi",
+        forC: "Disiapkan untuk tinjauan manajemen (C-level)",
+        intro:
+          "Satu halaman ini mengukur potensi kerugian bisnis yang dihadapi organisasi jika bencana terjadi hari ini, beserta investasi spesifik yang menguranginya. Angka menggabungkan waktu pemulihan hasil asesmen dengan input biaya downtime yang dimasukkan.",
+        lossHeading: "Kerugian bisnis yang berisiko (per insiden)",
+        asksHeading: "Rekomendasi investasi, berdasarkan prioritas",
+        whatItBuys: "Yang dilindungi",
+      },
     },
     flagsTitle: "Tanda risiko",
     flags: {

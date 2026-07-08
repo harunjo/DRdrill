@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { track } from "@vercel/analytics";
-import { AlertOctagon, AlertTriangle, Copy, Check } from "lucide-react";
+import { AlertOctagon, AlertTriangle, Copy, Check, FileDown } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import type { Assessment } from "@/lib/engine";
@@ -29,6 +29,7 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
 
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const [fallback, setFallback] = useState("");
+  const printDate = new Date().toLocaleDateString();
 
   const exposureText =
     agg.monetizedCount > 0
@@ -74,6 +75,7 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
   };
 
   return (
+    <>
     <section className="panel mt-4 overflow-hidden">
       {/* One-pager header */}
       <div className="hero-band border-b border-line px-5 py-6 sm:px-6">
@@ -149,6 +151,16 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
             {copyState === "copied" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             {copyState === "copied" ? inv.copied : inv.copy}
           </button>
+          <button
+            onClick={() => {
+              track("pdf_exported"); // R24: anonymous count, no payload
+              window.print();
+            }}
+            className="btn-ghost px-4 text-sm"
+          >
+            <FileDown className="h-4 w-4" />
+            {inv.pdf.download}
+          </button>
           <span className="text-[12px] text-faint">{inv.preparedBy}</span>
         </div>
         {copyState === "failed" && (
@@ -165,5 +177,96 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
         )}
       </div>
     </section>
+
+    {/* Print-only C-level justification — native window.print() → Save as PDF.
+        Rendered outside the on-screen section so no positioned/overflow ancestor
+        clips it; hidden on screen, revealed by the .print-root rules in globals.css. */}
+    <div className="print-root">
+      <div style={{ color: "#111", fontSize: "13px", lineHeight: 1.5 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "baseline",
+            borderBottom: "2px solid #111",
+            paddingBottom: "10px",
+          }}
+        >
+          <div>
+            <div style={{ fontSize: "18px", fontWeight: 700 }}>{inv.pdf.docTitle}</div>
+            <div style={{ fontSize: "11px", color: "#666", marginTop: "2px" }}>{inv.pdf.forC}</div>
+          </div>
+          <div style={{ fontSize: "11px", color: "#666", textAlign: "right" }}>
+            {t.appName}
+            <br />
+            {printDate}
+          </div>
+        </div>
+
+        <p style={{ marginTop: "14px" }}>{inv.pdf.intro}</p>
+
+        <div style={{ marginTop: "18px" }}>
+          <div
+            style={{
+              fontSize: "10px",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "#666",
+            }}
+          >
+            {inv.pdf.lossHeading}
+          </div>
+          <div
+            style={{
+              fontSize: "30px",
+              fontWeight: 700,
+              color: critHeadline ? "#c0392b" : "#111",
+              marginTop: "2px",
+            }}
+          >
+            {exposureText}
+          </div>
+          <div style={{ fontSize: "12px", color: "#555", marginTop: "2px" }}>
+            {inv.posture}: {t.report.posture[posture]} · {inv.bia}
+          </div>
+        </div>
+
+        <div style={{ marginTop: "22px" }}>
+          <div style={{ fontSize: "13px", fontWeight: 700, marginBottom: "8px" }}>
+            {inv.pdf.asksHeading}
+          </div>
+          {asks.length === 0 ? (
+            <p>{t.report.investEmpty}</p>
+          ) : (
+            <ol style={{ margin: 0, paddingLeft: "18px" }}>
+              {asks.map((ask, i) => (
+                <li key={`${ask.flag.code}-${ask.flag.scope}-${i}`} style={{ marginBottom: "10px" }}>
+                  <span style={{ fontWeight: 600 }}>
+                    {t.report.flags[ask.flag.code].title}
+                    {scopeSuffix(ask)}
+                  </span>
+                  <span style={{ display: "block", color: "#555" }}>
+                    {inv.pdf.whatItBuys}: {effectLine(ask)}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+
+        <div
+          style={{
+            marginTop: "24px",
+            borderTop: "1px solid #ccc",
+            paddingTop: "10px",
+            fontSize: "10px",
+            color: "#777",
+          }}
+        >
+          {coverage} · {inv.preparedBy}
+        </div>
+      </div>
+    </div>
+    </>
   );
 }
