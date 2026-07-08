@@ -39,6 +39,16 @@ export const en = {
       saas: "SaaS",
     },
     sizeLabel: "Size (GB)",
+    cost: {
+      label: "Downtime cost (optional)",
+      unit: "Rp / hour",
+      placeholder: "e.g. 5000000",
+      quickFill: "Quick-fill downtime cost",
+      sameForAll: "Same for all",
+      byTier: "By tier",
+      apply: "Apply",
+      tierShort: "T{n}",
+    },
     tiers: {
       1: "Tier 1 — mission critical",
       2: "Tier 2 — business important",

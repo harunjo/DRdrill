@@ -26,6 +26,7 @@ import {
   type Workload,
   type WorkloadType,
 } from "@/lib/engine";
+import { applyByTier, applyToAll } from "@/lib/costfill";
 
 export const emptyProtection: Protection = {
   frequencyHours: 24,
@@ -75,6 +76,11 @@ export function Intake({
 }) {
   const TOTAL = 3;
   const [step, setStep] = useState(0);
+  // Cost-of-downtime quick-fill (U2) — local input state; commits to env on Apply.
+  const [fillMode, setFillMode] = useState<"all" | "tier">("all");
+  const [fillAll, setFillAll] = useState("");
+  const [fillTier, setFillTier] = useState<Record<number, string>>({});
+  const tiersPresent = [...new Set(env.workloads.map((w) => w.tier))].sort();
 
   const groups: Placement[] =
     env.model === "hybrid" ? ["onprem", "cloud"] : env.model === "cloud" ? ["cloud"] : ["onprem"];
@@ -213,6 +219,94 @@ export function Intake({
 
             {step === 1 && (
               <>
+                {env.workloads.length > 0 && (
+                  <div className="mb-3 rounded-lg border border-line bg-panel p-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[12px] font-medium text-muted">
+                        {t.intake.cost.quickFill}
+                      </span>
+                      <div className="flex overflow-hidden rounded-lg border border-line text-xs font-semibold">
+                        {(["all", "tier"] as const).map((m) => (
+                          <button
+                            key={m}
+                            type="button"
+                            onClick={() => setFillMode(m)}
+                            aria-pressed={fillMode === m}
+                            className={`px-2.5 py-1.5 transition-colors ${
+                              fillMode === m ? "bg-signal text-white" : "text-faint hover:text-muted"
+                            }`}
+                          >
+                            {m === "all" ? t.intake.cost.sameForAll : t.intake.cost.byTier}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      {fillMode === "all" ? (
+                        <>
+                          <input
+                            type="number"
+                            min={0}
+                            className="field w-36 px-2 text-sm"
+                            placeholder={t.intake.cost.placeholder}
+                            value={fillAll}
+                            onChange={(e) => setFillAll(e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            className="btn-primary px-4 text-sm"
+                            disabled={fillAll === ""}
+                            onClick={() =>
+                              onChange({
+                                ...env,
+                                workloads: applyToAll(
+                                  env.workloads,
+                                  fillAll === "" ? undefined : Number(fillAll),
+                                ),
+                              })
+                            }
+                          >
+                            {t.intake.cost.apply}
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {tiersPresent.map((tier) => (
+                            <label
+                              key={tier}
+                              className="flex items-center gap-1 text-[12px] text-muted"
+                            >
+                              {fmt(t.intake.cost.tierShort, { n: tier })}
+                              <input
+                                type="number"
+                                min={0}
+                                className="field w-24 px-2 text-sm"
+                                value={fillTier[tier] ?? ""}
+                                onChange={(e) =>
+                                  setFillTier((s) => ({ ...s, [tier]: e.target.value }))
+                                }
+                              />
+                            </label>
+                          ))}
+                          <button
+                            type="button"
+                            className="btn-primary px-4 text-sm"
+                            onClick={() => {
+                              const map: Partial<Record<Tier, number>> = {};
+                              for (const tr of tiersPresent) {
+                                const v = fillTier[tr];
+                                if (v !== undefined && v !== "") map[tr] = Number(v);
+                              }
+                              onChange({ ...env, workloads: applyByTier(env.workloads, map) });
+                            }}
+                          >
+                            {t.intake.cost.apply}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
                 {env.workloads.length === 0 ? (
                   /* ── Empty state — line-art, non-scolding ── */
                   <div className="flex flex-col items-center rounded-xl border border-dashed border-line bg-well/50 px-6 py-10 text-center">
@@ -318,6 +412,23 @@ export function Intake({
                             </select>
                           )}
                         </div>
+                        <label className="mt-2 flex min-h-[44px] items-center gap-2 rounded-lg border border-line px-3 py-2 text-[13px] text-muted">
+                          <span className="flex-1">{t.intake.cost.label}</span>
+                          <span className="tag">{t.intake.cost.unit}</span>
+                          <input
+                            type="number"
+                            min={0}
+                            className="field w-28 px-2 text-sm"
+                            placeholder={t.intake.cost.placeholder}
+                            value={w.costPerHourDowntime ?? ""}
+                            onChange={(e) =>
+                              updateWorkload(w.id, {
+                                costPerHourDowntime:
+                                  e.target.value === "" ? undefined : Number(e.target.value),
+                              })
+                            }
+                          />
+                        </label>
                       </div>
                     );
                   })

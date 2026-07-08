@@ -38,6 +38,16 @@ export const id: Dictionary = {
       saas: "SaaS",
     },
     sizeLabel: "Ukuran (GB)",
+    cost: {
+      label: "Biaya downtime (opsional)",
+      unit: "Rp / jam",
+      placeholder: "mis. 5000000",
+      quickFill: "Isi cepat biaya downtime",
+      sameForAll: "Sama untuk semua",
+      byTier: "Per tier",
+      apply: "Terapkan",
+      tierShort: "T{n}",
+    },
     tiers: {
       1: "Tier 1 — sangat kritikal",
       2: "Tier 2 — penting bagi bisnis",
