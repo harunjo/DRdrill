@@ -26,7 +26,8 @@ import {
   type Workload,
   type WorkloadType,
 } from "@/lib/engine";
-import { applyByTier, applyToAll } from "@/lib/costfill";
+import { applyByTier, applyToAll, estimateDowntimeCost } from "@/lib/costfill";
+import { formatIDR } from "@/lib/exposure";
 
 export const emptyProtection: Protection = {
   frequencyHours: 24,
@@ -81,6 +82,15 @@ export function Intake({
   const [fillAll, setFillAll] = useState("");
   const [fillTier, setFillTier] = useState<Record<number, string>>({});
   const tiersPresent = [...new Set(env.workloads.map((w) => w.tier))].sort();
+  // Educational estimator (U2) — decompose the number managers can't name into
+  // inputs they can. Computes live; "Use" hands off to the same-for-all field.
+  const [estOpen, setEstOpen] = useState(false);
+  const [est, setEst] = useState({ staff: "", staffCost: "", revenue: "" });
+  const estValue = estimateDowntimeCost({
+    staffAffected: Number(est.staff),
+    hourlyCostPerStaff: Number(est.staffCost),
+    revenuePerHour: Number(est.revenue),
+  });
 
   const groups: Placement[] =
     env.model === "hybrid" ? ["onprem", "cloud"] : env.model === "cloud" ? ["cloud"] : ["onprem"];
@@ -305,6 +315,61 @@ export function Intake({
                         </>
                       )}
                     </div>
+
+                    {/* Educational estimator — turns "I don't know" into inputs they do */}
+                    <button
+                      type="button"
+                      onClick={() => setEstOpen((v) => !v)}
+                      aria-expanded={estOpen}
+                      className="mt-2 text-[12px] font-medium text-signal hover:underline"
+                    >
+                      {t.intake.cost.estimateCta}
+                    </button>
+                    {estOpen && (
+                      <div className="mt-2 rounded-lg border border-line bg-well/60 p-3">
+                        <p className="text-[12px] leading-relaxed text-muted">
+                          {t.intake.cost.estimateHow}
+                        </p>
+                        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                          {(
+                            [
+                              ["staff", t.intake.cost.estStaff],
+                              ["staffCost", t.intake.cost.estStaffCost],
+                              ["revenue", t.intake.cost.estRevenue],
+                            ] as const
+                          ).map(([key, lbl]) => (
+                            <label key={key} className="flex flex-col gap-1 text-[11px] text-faint">
+                              {lbl}
+                              <input
+                                type="number"
+                                min={0}
+                                className="field w-full px-2 py-1.5 text-sm"
+                                value={est[key]}
+                                onChange={(e) => setEst((s) => ({ ...s, [key]: e.target.value }))}
+                              />
+                            </label>
+                          ))}
+                        </div>
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-mono text-[15px] font-semibold text-crit">
+                            {fmt(t.intake.cost.estResult, { v: formatIDR(estValue) })}
+                          </span>
+                          <button
+                            type="button"
+                            className="btn-primary px-4 text-sm"
+                            disabled={estValue <= 0}
+                            onClick={() => {
+                              setFillMode("all");
+                              setFillAll(String(estValue));
+                              onChange({ ...env, workloads: applyToAll(env.workloads, estValue) });
+                              setEstOpen(false);
+                            }}
+                          >
+                            {t.intake.cost.estUse}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 {env.workloads.length === 0 ? (

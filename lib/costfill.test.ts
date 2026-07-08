@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyByTier, applyToAll } from "./costfill";
+import { applyByTier, applyToAll, estimateDowntimeCost } from "./costfill";
 import type { Workload } from "./engine";
 
 const wl = (over: Partial<Workload>): Workload => ({
@@ -34,5 +34,26 @@ describe("applyByTier", () => {
   it("clears when a tier is present with undefined", () => {
     const out = applyByTier([wl({ tier: 1, costPerHourDowntime: 5 })], { 1: undefined });
     expect(out[0].costPerHourDowntime).toBeUndefined();
+  });
+});
+
+describe("estimateDowntimeCost", () => {
+  it("sums staff productivity and lost revenue", () => {
+    // 20 staff × Rp150k/hr + Rp2M/hr revenue = 5M
+    expect(
+      estimateDowntimeCost({ staffAffected: 20, hourlyCostPerStaff: 150_000, revenuePerHour: 2_000_000 }),
+    ).toBe(5_000_000);
+  });
+
+  it("works from productivity alone for internal systems", () => {
+    expect(
+      estimateDowntimeCost({ staffAffected: 10, hourlyCostPerStaff: 100_000, revenuePerHour: 0 }),
+    ).toBe(1_000_000);
+  });
+
+  it("clamps blank/negative/NaN inputs to zero", () => {
+    expect(
+      estimateDowntimeCost({ staffAffected: NaN, hourlyCostPerStaff: -5, revenuePerHour: 0 }),
+    ).toBe(0);
   });
 });

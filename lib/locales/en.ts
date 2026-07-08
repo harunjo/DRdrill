@@ -48,6 +48,13 @@ export const en = {
       byTier: "By tier",
       apply: "Apply",
       tierShort: "T{n}",
+      estimateCta: "Don't know the cost? Estimate it",
+      estimateHow: "One hour of downtime ≈ (staff who can't work × their hourly cost) + revenue lost that hour. Fill what you know — leave the rest at 0.",
+      estStaff: "Staff blocked",
+      estStaffCost: "Cost / staff / hour",
+      estRevenue: "Revenue lost / hour",
+      estResult: "≈ {v} / hour",
+      estUse: "Use for all workloads",
     },
     tiers: {
       1: "Tier 1 — mission critical",

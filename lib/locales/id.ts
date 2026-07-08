@@ -47,6 +47,13 @@ export const id: Dictionary = {
       byTier: "Per tier",
       apply: "Terapkan",
       tierShort: "T{n}",
+      estimateCta: "Belum tahu biayanya? Estimasi di sini",
+      estimateHow: "Satu jam downtime ≈ (staf yang tidak bisa bekerja × biaya per jam mereka) + revenue yang hilang jam itu. Isi yang Anda tahu — sisanya biarkan 0.",
+      estStaff: "Staf terdampak",
+      estStaffCost: "Biaya / staf / jam",
+      estRevenue: "Revenue hilang / jam",
+      estResult: "≈ {v} / jam",
+      estUse: "Pakai untuk semua workload",
     },
     tiers: {
       1: "Tier 1 — sangat kritikal",
