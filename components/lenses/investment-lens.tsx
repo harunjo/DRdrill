@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import { track } from "@vercel/analytics";
 import { AlertOctagon, AlertTriangle, Copy, Check, FileDown } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
@@ -11,12 +10,8 @@ import { fmtMinutes } from "@/lib/engine";
 import { TIER_TARGETS } from "@/lib/calibration";
 import { aggregateExposure, catastrophicList, formatMoney, isCatastrophic, postureBand } from "@/lib/exposure";
 import { buildSummary, orderAsks, type Ask } from "@/lib/investment";
+import type { PdfBlock, PdfDoc } from "@/lib/pdf";
 import { PostureChip } from "@/components/lenses/shared";
-
-// Stable args for a client-only flag via useSyncExternalStore (no re-subscribe).
-const subscribeNoop = () => () => {};
-const getTrue = () => true;
-const getFalse = () => false;
 
 export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: Assessment }) {
   const a = assessment;
@@ -37,9 +32,6 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
 
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const [fallback, setFallback] = useState("");
-  // Portal the print doc to <body>, but only on the client (no document on the
-  // server). useSyncExternalStore returns false during SSR + first hydration.
-  const mounted = useSyncExternalStore(subscribeNoop, getTrue, getFalse);
   const printDate = new Date().toLocaleDateString();
 
   // Name the unrecoverable workloads with their criticality (e.g. "ERP (Kritis)")
@@ -96,15 +88,14 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
       return bd.amount != null ? fmt(inv.closes, { amount: formatMoney(bd.amount, t.currency) }) : inv.closesQual;
     return inv.strengthens;
   };
+  const flagTitle = (ask: Ask): string => t.report.flags[ask.flag.code].title + scopeSuffix(ask);
 
   const summaryText = () =>
     buildSummary({
       title: inv.fundingCase,
       exposure: `${inv.exposureAtRisk}: ${exposureText}`,
       posture: `${inv.posture}: ${t.report.posture[posture]} — ${inv.bia}`,
-      asks: asks.map(
-        (ask) => `${t.report.flags[ask.flag.code].title}${scopeSuffix(ask)} — ${effectLine(ask)}`,
-      ),
+      asks: asks.map((ask) => `${flagTitle(ask)} — ${effectLine(ask)}`),
       coverage,
     });
 
@@ -122,8 +113,149 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
     }
   };
 
+  // The C-level justification as an ordered list of blocks. Data sections are
+  // engine-computed; sections tagged with a guide are skeletons the sponsoring
+  // team completes (the app never prices a fix / R2). Rendered to a real PDF
+  // file by lib/pdf.ts — browser-only, no egress (R13).
+  function buildPdfDoc(): PdfDoc {
+    const blocks: PdfBlock[] = [
+      { kind: "heading", num: 1, title: P.execSummary },
+      {
+        kind: "paragraph",
+        text: fmt(P.execBody, {
+          n,
+          model: modelLabel,
+          exposure: exposureText,
+          posture: t.report.posture[posture],
+        }),
+      },
+      {
+        kind: "loss",
+        label: P.lossHeading,
+        value: exposureText,
+        sub: `${inv.posture}: ${t.report.posture[posture]} · ${inv.bia}`,
+        critical: critHeadline,
+      },
+
+      { kind: "heading", num: 2, title: P.currentSituation },
+      { kind: "paragraph", text: fmt(P.situationLead, { model: modelLabel }) },
+      a.flags.length === 0
+        ? { kind: "paragraph", text: P.noGaps }
+        : { kind: "bullets", items: a.flags.map((f) => t.report.flags[f.code].title) },
+
+      { kind: "heading", num: 3, title: P.riskAssessment },
+      asks.length === 0
+        ? { kind: "paragraph", text: P.noGaps }
+        : {
+            kind: "table",
+            head: [P.thRisk, P.thSeverity, P.thFinancial],
+            rows: asks.map((ask) => [
+              flagTitle(ask),
+              ask.flag.severity === "critical" ? t.report.severity.critical : t.report.severity.warning,
+              financialCell(ask),
+            ]),
+          },
+
+      { kind: "heading", num: 4, title: P.bia },
+      {
+        kind: "table",
+        head: [P.thWorkload, P.thCriticality, P.thTolerance, P.thImpact],
+        rows: a.results.map((r) => [
+          r.workload.name,
+          critLabel(r.workload.tier),
+          dur(TIER_TARGETS[r.workload.tier].rtoMin),
+          P.biaImpact[r.workload.tier],
+        ]),
+      },
+
+      { kind: "heading", num: 5, title: P.currentGap },
+      { kind: "paragraph", text: P.gapLead },
+      {
+        kind: "table",
+        head: [P.thCapability, P.thCurrent, P.thTarget],
+        rows: [
+          [P.capabilityRto, dur(worstRto), dur(targetRto)],
+          [P.capabilityRpo, dur(worstRpo), dur(targetRpo)],
+          ...(hasSingleSite ? [[P.capabilitySite, P.none, P.active]] : []),
+          ...(hasNoImmutable ? [[P.capabilityCyber, P.none, P.yes]] : []),
+        ],
+      },
+
+      { kind: "heading", num: 6, title: P.options, guide: P.guideTag },
+      { kind: "guide", lines: P.optionsGuide },
+
+      { kind: "heading", num: 7, title: P.solution, guide: P.guideTag },
+      { kind: "guide", lines: P.solutionGuide },
+
+      { kind: "heading", num: 8, title: P.financial, guide: P.guideTag },
+      { kind: "guide", lines: [P.financialGuide] },
+      { kind: "table", head: [P.thItem, P.thCost], rows: P.finItems.map((it) => [it, ""]) },
+
+      { kind: "heading", num: 9, title: P.doingNothing },
+      { kind: "paragraph", text: P.doingNothingLead },
+      { kind: "loss", label: "", value: exposureText, sub: "", critical: critHeadline },
+      { kind: "bullets", items: P.doingNothingList },
+
+      { kind: "heading", num: 10, title: P.benefits },
+      { kind: "subheading", text: P.tangibleH },
+      asks.length === 0
+        ? { kind: "paragraph", text: "—" }
+        : {
+            kind: "bullets",
+            items: asks.map((ask) => `${t.report.flags[ask.flag.code].title} — ${effectLine(ask)}`),
+          },
+      { kind: "subheading", text: P.intangibleH },
+      { kind: "bullets", items: P.intangible },
+
+      { kind: "heading", num: 11, title: P.roadmap, guide: P.guideTag },
+      { kind: "guide", lines: P.roadmapGuide },
+
+      { kind: "heading", num: 12, title: P.governance, guide: P.guideTag },
+      { kind: "guide", lines: P.governanceGuide },
+
+      { kind: "heading", num: 13, title: P.kpis },
+      { kind: "paragraph", text: P.kpiLead },
+      {
+        kind: "bullets",
+        items: [
+          `${P.capabilityRto} <= ${dur(targetRto)}`,
+          `${P.capabilityRpo} <= ${dur(targetRpo)}`,
+          ...P.kpiStatic,
+        ],
+      },
+
+      { kind: "heading", num: 14, title: P.recommendation },
+      { kind: "paragraph", text: fmt(P.recBody, { fill: P.fillHint }) },
+      { kind: "subheading", text: P.asksHeading },
+      asks.length === 0
+        ? { kind: "paragraph", text: t.report.investEmpty }
+        : {
+            kind: "bullets",
+            items: asks.map((ask) => `${flagTitle(ask)} — ${P.whatItBuys}: ${effectLine(ask)}`),
+          },
+    ];
+
+    return {
+      filename: `${P.docTitle}.pdf`,
+      title: P.docTitle,
+      subtitle: P.forC,
+      brand: t.appName,
+      date: printDate,
+      intro: P.intro,
+      footer: `${coverage} · ${inv.preparedBy}`,
+      blocks,
+    };
+  }
+
+  const onDownloadPdf = async () => {
+    track("pdf_exported"); // R24: anonymous count, no payload
+    // Build a real PDF file client-side and download it — no print dialog, no
+    // egress. jsPDF is code-split, loaded only on demand.
+    const { downloadPdf } = await import("@/lib/pdf");
+    downloadPdf(buildPdfDoc());
+  };
+
   return (
-    <>
     <section className="panel mt-4 overflow-hidden">
       {/* One-pager header */}
       <div className="hero-band border-b border-line px-5 py-6 sm:px-6">
@@ -199,22 +331,7 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
             {copyState === "copied" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             {copyState === "copied" ? inv.copied : inv.copy}
           </button>
-          <button
-            onClick={() => {
-              track("pdf_exported"); // R24: anonymous count, no payload
-              // The browser uses document.title as the default PDF filename —
-              // localize it so a Bahasa session saves a Bahasa-named file.
-              const prev = document.title;
-              document.title = `DR Drill — ${P.docTitle}`;
-              const restore = () => {
-                document.title = prev;
-                window.removeEventListener("afterprint", restore);
-              };
-              window.addEventListener("afterprint", restore);
-              window.print();
-            }}
-            className="btn-ghost px-4 text-sm"
-          >
+          <button onClick={onDownloadPdf} className="btn-ghost px-4 text-sm">
             <FileDown className="h-4 w-4" />
             {inv.pdf.download}
           </button>
@@ -234,353 +351,5 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
         )}
       </div>
     </section>
-
-    {/* Print-only C-level justification — native window.print() → Save as PDF.
-        Portaled to <body> so it prints as a top-level element in normal flow:
-        @page margins then apply on every page and content paginates cleanly
-        (an absolutely-positioned box ignores page margins and can't). Hidden on
-        screen; the app is display:none'd in print by the .print-root rules.
-        Data sections are computed by the engine; sections tagged as a guide are
-        skeletons the sponsoring team completes (the app never prices a fix / R2). */}
-    {mounted && createPortal(<div className="print-root">{renderPrintDoc()}</div>, document.body)}
-    </>
   );
-
-  function renderPrintDoc() {
-    const secStyle = { marginTop: "20px", breakInside: "avoid" as const };
-    const hStyle = {
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      fontSize: "13px",
-      fontWeight: 700,
-      color: "#111",
-      borderBottom: "1px solid #ddd",
-      paddingBottom: "4px",
-      marginBottom: "8px",
-    };
-    const guideTagStyle = {
-      fontSize: "9px",
-      fontWeight: 600,
-      textTransform: "uppercase" as const,
-      letterSpacing: "0.05em",
-      color: "#8a6d00",
-      background: "#fdf6e3",
-      border: "1px solid #ecdca0",
-      borderRadius: "4px",
-      padding: "1px 6px",
-    };
-    const guideBoxStyle = {
-      border: "1px dashed #bbb",
-      background: "#f7f7f7",
-      borderRadius: "6px",
-      padding: "10px 12px",
-      color: "#555",
-      fontStyle: "italic" as const,
-      fontSize: "12px",
-    };
-    const tblStyle = {
-      width: "100%",
-      borderCollapse: "collapse" as const,
-      fontSize: "12px",
-      marginTop: "4px",
-    };
-    const thStyle = {
-      textAlign: "left" as const,
-      borderBottom: "1.5px solid #111",
-      padding: "5px 8px",
-      fontWeight: 600,
-      color: "#111",
-    };
-    const tdStyle = {
-      borderBottom: "1px solid #e5e5e5",
-      padding: "5px 8px",
-      color: "#333",
-      verticalAlign: "top" as const,
-    };
-
-    const secHead = (num: number, title: string, guide = false) => (
-      <div style={hStyle}>
-        <span>
-          {num}. {title}
-        </span>
-        {guide && <span style={guideTagStyle}>{P.guideTag}</span>}
-      </div>
-    );
-    const table = (headers: string[], rows: string[][]) => (
-      <table style={tblStyle}>
-        <thead>
-          <tr>
-            {headers.map((h, i) => (
-              <th key={i} style={thStyle}>
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, ri) => (
-            <tr key={ri}>
-              {row.map((c, ci) => (
-                <td key={ci} style={tdStyle}>
-                  {c}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    );
-    const guideBox = (lines: string[]) => (
-      <div style={guideBoxStyle}>
-        {lines.map((l, i) => (
-          <p key={i} style={{ margin: i ? "6px 0 0" : 0 }}>
-            {l}
-          </p>
-        ))}
-      </div>
-    );
-    const bullets = (items: string[]) => (
-      <ul style={{ margin: "4px 0 0", paddingLeft: "18px", fontSize: "12px", color: "#333" }}>
-        {items.map((it, i) => (
-          <li key={i} style={{ marginBottom: "3px" }}>
-            {it}
-          </li>
-        ))}
-      </ul>
-    );
-
-    return (
-      <div style={{ color: "#111", fontSize: "12.5px", lineHeight: 1.55 }}>
-        {/* Header */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
-            borderBottom: "2px solid #111",
-            paddingBottom: "10px",
-          }}
-        >
-          <div>
-            <div style={{ fontSize: "18px", fontWeight: 700 }}>{P.docTitle}</div>
-            <div style={{ fontSize: "11px", color: "#666", marginTop: "2px" }}>{P.forC}</div>
-          </div>
-          <div style={{ fontSize: "11px", color: "#666", textAlign: "right" }}>
-            {t.appName}
-            <br />
-            {printDate}
-          </div>
-        </div>
-        <p style={{ marginTop: "12px", color: "#444" }}>{P.intro}</p>
-
-        {/* 1. Executive Summary */}
-        <div style={secStyle}>
-          {secHead(1, P.execSummary)}
-          <p style={{ margin: 0 }}>
-            {fmt(P.execBody, {
-              n,
-              model: modelLabel,
-              exposure: exposureText,
-              posture: t.report.posture[posture],
-            })}
-          </p>
-          <div style={{ marginTop: "12px" }}>
-            <div
-              style={{
-                fontSize: "10px",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "#666",
-              }}
-            >
-              {P.lossHeading}
-            </div>
-            <div
-              style={{
-                fontSize: "28px",
-                fontWeight: 700,
-                color: critHeadline ? "#c0392b" : "#111",
-                marginTop: "2px",
-              }}
-            >
-              {exposureText}
-            </div>
-            <div style={{ fontSize: "11px", color: "#555" }}>
-              {inv.posture}: {t.report.posture[posture]} · {inv.bia}
-            </div>
-          </div>
-        </div>
-
-        {/* 2. Current Situation */}
-        <div style={secStyle}>
-          {secHead(2, P.currentSituation)}
-          <p style={{ margin: "0 0 6px" }}>{fmt(P.situationLead, { model: modelLabel })}</p>
-          {a.flags.length === 0 ? (
-            <p style={{ margin: 0 }}>{P.noGaps}</p>
-          ) : (
-            bullets(a.flags.map((f) => t.report.flags[f.code].title))
-          )}
-        </div>
-
-        {/* 3. Risk Assessment */}
-        <div style={secStyle}>
-          {secHead(3, P.riskAssessment)}
-          {asks.length === 0 ? (
-            <p style={{ margin: 0 }}>{P.noGaps}</p>
-          ) : (
-            table(
-              [P.thRisk, P.thSeverity, P.thFinancial],
-              asks.map((ask) => [
-                t.report.flags[ask.flag.code].title + scopeSuffix(ask),
-                ask.flag.severity === "critical"
-                  ? t.report.severity.critical
-                  : t.report.severity.warning,
-                financialCell(ask),
-              ]),
-            )
-          )}
-        </div>
-
-        {/* 4. Business Impact Analysis */}
-        <div style={secStyle}>
-          {secHead(4, P.bia)}
-          {table(
-            [P.thWorkload, P.thCriticality, P.thTolerance, P.thImpact],
-            a.results.map((r) => [
-              r.workload.name,
-              critLabel(r.workload.tier),
-              dur(TIER_TARGETS[r.workload.tier].rtoMin),
-              P.biaImpact[r.workload.tier],
-            ]),
-          )}
-        </div>
-
-        {/* 5. Current Gap */}
-        <div style={secStyle}>
-          {secHead(5, P.currentGap)}
-          <p style={{ margin: "0 0 6px" }}>{P.gapLead}</p>
-          {table(
-            [P.thCapability, P.thCurrent, P.thTarget],
-            [
-              [P.capabilityRto, dur(worstRto), dur(targetRto)],
-              [P.capabilityRpo, dur(worstRpo), dur(targetRpo)],
-              ...(hasSingleSite ? [[P.capabilitySite, P.none, P.active]] : []),
-              ...(hasNoImmutable ? [[P.capabilityCyber, P.none, P.yes]] : []),
-            ],
-          )}
-        </div>
-
-        {/* 6. Options Considered — guide */}
-        <div style={secStyle}>
-          {secHead(6, P.options, true)}
-          {guideBox(P.optionsGuide)}
-        </div>
-
-        {/* 7. Proposed Solution — guide */}
-        <div style={secStyle}>
-          {secHead(7, P.solution, true)}
-          {guideBox(P.solutionGuide)}
-        </div>
-
-        {/* 8. Financial Analysis — guide + blank cost table */}
-        <div style={secStyle}>
-          {secHead(8, P.financial, true)}
-          <div style={guideBoxStyle}>{P.financialGuide}</div>
-          <div style={{ marginTop: "8px" }}>
-            {table([P.thItem, P.thCost], P.finItems.map((it) => [it, ""]))}
-          </div>
-        </div>
-
-        {/* 9. Cost of Doing Nothing */}
-        <div style={secStyle}>
-          {secHead(9, P.doingNothing)}
-          <p style={{ margin: "0 0 6px" }}>{P.doingNothingLead}</p>
-          <div
-            style={{ fontSize: "22px", fontWeight: 700, color: critHeadline ? "#c0392b" : "#111" }}
-          >
-            {exposureText}
-          </div>
-          {bullets(P.doingNothingList)}
-        </div>
-
-        {/* 10. Benefits */}
-        <div style={secStyle}>
-          {secHead(10, P.benefits)}
-          <div style={{ fontWeight: 600, fontSize: "12px", marginBottom: "2px" }}>{P.tangibleH}</div>
-          {asks.length === 0 ? (
-            <p style={{ margin: 0 }}>—</p>
-          ) : (
-            bullets(asks.map((ask) => `${t.report.flags[ask.flag.code].title} — ${effectLine(ask)}`))
-          )}
-          <div style={{ fontWeight: 600, fontSize: "12px", margin: "8px 0 2px" }}>
-            {P.intangibleH}
-          </div>
-          {bullets(P.intangible)}
-        </div>
-
-        {/* 11. Roadmap — guide */}
-        <div style={secStyle}>
-          {secHead(11, P.roadmap, true)}
-          {guideBox(P.roadmapGuide)}
-        </div>
-
-        {/* 12. Governance — guide */}
-        <div style={secStyle}>
-          {secHead(12, P.governance, true)}
-          {guideBox(P.governanceGuide)}
-        </div>
-
-        {/* 13. Success Metrics */}
-        <div style={secStyle}>
-          {secHead(13, P.kpis)}
-          <p style={{ margin: "0 0 6px" }}>{P.kpiLead}</p>
-          {bullets([
-            `${P.capabilityRto} ≤ ${dur(targetRto)}`,
-            `${P.capabilityRpo} ≤ ${dur(targetRpo)}`,
-            ...P.kpiStatic,
-          ])}
-        </div>
-
-        {/* 14. Recommendation */}
-        <div style={secStyle}>
-          {secHead(14, P.recommendation)}
-          <p style={{ margin: "0 0 8px" }}>{fmt(P.recBody, { fill: P.fillHint })}</p>
-          <div style={{ fontWeight: 600, fontSize: "12px", marginBottom: "4px" }}>
-            {P.asksHeading}
-          </div>
-          {asks.length === 0 ? (
-            <p style={{ margin: 0 }}>{t.report.investEmpty}</p>
-          ) : (
-            <ol style={{ margin: 0, paddingLeft: "18px" }}>
-              {asks.map((ask, i) => (
-                <li key={`${ask.flag.code}-${ask.flag.scope}-${i}`} style={{ marginBottom: "8px" }}>
-                  <span style={{ fontWeight: 600 }}>
-                    {t.report.flags[ask.flag.code].title}
-                    {scopeSuffix(ask)}
-                  </span>
-                  <span style={{ display: "block", color: "#555" }}>
-                    {P.whatItBuys}: {effectLine(ask)}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div
-          style={{
-            marginTop: "22px",
-            borderTop: "1px solid #ccc",
-            paddingTop: "10px",
-            fontSize: "10px",
-            color: "#777",
-          }}
-        >
-          {coverage} · {inv.preparedBy}
-        </div>
-      </div>
-    );
-  }
 }

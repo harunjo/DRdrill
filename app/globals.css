@@ -211,30 +211,3 @@ input[type="checkbox"] {
    who opt out of motion. */
 @keyframes alert-blink { 50% { opacity: 0.35; } }
 .alert-blink { animation: alert-blink 1s ease-in-out infinite; }
-
-/* ── Print: C-level investment justification (native window.print → Save as PDF)
-   The .print-root is portaled to <body> (see investment-lens.tsx). In print we
-   hide every other top-level element and let the print doc flow normally, so the
-   @page margins apply on EVERY page and long content paginates cleanly (an
-   absolutely-positioned box would ignore page margins). Stays in-browser so no
-   report data ever egresses. */
-.print-root { display: none; }
-/* Vertical margins via @page; horizontal margins come from .print-root padding
-   below so they survive even if the user's print dialog is set to "Margins:
-   None" (which zeroes @page but never touches element padding). */
-@page { margin: 14mm 0; }
-@media print {
-  body > *:not(.print-root) { display: none !important; }
-  body { background: #fff; }
-  .print-root {
-    display: block;
-    box-sizing: border-box;
-    padding: 0 14mm;
-    background: #fff;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-  /* Keep tables whole where they fit and repeat their header row if they split. */
-  .print-root table { break-inside: avoid; }
-  .print-root thead { display: table-header-group; }
-}
