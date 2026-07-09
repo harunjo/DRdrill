@@ -200,6 +200,7 @@ export const id: Dictionary = {
       closesQual: "Menutup eksposur yang dilindungi kontrol ini",
       makesRecoverable: "Membuat {n} workload yang recoverable",
       strengthens: "Memperkuat ketahanan",
+      closesSecurityGap: "Menutup celah keamanan ini",
       preparedBy: "Disiapkan oleh harunjonatan.com · Data Anda aman — kami tidak menyimpan detail lingkungan Anda, dan nama workload Anda tidak pernah meninggalkan browser. Simulasi hanya mengirim temuan yang dianonimkan (W1, W2, …).",
       copy: "Salin ringkasan",
       copied: "Tersalin",

@@ -7,11 +7,14 @@ import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import type { Assessment } from "@/lib/engine";
 import { fmtMinutes } from "@/lib/engine";
-import { TIER_TARGETS } from "@/lib/calibration";
+import { SECURITY_CONTROLS, TIER_TARGETS } from "@/lib/calibration";
 import { aggregateExposure, catastrophicList, formatMoney, isCatastrophic, postureBand } from "@/lib/exposure";
 import { buildSummary, orderAsks, type Ask } from "@/lib/investment";
 import type { PdfBlock, PdfDoc } from "@/lib/pdf";
 import { PostureChip } from "@/components/lenses/shared";
+
+// CSF Detect/Respond gap flag codes — these asks are security posture, not DR.
+const SECURITY_CODES = new Set(SECURITY_CONTROLS.map((c) => c.gap?.code).filter(Boolean));
 
 export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: Assessment }) {
   const a = assessment;
@@ -86,6 +89,7 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
     if (bd.kind === "catastrophic") return fmt(inv.makesRecoverable, { n: bd.amount ?? 0 });
     if (bd.kind === "loss")
       return bd.amount != null ? fmt(inv.closes, { amount: formatMoney(bd.amount, t.currency) }) : inv.closesQual;
+    if (SECURITY_CODES.has(ask.flag.code)) return inv.closesSecurityGap;
     return inv.strengthens;
   };
   const flagTitle = (ask: Ask): string => t.report.flags[ask.flag.code].title + scopeSuffix(ask);

@@ -207,6 +207,7 @@ export const en = {
       closesQual: "Closes the exposure this control protects",
       makesRecoverable: "Makes {n} workload(s) recoverable",
       strengthens: "Strengthens resilience posture",
+      closesSecurityGap: "Closes this security gap",
       preparedBy: "Prepared by harunjonatan.com · Your data is safe — we don't store your environment details, and your workload names never leave your browser. The drill sends anonymized findings only (W1, W2, …).",
       copy: "Copy summary",
       copied: "Copied",

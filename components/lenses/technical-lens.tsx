@@ -328,6 +328,38 @@ export function TechnicalLens({
         )}
       </Part>
 
+      {/* ── Security posture (CSF Detect/Respond), when assessed ── */}
+      {(a.detect || a.respond) && (
+        <div className="panel mt-4 p-5 sm:p-6">
+          <div className="text-[13px] font-semibold">{t.report.csf.title}</div>
+          <p className="mt-0.5 text-[12px] text-faint">{t.report.csf.subtitle}</p>
+          <div className="mt-3 flex gap-3">
+            {(
+              [
+                ["detect", a.detect?.score],
+                ["respond", a.respond?.score],
+              ] as const
+            ).map(([fn, sc]) =>
+              sc == null ? null : (
+                <div
+                  key={fn}
+                  className="flex-1 rounded-xl border border-line bg-well/60 p-3 text-center"
+                >
+                  <div className="text-[11px] text-faint">{t.report.csf.functions[fn]}</div>
+                  <div
+                    className="mt-1 font-mono text-[1.5rem] font-semibold"
+                    style={{ color: sc >= 70 ? TONE.ok : sc >= 40 ? TONE.warn : TONE.crit }}
+                  >
+                    {sc}
+                  </div>
+                  <div className="text-[10px] text-faint">/100</div>
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Part 4: Live drill ── */}
       <Part title={t.drill.title} coverage={coverage}>
         {drill}
