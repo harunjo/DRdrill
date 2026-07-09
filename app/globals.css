@@ -213,12 +213,17 @@ input[type="checkbox"] {
    absolutely-positioned box would ignore page margins). Stays in-browser so no
    report data ever egresses. */
 .print-root { display: none; }
-@page { margin: 16mm 14mm; }
+/* Vertical margins via @page; horizontal margins come from .print-root padding
+   below so they survive even if the user's print dialog is set to "Margins:
+   None" (which zeroes @page but never touches element padding). */
+@page { margin: 14mm 0; }
 @media print {
   body > *:not(.print-root) { display: none !important; }
   body { background: #fff; }
   .print-root {
     display: block;
+    box-sizing: border-box;
+    padding: 0 14mm;
     background: #fff;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

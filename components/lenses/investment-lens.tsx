@@ -202,6 +202,15 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
           <button
             onClick={() => {
               track("pdf_exported"); // R24: anonymous count, no payload
+              // The browser uses document.title as the default PDF filename —
+              // localize it so a Bahasa session saves a Bahasa-named file.
+              const prev = document.title;
+              document.title = `DR Drill — ${P.docTitle}`;
+              const restore = () => {
+                document.title = prev;
+                window.removeEventListener("afterprint", restore);
+              };
+              window.addEventListener("afterprint", restore);
               window.print();
             }}
             className="btn-ghost px-4 text-sm"
