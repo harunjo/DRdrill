@@ -6,6 +6,7 @@ import {
   type Protection,
   type Workload,
 } from "./engine";
+import { SECURITY_CONTROLS } from "./calibration";
 
 const noProtection: Protection = {
   frequencyHours: 0,
@@ -277,9 +278,12 @@ describe("assessFunction (CSF Detect/Respond, U1)", () => {
     expect(r.gaps.every((g) => g.scope === "all")).toBe(true);
   });
 
-  it("scores by weight (SIEM present, weight 2 of 9)", () => {
+  it("scores by weight (SIEM present, others absent)", () => {
+    const detect = SECURITY_CONTROLS.filter((c) => c.fn === "detect");
+    const total = detect.reduce((s, c) => s + c.weight, 0);
+    const siemW = detect.find((c) => c.key === "siem")!.weight;
     const r = assessFunction("detect", { siem: true });
-    expect(r.score).toBe(Math.round((2 / 9) * 100)); // 22
+    expect(r.score).toBe(Math.round((siemW / total) * 100));
     expect(r.gaps.some((g) => g.code === "no-siem")).toBe(false);
   });
 });

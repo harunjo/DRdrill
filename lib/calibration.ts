@@ -37,20 +37,36 @@ export const IDR_PER_USD = 16_000;
 // signals: `weight` drives the function's 0–100 score, `depth` gates the
 // generalist (core) vs advanced intake (R18), and `gap` (when present) means an
 // absent control raises an investment flag of that severity.
-// ponytail: weights are a first-pass calibration — review with a practitioner
-// before launch, same standing as TIER_TARGETS.
+//
+// Calibration rationale (weights 1–3, higher = more load-bearing for maturity):
+//   Detect — "can the org SEE an attack unfold?"
+//     3  centralLogging   — the substrate; without it nothing can be detected or investigated
+//     3  siem             — correlation that turns raw logs into an actual detection
+//     3  endpointMonitoring (EDR) — endpoints are where modern ransomware/malware lands first
+//     2  alerting         — detection no one is paged on is just after-the-fact history
+//     2  vulnScanning     — finds the exposed doors before an attacker does
+//     1  networkMonitoring — useful corroboration, secondary to the above (advanced)
+//   Respond — "can the org CONTAIN and recover?"
+//     3  irPlan           — improvising a live incident burns the hours that matter
+//     3  isolation        — containment is what stops one host becoming the whole estate
+//     2  irOwnership      — a plan with no named owner sits in a drawer during the crisis
+//     1  breachNotification — regulatory/comms; adds penalties but doesn't cut technical impact
+//     1  playbooks        — makes response faster/repeatable (advanced)
+//     1  tabletop         — validates the above actually works under pressure (advanced)
+// ponytail: still a knob — an operator with sector-specific incident data should
+// revisit these, same standing as TIER_TARGETS.
 export const SECURITY_CONTROLS: SecurityControl[] = [
   // Detect (NIST CSF DE)
-  { key: "siem", fn: "detect", weight: 2, depth: "core", gap: { code: "no-siem", severity: "critical" } },
-  { key: "centralLogging", fn: "detect", weight: 2, depth: "core", gap: { code: "no-central-logging", severity: "critical" } },
-  { key: "endpointMonitoring", fn: "detect", weight: 2, depth: "core", gap: { code: "no-endpoint-monitoring", severity: "warning" } },
-  { key: "alerting", fn: "detect", weight: 1, depth: "core", gap: { code: "no-alerting", severity: "warning" } },
-  { key: "vulnScanning", fn: "detect", weight: 1, depth: "core", gap: { code: "no-vuln-scanning", severity: "warning" } },
+  { key: "siem", fn: "detect", weight: 3, depth: "core", gap: { code: "no-siem", severity: "critical" } },
+  { key: "centralLogging", fn: "detect", weight: 3, depth: "core", gap: { code: "no-central-logging", severity: "critical" } },
+  { key: "endpointMonitoring", fn: "detect", weight: 3, depth: "core", gap: { code: "no-endpoint-monitoring", severity: "critical" } },
+  { key: "alerting", fn: "detect", weight: 2, depth: "core", gap: { code: "no-alerting", severity: "warning" } },
+  { key: "vulnScanning", fn: "detect", weight: 2, depth: "core", gap: { code: "no-vuln-scanning", severity: "warning" } },
   { key: "networkMonitoring", fn: "detect", weight: 1, depth: "advanced" },
   // Respond (NIST CSF RS)
-  { key: "irPlan", fn: "respond", weight: 2, depth: "core", gap: { code: "no-ir-plan", severity: "critical" } },
-  { key: "isolation", fn: "respond", weight: 2, depth: "core", gap: { code: "no-isolation", severity: "critical" } },
-  { key: "irOwnership", fn: "respond", weight: 1, depth: "core", gap: { code: "no-ir-ownership", severity: "warning" } },
+  { key: "irPlan", fn: "respond", weight: 3, depth: "core", gap: { code: "no-ir-plan", severity: "critical" } },
+  { key: "isolation", fn: "respond", weight: 3, depth: "core", gap: { code: "no-isolation", severity: "critical" } },
+  { key: "irOwnership", fn: "respond", weight: 2, depth: "core", gap: { code: "no-ir-ownership", severity: "warning" } },
   { key: "breachNotification", fn: "respond", weight: 1, depth: "core", gap: { code: "no-breach-notification", severity: "warning" } },
   { key: "playbooks", fn: "respond", weight: 1, depth: "advanced" },
   { key: "tabletop", fn: "respond", weight: 1, depth: "advanced" },
