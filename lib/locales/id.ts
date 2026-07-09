@@ -286,6 +286,51 @@ export const id: Dictionary = {
         detail:
           "Workload tanpa proteksi apa pun akan beresiko kehilangan data secara permanen. Melindunginya adalah investasi pertama yang perlu dilakukan.",
       },
+      "no-siem": {
+        title: "Serangan bisa lolos tanpa terdeteksi",
+        detail:
+          "Tanpa SIEM yang mengorelasikan log, penyerang bisa beroperasi berminggu-minggu sebelum ada yang sadar. Deteksi terpusat mengubah pembobolan senyap menjadi peringatan dini.",
+      },
+      "no-central-logging": {
+        title: "Tidak ada catatan terpusat untuk investigasi",
+        detail:
+          "Bila log hanya tersimpan di masing-masing sistem, tidak ada satu tempat untuk melihat serangan berlangsung atau membuktikan apa yang terjadi. Log terpusat adalah fondasi deteksi dan respons.",
+      },
+      "no-endpoint-monitoring": {
+        title: "Endpoint tidak dipantau",
+        detail:
+          "Laptop dan server adalah tempat mayoritas intrusi mendarat pertama kali. Pemantauan endpoint (EDR) menangkap aktivitas berbahaya di mesin sebelum menyebar.",
+      },
+      "no-alerting": {
+        title: "Deteksi tanpa peringatan hanya jadi catatan",
+        detail:
+          "Sinyal yang tidak memicu notifikasi baru ditinjau setelah kerusakan terjadi. Alerting mengubah kejadian terdeteksi menjadi respons tepat waktu.",
+      },
+      "no-vuln-scanning": {
+        title: "Celah yang tak diketahui tetap terbuka",
+        detail:
+          "Kelemahan yang belum ditambal dan terekspos adalah pintu yang dipakai penyerang. Pemindaian kerentanan berkala adalah cara bisnis menemukan dan menutupnya lebih dulu.",
+      },
+      "no-ir-plan": {
+        title: "Tidak ada rencana saat insiden terjadi",
+        detail:
+          "Berimprovisasi saat insiden berlangsung menghabiskan waktu berjam-jam yang tak bisa ditebus. Rencana respons insiden terdokumentasi menjaga krisis tidak berubah jadi kekacauan.",
+      },
+      "no-isolation": {
+        title: "Tidak ada yang menahan penyebaran",
+        detail:
+          "Tanpa kemampuan mengisolasi segmen yang terkompromi, satu mesin terinfeksi bisa menjatuhkan seluruh lingkungan. Isolasi jaringan adalah kontrol yang membendung insiden.",
+      },
+      "no-ir-ownership": {
+        title: "Tidak ada pemilik respons",
+        detail:
+          "Bila tidak ada yang jelas bertugas, jam pertama insiden habis untuk 'siapa yang menangani ini?'. Kepemilikan respons yang ditunjuk memulai penanganan lebih cepat.",
+      },
+      "no-breach-notification": {
+        title: "Tidak ada proses pemberitahuan",
+        detail:
+          "Regulator dan pelanggan mengharapkan pengungkapan tepat waktu setelah pembobolan; jendela yang terlewat menambah penalti. Proses pemberitahuan pembobolan mencegah insiden teknis berubah jadi masalah kepatuhan.",
+      },
     },
     rule321Title: "Aturan 3-2-1",
     rule321: {

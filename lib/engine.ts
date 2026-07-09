@@ -12,6 +12,7 @@ import {
   CLOUD_RESTORE_GBPH,
   RESTORE_OVERHEAD_MIN,
   REPLICA_FAILOVER_MIN,
+  SECURITY_CONTROLS,
 } from "./calibration";
 
 export type DeploymentModel = "onprem" | "cloud" | "hybrid" | "private";
@@ -56,6 +57,9 @@ export interface Environment {
     onprem?: Protection; // used by onprem, private, hybrid
     cloud?: Protection; // used by cloud, hybrid
   };
+  /** Per-environment CSF Detect/Respond control presence (R17). Absent
+   *  entirely = the security functions were not assessed (R2). */
+  security?: SecurityInputs;
 }
 
 // Flags are emitted as codes; UI and narrative prompt map codes to localized,
@@ -66,13 +70,48 @@ export type FlagCode =
   | "single-site"
   | "no-cross-region"
   | "saas-shared-responsibility"
-  | "unprotected-workloads";
+  | "unprotected-workloads"
+  // NIST CSF Detect/Respond gaps (absent per-environment controls, R7)
+  | "no-siem"
+  | "no-central-logging"
+  | "no-endpoint-monitoring"
+  | "no-alerting"
+  | "no-vuln-scanning"
+  | "no-ir-plan"
+  | "no-isolation"
+  | "no-ir-ownership"
+  | "no-breach-notification";
 
 export interface RiskFlag {
   code: FlagCode;
   severity: "critical" | "warning";
-  /** which placement group triggered it, for UI context */
+  /** which placement group triggered it, for UI context ("all" for the
+   *  per-environment CSF Detect/Respond gaps) */
   scope: Placement | "all";
+}
+
+// --- NIST CSF Detect/Respond posture (per-environment, R4/R5/R17) ---
+
+export type CsfFunction = "detect" | "respond";
+
+/** One assessable control. `depth` gates generalist vs advanced intake (R18);
+ *  an absent control with a `gap` raises that investment flag (R7). */
+export interface SecurityControl {
+  key: string; // stable id, also the i18n key
+  fn: CsfFunction;
+  weight: number; // contribution to the function's 0–100 maturity score
+  depth: "core" | "advanced";
+  gap?: { code: FlagCode; severity: "critical" | "warning" };
+}
+
+/** Environment-level control presence, keyed by SecurityControl.key. A missing
+ *  key means the control is absent. Booleans only — never PII. */
+export type SecurityInputs = Record<string, boolean>;
+
+export interface FunctionResult {
+  score: number; // 0–100 weighted maturity
+  controls: SecurityInputs; // normalized present/absent per control (browser-only view)
+  gaps: RiskFlag[]; // absent controls that carry a gap flag
 }
 
 export interface WorkloadResult {
@@ -101,6 +140,10 @@ export interface FindingsPayload {
   flags: RiskFlag[];
   rule321: { threeCopies: boolean; twoMedia: boolean; oneOffsite: boolean };
   score: number;
+  /** CSF Detect/Respond maturity — score only (pseudonymized, R10). Absent when
+   *  the security functions were not assessed. */
+  detect?: { score: number };
+  respond?: { score: number };
 }
 
 export interface Assessment {
@@ -111,6 +154,10 @@ export interface Assessment {
   findings: FindingsPayload;
   /** label → real name; browser-only, used to re-substitute into the narrative */
   labelMap: Record<string, string>;
+  /** Browser-only CSF Detect/Respond results (score + per-control checklist).
+   *  Absent when the security functions were not assessed. */
+  detect?: FunctionResult;
+  respond?: FunctionResult;
 }
 
 export function placementOf(w: Workload, model: DeploymentModel): Placement {
@@ -189,6 +236,25 @@ function collectFlags(env: Environment): RiskFlag[] {
   return flags;
 }
 
+/** Deterministic CSF maturity for one function: weighted control presence, plus
+ *  a gap flag for each absent control that carries one (R6, R7, R11). Pure —
+ *  no model involvement. */
+export function assessFunction(fn: CsfFunction, security: SecurityInputs): FunctionResult {
+  const controls = SECURITY_CONTROLS.filter((c) => c.fn === fn);
+  const total = controls.reduce((s, c) => s + c.weight, 0);
+  let present = 0;
+  const gaps: RiskFlag[] = [];
+  const normalized: SecurityInputs = {};
+  for (const c of controls) {
+    const has = security[c.key] === true;
+    normalized[c.key] = has;
+    if (has) present += c.weight;
+    else if (c.gap) gaps.push({ code: c.gap.code, severity: c.gap.severity, scope: "all" });
+  }
+  const score = total > 0 ? Math.round((present / total) * 100) : 0;
+  return { score, controls: normalized, gaps };
+}
+
 export function assess(env: Environment): Assessment {
   const workloads = env.workloads.slice(0, MAX_WORKLOADS);
 
@@ -199,7 +265,13 @@ export function assess(env: Environment): Assessment {
     return { ...assessWorkload(w, env), label };
   });
 
-  const flags = collectFlags(env);
+  // Recover (DR) flags drive the Recover score below; the CSF Detect/Respond
+  // gaps are appended to the report/investment flag set but never affect the
+  // Recover score (R1 — Recover computations unchanged).
+  const drFlags = collectFlags(env);
+  const detect = env.security ? assessFunction("detect", env.security) : undefined;
+  const respond = env.security ? assessFunction("respond", env.security) : undefined;
+  const flags = [...drFlags, ...(detect?.gaps ?? []), ...(respond?.gaps ?? [])];
 
   // 3-2-1 across the environment: any protected group counts copies; media
   // diversity approximated by replication or a cloud+onprem split; offsite by
@@ -218,14 +290,15 @@ export function assess(env: Environment): Assessment {
     oneOffsite: groups.some((p) => p.offsiteCopy),
   };
 
-  // ponytail: linear score — 60% target compliance, 40% hygiene flags.
+  // ponytail: linear score — 60% target compliance, 40% hygiene flags. Uses
+  // drFlags only, so the Recover score ignores CSF Detect/Respond gaps (R1).
   const checks = results.flatMap((r) => [r.rpoMeets, r.rtoMeets]);
   const compliance = checks.length ? checks.filter(Boolean).length / checks.length : 0;
   const hygiene =
     1 -
     Math.min(
       1,
-      flags.reduce((n, f) => n + (f.severity === "critical" ? 0.4 : 0.15), 0),
+      drFlags.reduce((n, f) => n + (f.severity === "critical" ? 0.4 : 0.15), 0),
     );
   const score = Math.max(0, Math.min(100, Math.round((compliance * 0.6 + hygiene * 0.4) * 100)));
 
@@ -245,9 +318,20 @@ export function assess(env: Environment): Assessment {
     flags,
     rule321,
     score,
+    ...(detect ? { detect: { score: detect.score } } : {}),
+    ...(respond ? { respond: { score: respond.score } } : {}),
   };
 
-  return { results, flags, rule321, score, findings, labelMap };
+  return {
+    results,
+    flags,
+    rule321,
+    score,
+    findings,
+    labelMap,
+    ...(detect ? { detect } : {}),
+    ...(respond ? { respond } : {}),
+  };
 }
 
 export interface DurationLabels {

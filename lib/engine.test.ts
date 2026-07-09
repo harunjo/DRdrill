@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   assess,
+  assessFunction,
   type Environment,
   type Protection,
   type Workload,
@@ -251,5 +252,59 @@ describe("3-2-1 rule", () => {
     expect(r.threeCopies).toBe(true);
     expect(r.twoMedia).toBe(true);
     expect(r.oneOffsite).toBe(true);
+  });
+});
+
+describe("assessFunction (CSF Detect/Respond, U1)", () => {
+  it("scores 100 with no gaps when every control is present", () => {
+    const all = Object.fromEntries(
+      ["siem", "centralLogging", "endpointMonitoring", "alerting", "vulnScanning", "networkMonitoring"].map(
+        (k) => [k, true],
+      ),
+    );
+    const r = assessFunction("detect", all);
+    expect(r.score).toBe(100);
+    expect(r.gaps).toHaveLength(0);
+  });
+
+  it("scores 0 and flags every gap-bearing control when none are present", () => {
+    const r = assessFunction("detect", {});
+    expect(r.score).toBe(0);
+    // 5 core detect controls carry gaps; networkMonitoring is advanced (no gap)
+    expect(r.gaps.map((g) => g.code).sort()).toEqual(
+      ["no-alerting", "no-central-logging", "no-endpoint-monitoring", "no-siem", "no-vuln-scanning"].sort(),
+    );
+    expect(r.gaps.every((g) => g.scope === "all")).toBe(true);
+  });
+
+  it("scores by weight (SIEM present, weight 2 of 9)", () => {
+    const r = assessFunction("detect", { siem: true });
+    expect(r.score).toBe(Math.round((2 / 9) * 100)); // 22
+    expect(r.gaps.some((g) => g.code === "no-siem")).toBe(false);
+  });
+});
+
+describe("assess() CSF wiring (U1)", () => {
+  const wl: Workload = { id: "a", name: "ERP", type: "database", sizeGB: 100, tier: 1 };
+  const base: Environment = {
+    model: "onprem",
+    workloads: [wl],
+    protection: { onprem: { ...noProtection, frequencyHours: 24 } },
+  };
+
+  it("omits detect/respond when security is not assessed (R2)", () => {
+    const a = assess(base);
+    expect(a.detect).toBeUndefined();
+    expect(a.findings.detect).toBeUndefined();
+    expect(a.flags.some((f) => f.code.startsWith("no-siem"))).toBe(false);
+  });
+
+  it("adds security gaps to flags but leaves the Recover score unchanged (R1)", () => {
+    const a = assess({ ...base, security: {} }); // assessed, nothing present
+    const recoverOnly = assess(base);
+    expect(a.score).toBe(recoverOnly.score); // Recover score not dragged by security gaps
+    expect(a.detect?.score).toBe(0);
+    expect(a.findings.detect).toEqual({ score: 0 });
+    expect(a.flags.some((f) => f.code === "no-siem")).toBe(true);
   });
 });

@@ -293,6 +293,51 @@ export const en = {
         detail:
           "Workloads without any protection are one incident away from permanent loss. Protecting them is the first investment to make.",
       },
+      "no-siem": {
+        title: "Attacks can go unseen",
+        detail:
+          "Without a SIEM correlating logs, an intruder can operate for weeks before anyone notices. Central detection turns a silent breach into an early alert.",
+      },
+      "no-central-logging": {
+        title: "No central record to investigate",
+        detail:
+          "When logs live only on each system, there is no single place to see an attack unfold or prove what happened. Centralized logging is the foundation detection and response both build on.",
+      },
+      "no-endpoint-monitoring": {
+        title: "Endpoints aren't watched",
+        detail:
+          "Laptops and servers are where most intrusions land first. Endpoint monitoring (EDR) spots malicious activity on the machine before it spreads.",
+      },
+      "no-alerting": {
+        title: "Detection without alerting is just history",
+        detail:
+          "Signals no one is paged on get reviewed after the damage is done. Alerting turns a detected event into a timely response.",
+      },
+      "no-vuln-scanning": {
+        title: "Unknown weaknesses stay open",
+        detail:
+          "Unpatched, exposed weaknesses are the doors attackers use. Regular vulnerability scanning is how the business finds and closes them first.",
+      },
+      "no-ir-plan": {
+        title: "No plan when an incident hits",
+        detail:
+          "Improvising during a live incident costs hours the business can't spare. A documented incident-response plan keeps a crisis from becoming chaos.",
+      },
+      "no-isolation": {
+        title: "Nothing to stop the spread",
+        detail:
+          "Without the ability to isolate a compromised segment, one infected machine can take the whole environment. Network isolation is the control that contains an incident.",
+      },
+      "no-ir-ownership": {
+        title: "No one owns the response",
+        detail:
+          "When no one is clearly on call, the first hour of an incident is lost to 'who handles this?'. Named response ownership starts the clock on containment.",
+      },
+      "no-breach-notification": {
+        title: "No process to notify",
+        detail:
+          "Regulators and customers expect timely disclosure after a breach; a missed window adds penalties to the damage. A breach-notification process keeps a technical incident from becoming a compliance one.",
+      },
     },
     rule321Title: "3-2-1 rule",
     rule321: {
