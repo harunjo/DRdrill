@@ -9,7 +9,8 @@ export const id: Dictionary = {
   tagline: "Gambarkan lingkungan IT Anda, lalu lihat kesiapan recovery yang sebenarnya — RPO/RTO yang benar-benar bisa dicapai, bukan sekadar angka di slide.",
   privacyLine:
     "Detail lingkungan dan nama workload Anda tidak pernah meninggalkan browser ini. Cerita simulasi ditulis hanya dari temuan yang dianonimkan (W1, W2, …), dan tidak ada input atau data Anda yang disimpan di server ini.",
-  trustIndicator: "Laporan berjalan di perangkat · nama tidak pernah meninggalkan browser",
+  trustIndicator:
+    "Asesmen berjalan sepenuhnya di perangkat Anda — nama tidak pernah dikirim keluar; simulasi hanya mengirim temuan anonim",
 
   intake: {
     steps: {
