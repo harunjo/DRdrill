@@ -206,6 +206,12 @@ input[type="checkbox"] {
   * { transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
 }
 
+/* Red-alert blink for the critical ("Rentan"/Exposed) posture chip. The
+   reduced-motion rule above zeroes the duration, so it holds steady for users
+   who opt out of motion. */
+@keyframes alert-blink { 50% { opacity: 0.35; } }
+.alert-blink { animation: alert-blink 1s ease-in-out infinite; }
+
 /* ── Print: C-level investment justification (native window.print → Save as PDF)
    The .print-root is portaled to <body> (see investment-lens.tsx). In print we
    hide every other top-level element and let the print doc flow normally, so the

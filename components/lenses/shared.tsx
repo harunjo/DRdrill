@@ -16,8 +16,12 @@ const POSTURE_TONE: Record<PostureBand, "ok" | "warn" | "crit"> = {
  *  case lens headers. */
 export function PostureChip({ t, posture }: { t: Dictionary; posture: PostureBand }) {
   const tone = TONE[POSTURE_TONE[posture]];
+  const critical = POSTURE_TONE[posture] === "crit"; // Exposed / "Rentan" → red alert
   return (
-    <span className="chip shrink-0" style={{ background: `${tone}18`, color: tone }}>
+    <span
+      className={`chip shrink-0${critical ? " alert-blink" : ""}`}
+      style={{ background: `${tone}18`, color: tone }}
+    >
       {t.report.posture[posture]}
     </span>
   );
