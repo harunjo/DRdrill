@@ -27,7 +27,7 @@ import {
   type WorkloadType,
 } from "@/lib/engine";
 import { applyByTier, applyToAll, estimateDowntimeCost } from "@/lib/costfill";
-import { formatIDR } from "@/lib/exposure";
+import { formatMoney } from "@/lib/exposure";
 
 export const emptyProtection: Protection = {
   frequencyHours: 24,
@@ -91,6 +91,13 @@ export function Intake({
     monthlySalaryPerStaff: Number(est.staffCost),
     revenuePerHour: Number(est.revenue),
   });
+
+  // Money is stored in IDR (single source of truth), but shown/entered in the
+  // display currency (IDR in Bahasa, USD in English). Convert at the input edge:
+  // all local input state is in display units; commit to env in IDR.
+  const cur = t.currency;
+  const toIDR = (x: number) => Math.round(x * cur.rate);
+  const toDisplay = (idr: number) => idr / cur.rate;
 
   const groups: Placement[] =
     env.model === "hybrid" ? ["onprem", "cloud"] : env.model === "cloud" ? ["cloud"] : ["onprem"];
@@ -271,7 +278,7 @@ export function Intake({
                                 ...env,
                                 workloads: applyToAll(
                                   env.workloads,
-                                  fillAll === "" ? undefined : Number(fillAll),
+                                  fillAll === "" ? undefined : toIDR(Number(fillAll)),
                                 ),
                               })
                             }
@@ -305,7 +312,7 @@ export function Intake({
                               const map: Partial<Record<Tier, number>> = {};
                               for (const tr of tiersPresent) {
                                 const v = fillTier[tr];
-                                if (v !== undefined && v !== "") map[tr] = Number(v);
+                                if (v !== undefined && v !== "") map[tr] = toIDR(Number(v));
                               }
                               onChange({ ...env, workloads: applyByTier(env.workloads, map) });
                             }}
@@ -353,7 +360,7 @@ export function Intake({
                         </div>
                         <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                           <span className="font-mono text-[15px] font-semibold text-crit">
-                            {fmt(t.intake.cost.estResult, { v: formatIDR(estValue) })}
+                            {fmt(t.intake.cost.estResult, { v: formatMoney(toIDR(estValue), cur) })}
                           </span>
                           <button
                             type="button"
@@ -490,11 +497,11 @@ export function Intake({
                             min={0}
                             className="field w-28 px-2 text-sm"
                             placeholder={t.intake.cost.placeholder}
-                            value={w.costPerHourDowntime ?? ""}
+                            value={w.costPerHourDowntime != null ? toDisplay(w.costPerHourDowntime) : ""}
                             onChange={(e) =>
                               updateWorkload(w.id, {
                                 costPerHourDowntime:
-                                  e.target.value === "" ? undefined : Number(e.target.value),
+                                  e.target.value === "" ? undefined : toIDR(Number(e.target.value)),
                               })
                             }
                           />
