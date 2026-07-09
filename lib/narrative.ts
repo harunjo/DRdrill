@@ -146,6 +146,16 @@ export function buildPrompt(req: NarrativeRequest): string {
   const flags = req.findings.flags.map((f) => `${f.code} (${f.severity}, ${f.scope})`);
   const langName = req.lang === "id" ? "Indonesian (Bahasa Indonesia)" : "English";
 
+  // CSF Detect/Respond given as qualitative bands only — never numbers (R9/R11).
+  const band = (s: number) => (s >= 70 ? "strong" : s >= 40 ? "developing" : "weak");
+  const security =
+    req.findings.detect || req.findings.respond
+      ? [
+          `Detection posture (Detect): ${req.findings.detect ? band(req.findings.detect.score) : "not assessed"}`,
+          `Response posture (Respond): ${req.findings.respond ? band(req.findings.respond.score) : "not assessed"}`,
+        ]
+      : [];
+
   return [
     `Write a short business-continuity drill story, written ENTIRELY in ${langName}: ${SCENARIO_TEXT[req.scenario][req.lang]} hits tonight.`,
     ``,
@@ -154,12 +164,15 @@ export function buildPrompt(req: NarrativeRequest): string {
     ...lines,
     `Risk flags: ${flags.join("; ") || "none"}`,
     `Readiness score: ${req.findings.score}/100`,
+    ...security,
     ``,
     `RULES:`,
     `- LANGUAGE (most important): these instructions are in English, but your entire output — every beat, every word — MUST be written in ${langName}. Do not mix in another language.`,
     `- Output 6 to 10 beats, one per line, each starting with a clock time like "02:14 — ".`,
     `- Refer to workloads ONLY by their labels (W1, W2, ...). Never invent system names.`,
     `- Every duration or quantity you mention MUST come from the facts above (you may convert minutes to hours). Do not invent any number except the clock times.`,
+    `- Describe detection and response posture qualitatively (e.g. "weak", "undetected", "slow to contain"); never state a maturity score or invent a duration for it.`,
+    `- For a cyber-attack scenario with weak detection or response, you may narrate the intruder operating undetected and spreading before recovery begins — kept qualitative per the rule above — then let recovery unfold per the RPO/RTO facts.`,
     `- Do not name any product, vendor, or tool.`,
     `- Do not introduce any fact, system, person, or outcome not derivable from the facts above.`,
     `- Tone: sober incident log, addressed to management; end with the state of the business at the end of the timeline.`,

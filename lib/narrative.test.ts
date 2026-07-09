@@ -172,3 +172,35 @@ describe("validateRequest — CSF detect/respond (U2)", () => {
     expect(validateRequest(req)).toBeNull();
   });
 });
+
+describe("buildPrompt — CSF Detect/Respond (U7)", () => {
+  it("includes qualitative detection/response posture (no numeric score) when assessed", () => {
+    const p = buildPrompt({
+      findings: { ...structuredClone(findings), detect: { score: 20 }, respond: { score: 80 } },
+      scenario: "ransomware",
+      lang: "en",
+    });
+    expect(p).toContain("Detection posture (Detect): weak");
+    expect(p).toContain("Response posture (Respond): strong");
+    expect(p).not.toContain("20/100"); // score must not leak into the prompt facts
+    expect(p).toContain("qualitatively");
+  });
+
+  it("omits security lines when Detect/Respond were not assessed", () => {
+    const p = buildPrompt({
+      findings: structuredClone(findings),
+      scenario: "ransomware",
+      lang: "en",
+    });
+    expect(p).not.toContain("Detection posture");
+  });
+
+  it("validateNarrative still rejects an invented dwell-time number (R11)", () => {
+    const check = validateNarrative(
+      "02:14 — the intruder dwelled for 21 days before anyone noticed.",
+      findings,
+    );
+    expect(check.ok).toBe(false);
+    expect(check.offending).toContain("21");
+  });
+});
