@@ -48,6 +48,7 @@ export const en = {
       saas: "SaaS",
     },
     sizeLabel: "Data size",
+    sizeUnit: "Size unit",
     cost: {
       label: "Downtime cost (optional)",
       unit: "USD / hour",

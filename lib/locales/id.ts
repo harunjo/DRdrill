@@ -41,6 +41,7 @@ export const id: Dictionary = {
       saas: "SaaS",
     },
     sizeLabel: "Ukuran data",
+    sizeUnit: "Satuan ukuran",
     cost: {
       label: "Biaya downtime (opsional)",
       unit: "Rp / jam",

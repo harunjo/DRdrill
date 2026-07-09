@@ -82,6 +82,8 @@ export function Intake({
   // Dual depth (R18): generalist by default; advanced reveals the full control
   // set and CSF terminology. Display-only — not persisted to the environment.
   const [advanced, setAdvanced] = useState(false);
+  // Per-workload display unit for size; storage stays canonical in GB (R13).
+  const [sizeUnit, setSizeUnit] = useState<Record<string, "GB" | "TB">>({});
   // Cost-of-downtime quick-fill (U2) — local input state; commits to env on Apply.
   const [fillMode, setFillMode] = useState<"all" | "tier">("all");
   const [fillAll, setFillAll] = useState("");
@@ -462,19 +464,48 @@ export function Intake({
                             ))}
                           </select>
                           <div className="relative">
-                            <input
-                              type="number"
-                              min={1}
-                              className="field w-full px-3 py-2 pr-11 text-sm"
-                              title={t.intake.sizeLabel}
-                              placeholder={t.intake.sizeLabel}
-                              value={Number.isFinite(w.sizeGB) ? w.sizeGB : ""}
-                              onChange={(e) => updateWorkload(w.id, { sizeGB: Number(e.target.value) })}
-                            />
-                            {/* Persistent unit so the box is never a contextless number. */}
-                            <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 tag">
-                              GB
-                            </span>
+                            {(() => {
+                              const unit = sizeUnit[w.id] ?? "GB";
+                              const shown = Number.isFinite(w.sizeGB)
+                                ? unit === "TB"
+                                  ? w.sizeGB / 1000
+                                  : w.sizeGB
+                                : "";
+                              return (
+                                <>
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    step="any"
+                                    className="field w-full px-3 py-2 pr-14 text-sm"
+                                    title={t.intake.sizeLabel}
+                                    placeholder={t.intake.sizeLabel}
+                                    value={shown}
+                                    onChange={(e) => {
+                                      const v = Number(e.target.value);
+                                      updateWorkload(w.id, {
+                                        sizeGB: unit === "TB" ? Math.round(v * 1000) : v,
+                                      });
+                                    }}
+                                  />
+                                  {/* Unit selector — never a contextless number. */}
+                                  <select
+                                    aria-label={t.intake.sizeUnit}
+                                    value={unit}
+                                    onChange={(e) =>
+                                      setSizeUnit((s) => ({
+                                        ...s,
+                                        [w.id]: e.target.value as "GB" | "TB",
+                                      }))
+                                    }
+                                    className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md bg-transparent py-0.5 pl-1 pr-0.5 text-[11px] font-semibold text-faint focus:outline-none"
+                                  >
+                                    <option value="GB">GB</option>
+                                    <option value="TB">TB</option>
+                                  </select>
+                                </>
+                              );
+                            })()}
                           </div>
                         </div>
                         {sizeInvalid && (
