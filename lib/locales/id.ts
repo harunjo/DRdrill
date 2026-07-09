@@ -189,6 +189,9 @@ export const id: Dictionary = {
       perWorkload: "Per workload",
       downtimeLabel: "downtime",
       addCost: "Isi biaya downtime di intake untuk melihat eksposur dalam Rupiah. Postur dan kesenjangan tetap berlaku.",
+      annualized: "Perkiraan kerugian tahunan (ALE)",
+      aleNote:
+        "Eksposur per insiden × seberapa mungkin gangguan terjadi tiap tahun — angkanya naik tiap ada celah kritis yang belum ditutup.",
     },
     invest: {
       fundingCase: "Business continuity — usulan pendanaan",

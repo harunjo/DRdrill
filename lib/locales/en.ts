@@ -196,6 +196,9 @@ export const en = {
       perWorkload: "Per workload",
       downtimeLabel: "downtime",
       addCost: "Add downtime cost in the intake to see exposure in Rupiah. Posture and gaps still apply.",
+      annualized: "Estimated annual loss (ALE)",
+      aleNote:
+        "Per-incident exposure × how likely a disruption is each year — the rate rises with each unresolved critical gap.",
     },
     invest: {
       fundingCase: "Business continuity — funding case",

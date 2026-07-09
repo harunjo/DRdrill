@@ -3,7 +3,7 @@
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import { fmtMinutes, type Assessment, type DurationLabels } from "@/lib/engine";
-import { aggregateExposure, catastrophicList, formatMoney, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
+import { aggregateExposure, annualizedLoss, catastrophicList, formatMoney, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
 import { Heatmap } from "@/components/heatmap";
 import { PostureChip } from "@/components/lenses/shared";
 
@@ -13,6 +13,7 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
   const inv = t.report.invest;
   const n = a.results.length;
   const agg = aggregateExposure(a.results);
+  const ale = annualizedLoss(agg.total, a.flags.filter((f) => f.severity === "critical").length);
   const posture = postureBand(a.results, a.flags);
   const coverage = fmt(t.report.coverageShort, { n });
   const dur: DurationLabels = { unrecoverable: t.report.unrecoverable, ...t.report.units };
@@ -48,7 +49,16 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
           ) : (
             <p className="mt-1 max-w-sm text-[13px] leading-relaxed text-muted">{b.addCost}</p>
           )}
-          <div className="mt-1 text-[12px] text-faint">{inv.bia}</div>
+          {agg.monetizedCount > 0 && ale > 0 && (
+            <div className="mt-3">
+              <div className="tag text-[10px]">{b.annualized}</div>
+              <div className="mt-0.5 font-mono text-[1.2rem] font-semibold text-warn">
+                {formatMoney(ale, t.currency)}
+              </div>
+              <div className="mt-0.5 max-w-sm text-[11px] leading-relaxed text-faint">{b.aleNote}</div>
+            </div>
+          )}
+          <div className="mt-2 text-[12px] text-faint">{inv.bia}</div>
         </div>
       </div>
 

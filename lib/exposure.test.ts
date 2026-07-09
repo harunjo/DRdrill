@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { assess, type Environment, type Protection, type Workload, type WorkloadResult } from "./engine";
 import {
   aggregateExposure,
+  annualizedLoss,
   catastrophicList,
   formatIDR,
   formatMoney,
@@ -231,5 +232,21 @@ describe("riskBoughtDown — CSF security gaps (U3)", () => {
     const r = riskBoughtDown({ code: "no-siem", severity: "critical", scope: "all" }, [], "onprem");
     expect(r.kind).toBe("posture");
     expect(r.amount).toBeNull();
+  });
+});
+
+describe("annualizedLoss (ALE, R14)", () => {
+  it("is 0 without a per-incident figure", () => {
+    expect(annualizedLoss(0, 3)).toBe(0);
+    expect(annualizedLoss(-5, 3)).toBe(0);
+  });
+  it("applies the base rate with no critical flags", () => {
+    expect(annualizedLoss(100_000_000, 0)).toBe(Math.round(100_000_000 * 0.15));
+  });
+  it("rises with each critical flag", () => {
+    expect(annualizedLoss(100_000_000, 2)).toBe(Math.round(100_000_000 * 0.35));
+  });
+  it("caps the rate so it never implies near-certainty", () => {
+    expect(annualizedLoss(100_000_000, 20)).toBe(Math.round(100_000_000 * 0.6));
   });
 });

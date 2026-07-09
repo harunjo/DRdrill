@@ -12,6 +12,7 @@ import {
   type Tier,
   type WorkloadResult,
 } from "./engine";
+import { ARO_BASE, ARO_MAX, ARO_PER_CRITICAL_FLAG } from "./calibration";
 
 /** A workload with no recovery path — its loss is unbounded, never a number. */
 export function isCatastrophic(r: WorkloadResult): boolean {
@@ -42,6 +43,15 @@ export function workloadExposure(r: WorkloadResult): number | null {
   if (cost == null || !Number.isFinite(cost) || cost <= 0) return null;
   const exposure = Math.round((r.achievableRtoMin / 60) * cost);
   return Number.isFinite(exposure) ? exposure : null; // guard absurd overflow
+}
+
+/** Annualized loss expectancy (R14): per-incident exposure × the annualized
+ *  rate of occurrence, which rises with each unresolved critical gap (capped).
+ *  Deterministic and honest — an expected annual figure, not an inflated one. */
+export function annualizedLoss(perIncidentIDR: number, criticalFlags: number): number {
+  if (!Number.isFinite(perIncidentIDR) || perIncidentIDR <= 0) return 0;
+  const aro = Math.min(ARO_MAX, ARO_BASE + Math.max(0, criticalFlags) * ARO_PER_CRITICAL_FLAG);
+  return Math.round(perIncidentIDR * aro);
 }
 
 export interface AggregateExposure {

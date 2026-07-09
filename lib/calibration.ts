@@ -33,6 +33,16 @@ export const REPLICA_FAILOVER_MIN = 60;
 // finance ever needs report-grade precision. Rough 2026 IDR per 1 USD.
 export const IDR_PER_USD = 16_000;
 
+// Annualized loss expectancy (R14). ALE = per-incident exposure (SLE) ×
+// annualized rate of occurrence (ARO, events/year). Weak posture is modeled as
+// more exposed: each unresolved critical gap raises the rate, capped so the
+// figure never implies near-certainty. ponytail: sector-neutral base rate — an
+// operator with real incident history should tune it, same standing as
+// TIER_TARGETS.
+export const ARO_BASE = 0.15; // baseline ~once every ~7 years
+export const ARO_PER_CRITICAL_FLAG = 0.1; // each critical gap adds to the rate
+export const ARO_MAX = 0.6; // cap — never claim near-certainty
+
 // NIST CSF 2.0 Detect/Respond controls (R4, R5). Per-environment maturity
 // signals: `weight` drives the function's 0–100 score, `depth` gates the
 // generalist (core) vs advanced intake (R18), and `gap` (when present) means an
