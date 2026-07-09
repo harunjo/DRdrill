@@ -10,13 +10,23 @@ import { fmtMinutes } from "@/lib/engine";
 import { SECURITY_CONTROLS, TIER_TARGETS } from "@/lib/calibration";
 import { aggregateExposure, catastrophicList, formatMoney, isCatastrophic, postureBand } from "@/lib/exposure";
 import { buildSummary, orderAsks, type Ask } from "@/lib/investment";
-import type { PdfBlock, PdfDoc } from "@/lib/pdf";
+import type { Branding, PdfBlock, PdfDoc } from "@/lib/pdf";
 import { PostureChip } from "@/components/lenses/shared";
 
 // CSF Detect/Respond gap flag codes — these asks are security posture, not DR.
 const SECURITY_CODES = new Set(SECURITY_CONTROLS.map((c) => c.gap?.code).filter(Boolean));
 
-export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: Assessment }) {
+export function InvestmentLens({
+  t,
+  assessment,
+  branding,
+  onBranding,
+}: {
+  t: Dictionary;
+  assessment: Assessment;
+  branding: Branding;
+  onBranding: (b: Branding) => void;
+}) {
   const a = assessment;
   const inv = t.report.invest;
   const n = a.results.length;
@@ -248,8 +258,19 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
       intro: P.intro,
       footer: `${coverage} · ${inv.preparedBy}`,
       blocks,
+      company: branding.name || undefined,
+      logo: branding.logo,
     };
   }
+
+  const onLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () =>
+      onBranding({ ...branding, logo: typeof reader.result === "string" ? reader.result : null });
+    reader.readAsDataURL(file);
+  };
 
   const onDownloadPdf = async () => {
     track("pdf_exported"); // R24: anonymous count, no payload
@@ -263,6 +284,17 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
     <section className="panel mt-4 overflow-hidden">
       {/* One-pager header */}
       <div className="hero-band border-b border-line px-5 py-6 sm:px-6">
+        {(branding.logo || branding.name) && (
+          <div className="mb-4 flex items-center gap-3">
+            {branding.logo && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={branding.logo} alt="" className="h-9 w-auto object-contain" />
+            )}
+            {branding.name && (
+              <span className="text-[15px] font-semibold text-text">{branding.name}</span>
+            )}
+          </div>
+        )}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h2 className="text-[16px] font-semibold tracking-tight">{inv.fundingCase}</h2>
@@ -340,6 +372,29 @@ export function InvestmentLens({ t, assessment }: { t: Dictionary; assessment: A
             {inv.pdf.download}
           </button>
           <span className="text-[12px] text-faint">{inv.preparedBy}</span>
+        </div>
+
+        {/* Branding — browser-only; appears on this one-pager and the PDF (R12) */}
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            value={branding.name}
+            onChange={(e) => onBranding({ ...branding, name: e.target.value })}
+            placeholder={inv.brand.companyName}
+            className="field min-w-[160px] flex-1 px-3 py-2 text-sm"
+          />
+          <label className="btn-ghost cursor-pointer px-3 text-sm">
+            <input type="file" accept="image/*" onChange={onLogo} className="hidden" />
+            {branding.logo ? inv.brand.changeLogo : inv.brand.addLogo}
+          </label>
+          {(branding.name || branding.logo) && (
+            <button
+              onClick={() => onBranding({ name: "", logo: null })}
+              className="btn-ghost px-2 text-sm text-faint"
+            >
+              {inv.brand.clear}
+            </button>
+          )}
         </div>
         {copyState === "failed" && (
           <div className="mt-3">

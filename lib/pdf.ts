@@ -17,6 +17,12 @@ export type PdfBlock =
 
 type RGB = [number, number, number];
 
+/** Optional report branding — browser-only, never leaves the browser (R12). */
+export interface Branding {
+  name: string;
+  logo: string | null; // data: URL
+}
+
 export interface PdfDoc {
   filename: string;
   title: string;
@@ -26,6 +32,8 @@ export interface PdfDoc {
   intro: string;
   footer: string;
   blocks: PdfBlock[];
+  company?: string;
+  logo?: string | null; // data: URL, embedded in-document
 }
 
 const M = 14; // page margin (mm)
@@ -59,6 +67,32 @@ export function buildPdf(d: PdfDoc): jsPDF {
     }
     y += gap;
   };
+
+  // Optional brand band — logo (left) + company name.
+  if (d.logo || d.company) {
+    let bx = M;
+    if (d.logo) {
+      try {
+        const p = doc.getImageProperties(d.logo);
+        const h = 10;
+        const w = (p.width / p.height) * h;
+        const fmt = d.logo.includes("image/png")
+          ? "PNG"
+          : d.logo.includes("image/webp")
+            ? "WEBP"
+            : "JPEG";
+        doc.addImage(d.logo, fmt, M, y, w, h);
+        bx = M + w + 4;
+      } catch {
+        // unreadable image — skip it rather than fail the whole export
+      }
+    }
+    if (d.company) {
+      doc.setFont("helvetica", "bold").setFontSize(13).setTextColor(17, 17, 17);
+      doc.text(san(d.company), bx, y + 7);
+    }
+    y += 14;
+  }
 
   // Header
   doc.setFont("helvetica", "bold").setFontSize(15).setTextColor(17, 17, 17);

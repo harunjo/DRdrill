@@ -208,6 +208,12 @@ export const id: Dictionary = {
       copied: "Tersalin",
       copyFailed: "Salin tidak tersedia — pilih teks di bawah untuk menyalin manual:",
       scope: { onprem: "on-premise", cloud: "cloud" },
+      brand: {
+        companyName: "Nama perusahaan (opsional)",
+        addLogo: "Tambah logo",
+        changeLogo: "Ganti logo",
+        clear: "Hapus",
+      },
       pdf: {
         download: "Unduh PDF",
         docTitle: "Business Continuity — Justifikasi Investasi",

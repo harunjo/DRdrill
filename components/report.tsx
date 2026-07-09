@@ -10,6 +10,7 @@ import { BusinessLens } from "@/components/lenses/business-lens";
 import { InvestmentLens } from "@/components/lenses/investment-lens";
 import { PostureRadar } from "@/components/posture-radar";
 import type { PostureScores } from "@/lib/posture";
+import type { Branding } from "@/lib/pdf";
 
 type Lens = "business" | "technical" | "investment";
 
@@ -32,6 +33,8 @@ export function Report({
 }) {
   const [lens, setLens] = useState<Lens>("business");
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
+  // Optional report branding — browser-only, never enters FindingsPayload (R12).
+  const [branding, setBranding] = useState<Branding>({ name: "", logo: null });
 
   const select = (key: Lens) => {
     setLens(key);
@@ -96,7 +99,14 @@ export function Report({
       <div role="tabpanel">
         {lens === "business" && <BusinessLens t={t} assessment={assessment} />}
         {lens === "technical" && <TechnicalLens t={t} assessment={assessment} drill={drill} />}
-        {lens === "investment" && <InvestmentLens t={t} assessment={assessment} />}
+        {lens === "investment" && (
+          <InvestmentLens
+            t={t}
+            assessment={assessment}
+            branding={branding}
+            onBranding={setBranding}
+          />
+        )}
       </div>
     </div>
   );
