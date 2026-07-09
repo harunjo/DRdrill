@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ComponentType } from "react";
+import { Fragment, useState, type ComponentType } from "react";
 import {
   Server,
   Cloud,
@@ -12,6 +12,7 @@ import {
   Check,
   ArrowLeft,
   ArrowRight,
+  ShieldCheck,
   type LucideProps,
 } from "lucide-react";
 import { fmt, type Dictionary } from "@/lib/i18n";
@@ -26,6 +27,7 @@ import {
   type Workload,
   type WorkloadType,
 } from "@/lib/engine";
+import { SECURITY_CONTROLS } from "@/lib/calibration";
 import { applyByTier, applyToAll, estimateDowntimeCost } from "@/lib/costfill";
 import { formatMoney } from "@/lib/exposure";
 
@@ -75,8 +77,11 @@ export function Intake({
   onChange: (env: Environment) => void;
   onRun: () => void;
 }) {
-  const TOTAL = 3;
+  const TOTAL = 4;
   const [step, setStep] = useState(0);
+  // Dual depth (R18): generalist by default; advanced reveals the full control
+  // set and CSF terminology. Display-only — not persisted to the environment.
+  const [advanced, setAdvanced] = useState(false);
   // Cost-of-downtime quick-fill (U2) — local input state; commits to env on Apply.
   const [fillMode, setFillMode] = useState<"all" | "tier">("all");
   const [fillAll, setFillAll] = useState("");
@@ -121,6 +126,11 @@ export function Intake({
       },
     });
 
+  // Toggling any control opts the environment into a security assessment (R2):
+  // an untouched security step leaves env.security undefined = not assessed.
+  const updateSecurity = (key: string, value: boolean) =>
+    onChange({ ...env, security: { ...(env.security ?? {}), [key]: value } });
+
   const toggle = (
     checked: boolean,
     label: string,
@@ -138,9 +148,19 @@ export function Intake({
     </label>
   );
 
-  const titles = [t.intake.stepModel, t.intake.stepWorkloads, t.intake.stepProtection];
-  const stepLabels = [t.intake.steps.model, t.intake.steps.workloads, t.intake.steps.protection];
-  const hints = [undefined, t.intake.workloadsHint, undefined];
+  const titles = [
+    t.intake.stepModel,
+    t.intake.stepWorkloads,
+    t.intake.stepProtection,
+    t.intake.stepSecurity,
+  ];
+  const stepLabels = [
+    t.intake.steps.model,
+    t.intake.steps.workloads,
+    t.intake.steps.protection,
+    t.intake.steps.security,
+  ];
+  const hints = [undefined, t.intake.workloadsHint, undefined, undefined];
   // Only the workloads step gates advancing; model always has a value and
   // protection is optional.
   const canAdvance = step === 1 ? canRun : true;
@@ -590,6 +610,39 @@ export function Intake({
                   </div>
                 );
               })}
+
+            {step === 3 && (
+              <div>
+                <p className="text-[13px] leading-relaxed text-muted">{t.intake.security.intro}</p>
+                <div className="mt-3">
+                  {toggle(advanced, t.intake.security.advancedToggle, setAdvanced)}
+                </div>
+                {(["detect", "respond"] as const).map((fn) => {
+                  const labels = (
+                    advanced ? t.intake.security.controlsCsf : t.intake.security.controls
+                  ) as Record<string, string>;
+                  return (
+                    <div key={fn} className="mt-3 rounded-xl border border-line bg-well/60 p-4">
+                      <div className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-text">
+                        <ShieldCheck className="h-4 w-4 text-signal" strokeWidth={2} />
+                        {t.intake.security.groups[fn]}
+                      </div>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {SECURITY_CONTROLS.filter(
+                          (c) => c.fn === fn && (advanced || c.depth === "core"),
+                        ).map((c) => (
+                          <Fragment key={c.key}>
+                            {toggle(env.security?.[c.key] === true, labels[c.key], (v) =>
+                              updateSecurity(c.key, v),
+                            )}
+                          </Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </section>
