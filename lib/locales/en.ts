@@ -42,7 +42,7 @@ export const en = {
     types: {
       database: "Database",
       vm: "Virtual machines",
-      files: "File shares",
+      files: "File server / NAS",
       saas: "SaaS",
     },
     sizeLabel: "Size (GB)",

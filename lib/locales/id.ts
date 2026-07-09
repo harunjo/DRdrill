@@ -35,7 +35,7 @@ export const id: Dictionary = {
     types: {
       database: "Database",
       vm: "Virtual machine",
-      files: "File share",
+      files: "File server / NAS",
       saas: "SaaS",
     },
     sizeLabel: "Ukuran (GB)",
