@@ -8,6 +8,8 @@ import type { Assessment } from "@/lib/engine";
 import { TechnicalLens } from "@/components/lenses/technical-lens";
 import { BusinessLens } from "@/components/lenses/business-lens";
 import { InvestmentLens } from "@/components/lenses/investment-lens";
+import { PostureRadar } from "@/components/posture-radar";
+import type { PostureScores } from "@/lib/posture";
 
 type Lens = "business" | "technical" | "investment";
 
@@ -46,12 +48,24 @@ export function Report({
     tabs.current[next]?.focus();
   };
 
+  // CSF posture across the six functions. Recover = the DR readiness score;
+  // Detect/Respond come from the security step; the rest are not yet assessed.
+  const postureScores: PostureScores = {
+    govern: null,
+    identify: null,
+    protect: null,
+    detect: assessment.detect?.score ?? null,
+    respond: assessment.respond?.score ?? null,
+    recover: assessment.score,
+  };
+
   return (
     <div className="mt-4">
+      <PostureRadar t={t} scores={postureScores} />
       <div
         role="tablist"
         aria-label={t.report.lensesLabel}
-        className="flex gap-1 rounded-xl border border-line bg-panel p-1 shadow-sm"
+        className="mt-4 flex gap-1 rounded-xl border border-line bg-panel p-1 shadow-sm"
       >
         {LENSES.map(({ key, icon: Icon }, i) => {
           const active = lens === key;

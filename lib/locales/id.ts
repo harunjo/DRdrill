@@ -143,6 +143,20 @@ export const id: Dictionary = {
 
   report: {
     newAssessment: "Asesmen baru",
+    csf: {
+      title: "Postur keamanan (NIST CSF)",
+      subtitle:
+        "Kematangan per fungsi. Recover adalah kesiapan pemulihan Anda; fungsi lain dinilai saat Anda mengisinya.",
+      notAssessed: "belum dinilai",
+      functions: {
+        govern: "Govern",
+        identify: "Identify",
+        protect: "Protect",
+        detect: "Detect",
+        respond: "Respond",
+        recover: "Recover",
+      },
+    },
     coverageShort: "Berdasarkan {n} workload yang Anda gambarkan",
     lensesLabel: "Tampilan laporan",
     lenses: { business: "Dampak bisnis", technical: "Teknis", investment: "Usulan investasi" },

@@ -150,6 +150,20 @@ export const en = {
 
   report: {
     newAssessment: "New assessment",
+    csf: {
+      title: "Security posture (NIST CSF)",
+      subtitle:
+        "Per-function maturity. Recover is your recovery readiness; the other functions are scored as you assess them.",
+      notAssessed: "not yet assessed",
+      functions: {
+        govern: "Govern",
+        identify: "Identify",
+        protect: "Protect",
+        detect: "Detect",
+        respond: "Respond",
+        recover: "Recover",
+      },
+    },
     coverageShort: "Based on the {n} workloads you described",
     lensesLabel: "Report view",
     lenses: { business: "Business impact", technical: "Technical", investment: "Investment case" },
