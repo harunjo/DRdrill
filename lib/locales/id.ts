@@ -38,7 +38,7 @@ export const id: Dictionary = {
       files: "File server / NAS",
       saas: "SaaS",
     },
-    sizeLabel: "Ukuran (GB)",
+    sizeLabel: "Ukuran data",
     cost: {
       label: "Biaya downtime (opsional)",
       unit: "Rp / jam",

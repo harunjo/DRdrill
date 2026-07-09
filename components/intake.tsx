@@ -434,16 +434,20 @@ export function Intake({
                               </option>
                             ))}
                           </select>
-                          <div>
+                          <div className="relative">
                             <input
                               type="number"
                               min={1}
-                              className="field w-full px-3 py-2 text-sm"
+                              className="field w-full px-3 py-2 pr-11 text-sm"
                               title={t.intake.sizeLabel}
                               placeholder={t.intake.sizeLabel}
                               value={Number.isFinite(w.sizeGB) ? w.sizeGB : ""}
                               onChange={(e) => updateWorkload(w.id, { sizeGB: Number(e.target.value) })}
                             />
+                            {/* Persistent unit so the box is never a contextless number. */}
+                            <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 tag">
+                              GB
+                            </span>
                           </div>
                         </div>
                         {sizeInvalid && (

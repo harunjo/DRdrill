@@ -45,7 +45,7 @@ export const en = {
       files: "File server / NAS",
       saas: "SaaS",
     },
-    sizeLabel: "Size (GB)",
+    sizeLabel: "Data size",
     cost: {
       label: "Downtime cost (optional)",
       unit: "Rp / hour",
