@@ -26,6 +26,16 @@ const FLAG_CODES = [
   "no-cross-region",
   "saas-shared-responsibility",
   "unprotected-workloads",
+  // CSF Detect/Respond gaps (R7)
+  "no-siem",
+  "no-central-logging",
+  "no-endpoint-monitoring",
+  "no-alerting",
+  "no-vuln-scanning",
+  "no-ir-plan",
+  "no-isolation",
+  "no-ir-ownership",
+  "no-breach-notification",
 ];
 
 // ponytail: hand-rolled strict validator instead of a schema library — the
@@ -40,11 +50,22 @@ export function validateRequest(body: unknown): NarrativeRequest | null {
   const f = b.findings as Record<string, unknown> | null;
   if (typeof f !== "object" || f === null) return null;
   if (
-    Object.keys(f).some((k) => !["model", "workloads", "flags", "rule321", "score"].includes(k))
+    Object.keys(f).some(
+      (k) => !["model", "workloads", "flags", "rule321", "score", "detect", "respond"].includes(k),
+    )
   )
     return null;
   if (!MODELS.includes(f.model as string)) return null;
   if (typeof f.score !== "number" || f.score < 0 || f.score > 100) return null;
+
+  // CSF Detect/Respond posture — optional; when present, score only (R10).
+  for (const fnKey of ["detect", "respond"] as const) {
+    if (!(fnKey in f)) continue;
+    const fn = f[fnKey] as Record<string, unknown> | null;
+    if (typeof fn !== "object" || fn === null) return null;
+    if (Object.keys(fn).some((k) => k !== "score")) return null;
+    if (typeof fn.score !== "number" || fn.score < 0 || fn.score > 100) return null;
+  }
 
   const workloads = f.workloads;
   if (!Array.isArray(workloads) || workloads.length < 1 || workloads.length > 10) return null;

@@ -131,3 +131,44 @@ describe("substituteLabels", () => {
     expect(out).toContain("ERP database (W1)");
   });
 });
+
+describe("validateRequest — CSF detect/respond (U2)", () => {
+  it("accepts findings carrying detect/respond scores", () => {
+    const req = {
+      findings: { ...structuredClone(findings), detect: { score: 40 }, respond: { score: 0 } },
+      scenario: "ransomware",
+      lang: "en",
+    };
+    expect(validateRequest(req)).not.toBeNull();
+  });
+
+  it("accepts the new CSF gap flag codes", () => {
+    const req = {
+      findings: {
+        ...structuredClone(findings),
+        flags: [{ code: "no-siem", severity: "critical", scope: "all" }],
+      },
+      scenario: "ransomware",
+      lang: "en",
+    };
+    expect(validateRequest(req)).not.toBeNull();
+  });
+
+  it("rejects an unknown key inside detect", () => {
+    const req = {
+      findings: { ...structuredClone(findings), detect: { score: 40, note: "x" } },
+      scenario: "ransomware",
+      lang: "en",
+    };
+    expect(validateRequest(req)).toBeNull();
+  });
+
+  it("rejects a non-number detect score", () => {
+    const req = {
+      findings: { ...structuredClone(findings), detect: { score: "high" } },
+      scenario: "ransomware",
+      lang: "en",
+    };
+    expect(validateRequest(req)).toBeNull();
+  });
+});
