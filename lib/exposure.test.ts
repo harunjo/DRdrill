@@ -225,3 +225,11 @@ describe("trust boundary (R13)", () => {
     expect(JSON.stringify(a.findings)).not.toContain("costPerHourDowntime");
   });
 });
+
+describe("riskBoughtDown — CSF security gaps (U3)", () => {
+  it("treats a Detect/Respond gap as posture-kind with no monetary amount", () => {
+    const r = riskBoughtDown({ code: "no-siem", severity: "critical", scope: "all" }, [], "onprem");
+    expect(r.kind).toBe("posture");
+    expect(r.amount).toBeNull();
+  });
+});
