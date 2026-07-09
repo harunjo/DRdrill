@@ -26,7 +26,17 @@ const FLAG_CODES = [
   "no-cross-region",
   "saas-shared-responsibility",
   "unprotected-workloads",
-  // CSF Detect/Respond gaps (R7)
+  // CSF Govern/Identify/Protect/Detect/Respond gaps (R7)
+  "no-security-policy",
+  "no-security-roles",
+  "no-third-party-risk",
+  "no-asset-inventory",
+  "no-risk-assessment",
+  "no-data-classification",
+  "no-mfa",
+  "no-patching",
+  "no-least-privilege",
+  "no-encryption",
   "no-siem",
   "no-central-logging",
   "no-endpoint-monitoring",
@@ -51,15 +61,27 @@ export function validateRequest(body: unknown): NarrativeRequest | null {
   if (typeof f !== "object" || f === null) return null;
   if (
     Object.keys(f).some(
-      (k) => !["model", "workloads", "flags", "rule321", "score", "detect", "respond"].includes(k),
+      (k) =>
+        ![
+          "model",
+          "workloads",
+          "flags",
+          "rule321",
+          "score",
+          "govern",
+          "identify",
+          "protect",
+          "detect",
+          "respond",
+        ].includes(k),
     )
   )
     return null;
   if (!MODELS.includes(f.model as string)) return null;
   if (typeof f.score !== "number" || f.score < 0 || f.score > 100) return null;
 
-  // CSF Detect/Respond posture — optional; when present, score only (R10).
-  for (const fnKey of ["detect", "respond"] as const) {
+  // CSF function posture — optional; when present, score only (R10).
+  for (const fnKey of ["govern", "identify", "protect", "detect", "respond"] as const) {
     if (!(fnKey in f)) continue;
     const fn = f[fnKey] as Record<string, unknown> | null;
     if (typeof fn !== "object" || fn === null) return null;
@@ -146,15 +168,22 @@ export function buildPrompt(req: NarrativeRequest): string {
   const flags = req.findings.flags.map((f) => `${f.code} (${f.severity}, ${f.scope})`);
   const langName = req.lang === "id" ? "Indonesian (Bahasa Indonesia)" : "English";
 
-  // CSF Detect/Respond given as qualitative bands only — never numbers (R9/R11).
+  // CSF posture given as qualitative bands only — never numbers (R9/R11).
   const band = (s: number) => (s >= 70 ? "strong" : s >= 40 ? "developing" : "weak");
-  const security =
-    req.findings.detect || req.findings.respond
-      ? [
-          `Detection posture (Detect): ${req.findings.detect ? band(req.findings.detect.score) : "not assessed"}`,
-          `Response posture (Respond): ${req.findings.respond ? band(req.findings.respond.score) : "not assessed"}`,
-        ]
-      : [];
+  const CSF_LABEL: Record<"govern" | "identify" | "protect" | "detect" | "respond", string> = {
+    govern: "Governance (Govern)",
+    identify: "Asset/risk identification (Identify)",
+    protect: "Safeguards (Protect)",
+    detect: "Detection (Detect)",
+    respond: "Response (Respond)",
+  };
+  const secFns = ["govern", "identify", "protect", "detect", "respond"] as const;
+  const security = secFns.some((f) => req.findings[f])
+    ? secFns.map(
+        (f) =>
+          `${CSF_LABEL[f]} posture: ${req.findings[f] ? band(req.findings[f]!.score) : "not assessed"}`,
+      )
+    : [];
 
   return [
     `Write a short business-continuity drill story, written ENTIRELY in ${langName}: ${SCENARIO_TEXT[req.scenario][req.lang]} hits tonight.`,

@@ -54,9 +54,9 @@ export function Report({
   // CSF posture across the six functions. Recover = the DR readiness score;
   // Detect/Respond come from the security step; the rest are not yet assessed.
   const postureScores: PostureScores = {
-    govern: null,
-    identify: null,
-    protect: null,
+    govern: assessment.govern?.score ?? null,
+    identify: assessment.identify?.score ?? null,
+    protect: assessment.protect?.score ?? null,
     detect: assessment.detect?.score ?? null,
     respond: assessment.respond?.score ?? null,
     recover: assessment.score,

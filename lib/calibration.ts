@@ -66,6 +66,23 @@ export const ARO_MAX = 0.6; // cap — never claim near-certainty
 // ponytail: still a knob — an operator with sector-specific incident data should
 // revisit these, same standing as TIER_TARGETS.
 export const SECURITY_CONTROLS: SecurityControl[] = [
+  // Govern (NIST CSF GV) — is security actually run as a program?
+  { key: "securityPolicy", fn: "govern", weight: 2, depth: "core", gap: { code: "no-security-policy", severity: "critical" } },
+  { key: "rolesResponsibilities", fn: "govern", weight: 2, depth: "core", gap: { code: "no-security-roles", severity: "warning" } },
+  { key: "thirdPartyRisk", fn: "govern", weight: 1, depth: "core", gap: { code: "no-third-party-risk", severity: "warning" } },
+  { key: "riskStrategy", fn: "govern", weight: 1, depth: "advanced" },
+  // Identify (NIST CSF ID) — do you know what you have and what's at risk?
+  { key: "assetInventory", fn: "identify", weight: 2, depth: "core", gap: { code: "no-asset-inventory", severity: "critical" } },
+  { key: "riskAssessment", fn: "identify", weight: 2, depth: "core", gap: { code: "no-risk-assessment", severity: "warning" } },
+  { key: "dataClassification", fn: "identify", weight: 1, depth: "core", gap: { code: "no-data-classification", severity: "warning" } },
+  { key: "dataFlowMapping", fn: "identify", weight: 1, depth: "advanced" },
+  // Protect (NIST CSF PR) — are the doors actually locked?
+  { key: "mfa", fn: "protect", weight: 3, depth: "core", gap: { code: "no-mfa", severity: "critical" } },
+  { key: "patching", fn: "protect", weight: 2, depth: "core", gap: { code: "no-patching", severity: "critical" } },
+  { key: "leastPrivilege", fn: "protect", weight: 2, depth: "core", gap: { code: "no-least-privilege", severity: "warning" } },
+  { key: "encryption", fn: "protect", weight: 2, depth: "core", gap: { code: "no-encryption", severity: "warning" } },
+  { key: "securityTraining", fn: "protect", weight: 1, depth: "advanced" },
+  { key: "networkSegmentation", fn: "protect", weight: 1, depth: "advanced" },
   // Detect (NIST CSF DE)
   { key: "siem", fn: "detect", weight: 3, depth: "core", gap: { code: "no-siem", severity: "critical" } },
   { key: "centralLogging", fn: "detect", weight: 3, depth: "core", gap: { code: "no-central-logging", severity: "critical" } },

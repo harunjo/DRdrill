@@ -333,9 +333,12 @@ export function TechnicalLens({
         <div className="panel mt-4 p-5 sm:p-6">
           <div className="text-[13px] font-semibold">{t.report.csf.title}</div>
           <p className="mt-0.5 text-[12px] text-faint">{t.report.csf.subtitle}</p>
-          <div className="mt-3 flex gap-3">
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {(
               [
+                ["govern", a.govern?.score],
+                ["identify", a.identify?.score],
+                ["protect", a.protect?.score],
                 ["detect", a.detect?.score],
                 ["respond", a.respond?.score],
               ] as const
@@ -343,7 +346,7 @@ export function TechnicalLens({
               sc == null ? null : (
                 <div
                   key={fn}
-                  className="flex-1 rounded-xl border border-line bg-well/60 p-3 text-center"
+                  className="rounded-xl border border-line bg-well/60 p-3 text-center"
                 >
                   <div className="text-[11px] text-faint">{t.report.csf.functions[fn]}</div>
                   <div

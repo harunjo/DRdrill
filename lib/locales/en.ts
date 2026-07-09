@@ -111,10 +111,27 @@ export const en = {
         "Assessed once for your whole organization — a SIEM or incident-response plan isn't per-workload. Toggle what you have; leave the rest. Skip this step to leave security unscored.",
       advancedToggle: "Advanced (NIST CSF terms)",
       groups: {
+        govern: "Govern — running security as a program",
+        identify: "Identify — knowing your assets & risks",
+        protect: "Protect — locking the doors",
         detect: "Detect — spotting an attack",
         respond: "Respond — acting on an incident",
       },
       controls: {
+        securityPolicy: "A written information-security policy",
+        rolesResponsibilities: "Defined security roles & responsibilities",
+        thirdPartyRisk: "Vendor / third-party risk is managed",
+        riskStrategy: "A risk-management strategy / risk appetite",
+        assetInventory: "An inventory of systems and assets",
+        riskAssessment: "Periodic security risk assessments",
+        dataClassification: "Data classified by sensitivity",
+        dataFlowMapping: "Sensitive data flows are mapped",
+        mfa: "Multi-factor authentication (MFA)",
+        patching: "Timely patching of systems",
+        leastPrivilege: "Least-privilege access control",
+        encryption: "Data encrypted at rest and in transit",
+        securityTraining: "Security-awareness training for staff",
+        networkSegmentation: "Network segmentation",
         siem: "Security monitoring (SIEM) that correlates logs",
         centralLogging: "Central log collection",
         endpointMonitoring: "Endpoint protection / EDR on servers and laptops",
@@ -129,6 +146,20 @@ export const en = {
         tabletop: "Regular incident drills / tabletop exercises",
       },
       controlsCsf: {
+        securityPolicy: "Policy (GV.PO)",
+        rolesResponsibilities: "Roles & responsibilities (GV.RR)",
+        thirdPartyRisk: "Supply-chain risk mgmt (GV.SC)",
+        riskStrategy: "Risk-management strategy (GV.RM)",
+        assetInventory: "Asset management (ID.AM)",
+        riskAssessment: "Risk assessment (ID.RA)",
+        dataClassification: "Data classification (ID.AM)",
+        dataFlowMapping: "Data-flow mapping (ID.AM)",
+        mfa: "Multi-factor auth (PR.AA)",
+        patching: "Patch / vulnerability mgmt (PR.PS)",
+        leastPrivilege: "Least privilege (PR.AA)",
+        encryption: "Encryption at rest / in transit (PR.DS)",
+        securityTraining: "Awareness & training (PR.AT)",
+        networkSegmentation: "Network segmentation (PR.IR)",
         siem: "SIEM / event correlation (DE.AE)",
         centralLogging: "Centralized logging (DE.CM)",
         endpointMonitoring: "Endpoint detection & response — EDR (DE.CM)",
@@ -357,6 +388,56 @@ export const en = {
         title: "Some workloads cannot be recovered",
         detail:
           "Workloads without any protection are one incident away from permanent loss. Protecting them is the first investment to make.",
+      },
+      "no-security-policy": {
+        title: "No security policy to steer by",
+        detail:
+          "Without a written security policy and an owner, controls are ad hoc and nothing is accountable. A policy is what turns scattered effort into a program.",
+      },
+      "no-security-roles": {
+        title: "No one clearly owns security",
+        detail:
+          "When security responsibilities aren't assigned, gaps fall between roles. Defined ownership is what makes the program run day to day.",
+      },
+      "no-third-party-risk": {
+        title: "Vendor risk is unmanaged",
+        detail:
+          "Your suppliers' weaknesses become yours. Managing third-party risk is how a breach at a vendor doesn't become a breach at you.",
+      },
+      "no-asset-inventory": {
+        title: "You can't protect what you can't see",
+        detail:
+          "Without an asset inventory, unknown systems go unpatched and unmonitored. Knowing what you have is the first step of every other control.",
+      },
+      "no-risk-assessment": {
+        title: "Risks are unmeasured",
+        detail:
+          "Without periodic risk assessment, investment goes to the loudest voice, not the biggest risk. Assessment is what points spend at what matters.",
+      },
+      "no-data-classification": {
+        title: "Sensitive data isn't identified",
+        detail:
+          "If you don't know which data is sensitive, you can't protect it proportionately. Classification is what tells you where to concentrate defenses.",
+      },
+      "no-mfa": {
+        title: "Passwords are the only lock",
+        detail:
+          "Stolen or guessed passwords are the most common way in. Multi-factor authentication is the single highest-value control against account takeover.",
+      },
+      "no-patching": {
+        title: "Known holes stay open",
+        detail:
+          "Attackers exploit known, unpatched vulnerabilities within days of disclosure. Timely patching closes the doors before they're used.",
+      },
+      "no-least-privilege": {
+        title: "Everyone can reach everything",
+        detail:
+          "Broad access means one compromised account exposes the whole estate. Least privilege limits how far any single breach can reach.",
+      },
+      "no-encryption": {
+        title: "Data is readable if taken",
+        detail:
+          "Unencrypted data is fully exposed the moment a device, backup, or connection is intercepted. Encryption makes stolen data useless.",
       },
       "no-siem": {
         title: "Attacks can go unseen",

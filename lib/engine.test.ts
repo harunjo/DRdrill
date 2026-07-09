@@ -312,3 +312,21 @@ describe("assess() CSF wiring (U1)", () => {
     expect(a.flags.some((f) => f.code === "no-siem")).toBe(true);
   });
 });
+
+describe("assess() — all CSF security functions (Govern/Identify/Protect)", () => {
+  const base: Environment = {
+    model: "onprem",
+    workloads: [{ id: "a", name: "ERP", type: "database", sizeGB: 100, tier: 1 }],
+    protection: { onprem: { ...noProtection, frequencyHours: 24 } },
+  };
+  it("scores all five functions and flags their core gaps when security is provided", () => {
+    const a = assess({ ...base, security: {} });
+    for (const fn of ["govern", "identify", "protect", "detect", "respond"] as const) {
+      expect(a[fn]?.score).toBe(0);
+      expect(a.findings[fn]).toEqual({ score: 0 });
+    }
+    expect(a.flags.some((f) => f.code === "no-mfa")).toBe(true);
+    expect(a.flags.some((f) => f.code === "no-asset-inventory")).toBe(true);
+    expect(a.flags.some((f) => f.code === "no-security-policy")).toBe(true);
+  });
+});

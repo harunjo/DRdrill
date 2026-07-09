@@ -71,7 +71,17 @@ export type FlagCode =
   | "no-cross-region"
   | "saas-shared-responsibility"
   | "unprotected-workloads"
-  // NIST CSF Detect/Respond gaps (absent per-environment controls, R7)
+  // NIST CSF Govern/Identify/Protect/Detect/Respond gaps (per-environment, R7)
+  | "no-security-policy"
+  | "no-security-roles"
+  | "no-third-party-risk"
+  | "no-asset-inventory"
+  | "no-risk-assessment"
+  | "no-data-classification"
+  | "no-mfa"
+  | "no-patching"
+  | "no-least-privilege"
+  | "no-encryption"
   | "no-siem"
   | "no-central-logging"
   | "no-endpoint-monitoring"
@@ -92,7 +102,17 @@ export interface RiskFlag {
 
 // --- NIST CSF Detect/Respond posture (per-environment, R4/R5/R17) ---
 
-export type CsfFunction = "detect" | "respond";
+export type CsfFunction = "govern" | "identify" | "protect" | "detect" | "respond";
+
+/** The CSF functions assessed from per-environment security controls (Recover is
+ *  derived from the DR engine, not from controls). */
+export const CSF_SECURITY_FUNCTIONS: CsfFunction[] = [
+  "govern",
+  "identify",
+  "protect",
+  "detect",
+  "respond",
+];
 
 /** One assessable control. `depth` gates generalist vs advanced intake (R18);
  *  an absent control with a `gap` raises that investment flag (R7). */
@@ -140,8 +160,11 @@ export interface FindingsPayload {
   flags: RiskFlag[];
   rule321: { threeCopies: boolean; twoMedia: boolean; oneOffsite: boolean };
   score: number;
-  /** CSF Detect/Respond maturity — score only (pseudonymized, R10). Absent when
-   *  the security functions were not assessed. */
+  /** CSF Govern/Identify/Protect/Detect/Respond maturity — score only
+   *  (pseudonymized, R10). Absent when the security functions were not assessed. */
+  govern?: { score: number };
+  identify?: { score: number };
+  protect?: { score: number };
   detect?: { score: number };
   respond?: { score: number };
 }
@@ -154,8 +177,11 @@ export interface Assessment {
   findings: FindingsPayload;
   /** label → real name; browser-only, used to re-substitute into the narrative */
   labelMap: Record<string, string>;
-  /** Browser-only CSF Detect/Respond results (score + per-control checklist).
+  /** Browser-only CSF results (score + per-control checklist) per function.
    *  Absent when the security functions were not assessed. */
+  govern?: FunctionResult;
+  identify?: FunctionResult;
+  protect?: FunctionResult;
   detect?: FunctionResult;
   respond?: FunctionResult;
 }
@@ -269,9 +295,12 @@ export function assess(env: Environment): Assessment {
   // gaps are appended to the report/investment flag set but never affect the
   // Recover score (R1 — Recover computations unchanged).
   const drFlags = collectFlags(env);
-  const detect = env.security ? assessFunction("detect", env.security) : undefined;
-  const respond = env.security ? assessFunction("respond", env.security) : undefined;
-  const flags = [...drFlags, ...(detect?.gaps ?? []), ...(respond?.gaps ?? [])];
+  const sec = env.security
+    ? (Object.fromEntries(
+        CSF_SECURITY_FUNCTIONS.map((f) => [f, assessFunction(f, env.security!)]),
+      ) as Record<CsfFunction, FunctionResult>)
+    : null;
+  const flags = [...drFlags, ...(sec ? CSF_SECURITY_FUNCTIONS.flatMap((f) => sec[f].gaps) : [])];
 
   // 3-2-1 across the environment: any protected group counts copies; media
   // diversity approximated by replication or a cloud+onprem split; offsite by
@@ -318,8 +347,11 @@ export function assess(env: Environment): Assessment {
     flags,
     rule321,
     score,
-    ...(detect ? { detect: { score: detect.score } } : {}),
-    ...(respond ? { respond: { score: respond.score } } : {}),
+    ...(sec
+      ? (Object.fromEntries(
+          CSF_SECURITY_FUNCTIONS.map((f) => [f, { score: sec[f].score }]),
+        ) as Partial<Record<CsfFunction, { score: number }>>)
+      : {}),
   };
 
   return {
@@ -329,8 +361,7 @@ export function assess(env: Environment): Assessment {
     score,
     findings,
     labelMap,
-    ...(detect ? { detect } : {}),
-    ...(respond ? { respond } : {}),
+    ...(sec ?? {}),
   };
 }
 

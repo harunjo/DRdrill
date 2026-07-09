@@ -104,10 +104,27 @@ export const id: Dictionary = {
         "Dinilai sekali untuk seluruh organisasi — SIEM atau rencana respons insiden bukan per-workload. Nyalakan yang Anda miliki; sisanya biarkan. Lewati langkah ini untuk membiarkan keamanan tidak dinilai.",
       advancedToggle: "Lanjutan (istilah NIST CSF)",
       groups: {
+        govern: "Govern — menjalankan keamanan sebagai program",
+        identify: "Identify — mengetahui aset & risiko",
+        protect: "Protect — mengunci pintu",
         detect: "Detect — mengenali serangan",
         respond: "Respond — menangani insiden",
       },
       controls: {
+        securityPolicy: "Kebijakan keamanan informasi tertulis",
+        rolesResponsibilities: "Peran & tanggung jawab keamanan yang jelas",
+        thirdPartyRisk: "Risiko vendor / pihak ketiga dikelola",
+        riskStrategy: "Strategi manajemen risiko / selera risiko",
+        assetInventory: "Inventaris sistem dan aset",
+        riskAssessment: "Penilaian risiko keamanan berkala",
+        dataClassification: "Data diklasifikasikan berdasarkan sensitivitas",
+        dataFlowMapping: "Alur data sensitif dipetakan",
+        mfa: "Autentikasi multi-faktor (MFA)",
+        patching: "Patching sistem tepat waktu",
+        leastPrivilege: "Kontrol akses hak paling minimal (least privilege)",
+        encryption: "Data dienkripsi saat disimpan dan dikirim",
+        securityTraining: "Pelatihan kesadaran keamanan untuk staf",
+        networkSegmentation: "Segmentasi jaringan",
         siem: "Monitoring keamanan (SIEM) yang mengorelasikan log",
         centralLogging: "Pengumpulan log terpusat",
         endpointMonitoring: "Proteksi endpoint / EDR di server dan laptop",
@@ -122,6 +139,20 @@ export const id: Dictionary = {
         tabletop: "Latihan insiden / tabletop secara berkala",
       },
       controlsCsf: {
+        securityPolicy: "Kebijakan (GV.PO)",
+        rolesResponsibilities: "Peran & tanggung jawab (GV.RR)",
+        thirdPartyRisk: "Manajemen risiko rantai pasok (GV.SC)",
+        riskStrategy: "Strategi manajemen risiko (GV.RM)",
+        assetInventory: "Manajemen aset (ID.AM)",
+        riskAssessment: "Penilaian risiko (ID.RA)",
+        dataClassification: "Klasifikasi data (ID.AM)",
+        dataFlowMapping: "Pemetaan alur data (ID.AM)",
+        mfa: "Autentikasi multi-faktor (PR.AA)",
+        patching: "Manajemen patch / kerentanan (PR.PS)",
+        leastPrivilege: "Least privilege (PR.AA)",
+        encryption: "Enkripsi saat disimpan / dikirim (PR.DS)",
+        securityTraining: "Kesadaran & pelatihan (PR.AT)",
+        networkSegmentation: "Segmentasi jaringan (PR.IR)",
         siem: "SIEM / korelasi event (DE.AE)",
         centralLogging: "Logging terpusat (DE.CM)",
         endpointMonitoring: "Endpoint detection & response — EDR (DE.CM)",
@@ -350,6 +381,56 @@ export const id: Dictionary = {
         title: "Sebagian workload tidak dapat dipulihkan jika terjadi bencana",
         detail:
           "Workload tanpa proteksi apa pun akan beresiko kehilangan data secara permanen. Melindunginya adalah investasi pertama yang perlu dilakukan.",
+      },
+      "no-security-policy": {
+        title: "Tidak ada kebijakan keamanan sebagai acuan",
+        detail:
+          "Tanpa kebijakan keamanan tertulis dan pemiliknya, kontrol berjalan seadanya dan tidak ada yang bertanggung jawab. Kebijakan mengubah upaya yang tersebar menjadi sebuah program.",
+      },
+      "no-security-roles": {
+        title: "Tidak ada yang jelas memiliki keamanan",
+        detail:
+          "Bila tanggung jawab keamanan tidak ditetapkan, celah jatuh di antara peran. Kepemilikan yang jelas membuat program berjalan sehari-hari.",
+      },
+      "no-third-party-risk": {
+        title: "Risiko vendor tidak dikelola",
+        detail:
+          "Kelemahan pemasok Anda menjadi kelemahan Anda. Mengelola risiko pihak ketiga mencegah pembobolan di vendor menjadi pembobolan di Anda.",
+      },
+      "no-asset-inventory": {
+        title: "Tak bisa melindungi yang tak terlihat",
+        detail:
+          "Tanpa inventaris aset, sistem yang tak diketahui tidak di-patch dan tidak dipantau. Mengetahui apa yang Anda miliki adalah langkah pertama semua kontrol lain.",
+      },
+      "no-risk-assessment": {
+        title: "Risiko tidak terukur",
+        detail:
+          "Tanpa penilaian risiko berkala, investasi mengalir ke suara paling keras, bukan risiko terbesar. Penilaian mengarahkan anggaran ke yang penting.",
+      },
+      "no-data-classification": {
+        title: "Data sensitif tidak dikenali",
+        detail:
+          "Bila Anda tidak tahu data mana yang sensitif, Anda tidak bisa melindunginya secara proporsional. Klasifikasi menunjukkan di mana pertahanan dipusatkan.",
+      },
+      "no-mfa": {
+        title: "Kata sandi jadi satu-satunya kunci",
+        detail:
+          "Kata sandi yang dicuri atau ditebak adalah cara masuk paling umum. Autentikasi multi-faktor adalah kontrol bernilai tertinggi melawan pengambilalihan akun.",
+      },
+      "no-patching": {
+        title: "Lubang yang diketahui tetap terbuka",
+        detail:
+          "Penyerang mengeksploitasi kerentanan yang diketahui dan belum di-patch dalam hitungan hari. Patching tepat waktu menutup pintu sebelum dipakai.",
+      },
+      "no-least-privilege": {
+        title: "Semua orang bisa mengakses segalanya",
+        detail:
+          "Akses luas berarti satu akun yang terkompromi membuka seluruh lingkungan. Least privilege membatasi sejauh mana satu pembobolan menjangkau.",
+      },
+      "no-encryption": {
+        title: "Data terbaca jika terambil",
+        detail:
+          "Data tanpa enkripsi sepenuhnya terekspos begitu perangkat, backup, atau koneksi disadap. Enkripsi membuat data curian tidak berguna.",
       },
       "no-siem": {
         title: "Serangan bisa lolos tanpa terdeteksi",

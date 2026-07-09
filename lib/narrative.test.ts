@@ -180,8 +180,8 @@ describe("buildPrompt — CSF Detect/Respond (U7)", () => {
       scenario: "ransomware",
       lang: "en",
     });
-    expect(p).toContain("Detection posture (Detect): weak");
-    expect(p).toContain("Response posture (Respond): strong");
+    expect(p).toContain("Detection (Detect) posture: weak");
+    expect(p).toContain("Response (Respond) posture: strong");
     expect(p).not.toContain("20/100"); // score must not leak into the prompt facts
     expect(p).toContain("qualitatively");
   });

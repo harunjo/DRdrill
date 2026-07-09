@@ -648,7 +648,7 @@ export function Intake({
                 <div className="mt-3">
                   {toggle(advanced, t.intake.security.advancedToggle, setAdvanced)}
                 </div>
-                {(["detect", "respond"] as const).map((fn) => {
+                {(["govern", "identify", "protect", "detect", "respond"] as const).map((fn) => {
                   const labels = (
                     advanced ? t.intake.security.controlsCsf : t.intake.security.controls
                   ) as Record<string, string>;
