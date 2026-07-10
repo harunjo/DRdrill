@@ -110,6 +110,8 @@ export const en = {
       intro:
         "Assessed once for your whole organization — a SIEM or incident-response plan isn't per-workload. Toggle what you have; leave the rest. Skip this step to leave security unscored.",
       advancedToggle: "Advanced (NIST CSF terms)",
+      allPresent: "All present",
+      clearGroup: "Clear",
       groups: {
         govern: "Govern — running security as a program",
         identify: "Identify — knowing your assets & risks",

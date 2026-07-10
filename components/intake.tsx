@@ -13,6 +13,7 @@ import {
   ArrowLeft,
   ArrowRight,
   ShieldCheck,
+  ChevronDown,
   type LucideProps,
 } from "lucide-react";
 import { fmt, type Dictionary } from "@/lib/i18n";
@@ -84,6 +85,8 @@ export function Intake({
   const [advanced, setAdvanced] = useState(false);
   // Per-workload display unit for size; storage stays canonical in GB (R13).
   const [sizeUnit, setSizeUnit] = useState<Record<string, "GB" | "TB">>({});
+  // Collapsed-by-default CSF groups so the security step opens tidy (R18/#3).
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   // Cost-of-downtime quick-fill (U2) — local input state; commits to env on Apply.
   const [fillMode, setFillMode] = useState<"all" | "tier">("all");
   const [fillAll, setFillAll] = useState("");
@@ -132,6 +135,12 @@ export function Intake({
   // an untouched security step leaves env.security undefined = not assessed.
   const updateSecurity = (key: string, value: boolean) =>
     onChange({ ...env, security: { ...(env.security ?? {}), [key]: value } });
+
+  const bulkSetSecurity = (keys: string[], value: boolean) =>
+    onChange({
+      ...env,
+      security: { ...(env.security ?? {}), ...Object.fromEntries(keys.map((k) => [k, value])) },
+    });
 
   const toggle = (
     checked: boolean,
@@ -648,30 +657,70 @@ export function Intake({
                 <div className="mt-3">
                   {toggle(advanced, t.intake.security.advancedToggle, setAdvanced)}
                 </div>
-                {(["govern", "identify", "protect", "detect", "respond"] as const).map((fn) => {
-                  const labels = (
-                    advanced ? t.intake.security.controlsCsf : t.intake.security.controls
-                  ) as Record<string, string>;
-                  return (
-                    <div key={fn} className="mt-3 rounded-xl border border-line bg-well/60 p-4">
-                      <div className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-text">
-                        <ShieldCheck className="h-4 w-4 text-signal" strokeWidth={2} />
-                        {t.intake.security.groups[fn]}
+                <div className="mt-3 grid gap-2">
+                  {(["govern", "identify", "protect", "detect", "respond"] as const).map((fn) => {
+                    const labels = (
+                      advanced ? t.intake.security.controlsCsf : t.intake.security.controls
+                    ) as Record<string, string>;
+                    const controls = SECURITY_CONTROLS.filter(
+                      (c) => c.fn === fn && (advanced || c.depth === "core"),
+                    );
+                    const keys = controls.map((c) => c.key);
+                    const setCount = keys.filter((k) => env.security?.[k] === true).length;
+                    const open = openGroups[fn] ?? false;
+                    return (
+                      <div key={fn} className="rounded-xl border border-line bg-well/60">
+                        <button
+                          type="button"
+                          onClick={() => setOpenGroups((s) => ({ ...s, [fn]: !open }))}
+                          aria-expanded={open}
+                          className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-text"
+                        >
+                          <ShieldCheck className="h-4 w-4 shrink-0 text-signal" strokeWidth={2} />
+                          <span className="flex-1">{t.intake.security.groups[fn]}</span>
+                          <span
+                            className={`chip shrink-0 ${setCount > 0 ? "chip-ok" : "chip-neutral"}`}
+                          >
+                            {setCount}/{keys.length}
+                          </span>
+                          <ChevronDown
+                            className={`h-4 w-4 shrink-0 text-faint transition-transform ${open ? "rotate-180" : ""}`}
+                            aria-hidden
+                          />
+                        </button>
+                        {open && (
+                          <div className="border-t border-line-soft px-4 pb-4 pt-3">
+                            <div className="mb-2 flex gap-4 text-[12px]">
+                              <button
+                                type="button"
+                                onClick={() => bulkSetSecurity(keys, true)}
+                                className="font-medium text-signal hover:underline"
+                              >
+                                {t.intake.security.allPresent}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => bulkSetSecurity(keys, false)}
+                                className="font-medium text-faint hover:underline"
+                              >
+                                {t.intake.security.clearGroup}
+                              </button>
+                            </div>
+                            <div className="grid gap-2 sm:grid-cols-2">
+                              {controls.map((c) => (
+                                <Fragment key={c.key}>
+                                  {toggle(env.security?.[c.key] === true, labels[c.key], (v) =>
+                                    updateSecurity(c.key, v),
+                                  )}
+                                </Fragment>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        {SECURITY_CONTROLS.filter(
-                          (c) => c.fn === fn && (advanced || c.depth === "core"),
-                        ).map((c) => (
-                          <Fragment key={c.key}>
-                            {toggle(env.security?.[c.key] === true, labels[c.key], (v) =>
-                              updateSecurity(c.key, v),
-                            )}
-                          </Fragment>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>

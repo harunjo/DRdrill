@@ -103,6 +103,8 @@ export const id: Dictionary = {
       intro:
         "Dinilai sekali untuk seluruh organisasi — SIEM atau rencana respons insiden bukan per-workload. Nyalakan yang Anda miliki; sisanya biarkan. Lewati langkah ini untuk membiarkan keamanan tidak dinilai.",
       advancedToggle: "Lanjutan (istilah NIST CSF)",
+      allPresent: "Semua ada",
+      clearGroup: "Kosongkan",
       groups: {
         govern: "Govern — menjalankan keamanan sebagai program",
         identify: "Identify — mengetahui aset & risiko",
