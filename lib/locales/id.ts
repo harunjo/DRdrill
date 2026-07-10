@@ -225,6 +225,7 @@ export const id: Dictionary = {
       annualized: "Perkiraan kerugian tahunan (ALE)",
       aleNote:
         "Eksposur per insiden × seberapa mungkin gangguan terjadi tiap tahun — angkanya naik tiap ada celah kritis yang belum ditutup.",
+      unrecoverableNote: "Workload tidak dapat dipulihkan jika terjadi bencana",
     },
     invest: {
       fundingCase: "Business continuity — usulan pendanaan",

@@ -92,6 +92,11 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
             })}
           </div>
         </div>
+        {a.results.some(isCatastrophic) && (
+          <p className="mt-4 border-t border-line-soft pt-3 text-[12px] font-medium text-crit">
+            {b.unrecoverableNote}
+          </p>
+        )}
       </div>
     </section>
   );

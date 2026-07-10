@@ -232,6 +232,7 @@ export const en = {
       annualized: "Estimated annual loss (ALE)",
       aleNote:
         "Per-incident exposure × how likely a disruption is each year — the rate rises with each unresolved critical gap.",
+      unrecoverableNote: "A workload cannot be recovered if a disaster strikes",
     },
     invest: {
       fundingCase: "Business continuity — funding case",
