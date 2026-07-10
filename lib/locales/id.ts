@@ -6,7 +6,7 @@ export const id: Dictionary = {
   appName: "DR Drill",
   currency: { code: "IDR", rate: 1 },
   masthead: "Asesmen business continuity",
-  tagline: "Silakan gambarkan lingkungan IT Anda untuk memperoleh gambaran nyata RPO/RTO IT Anda.",
+  tagline: "Silakan gambarkan lingkungan IT Anda untuk memperoleh gambaran nyata RPO/RTO",
   privacyLine:
     "Detail lingkungan dan nama workload Anda tidak pernah meninggalkan browser ini. Cerita simulasi ditulis hanya dari temuan yang dianonimkan (W1, W2, …), dan tidak ada input atau data Anda yang disimpan di server ini.",
   trustIndicator:
