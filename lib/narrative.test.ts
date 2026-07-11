@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { FindingsPayload } from "./engine";
+import { assess, type Environment, type FindingsPayload } from "./engine";
 import {
   buildPrompt,
   substituteLabels,
@@ -202,5 +202,29 @@ describe("buildPrompt — CSF Detect/Respond (U7)", () => {
     );
     expect(check.ok).toBe(false);
     expect(check.offending).toContain("21");
+  });
+});
+
+describe("validateRequest — full CSF payload (regression, >20 flags)", () => {
+  it("accepts an assessment carrying every CSF gap", () => {
+    const env: Environment = {
+      model: "onprem",
+      workloads: [{ id: "a", name: "ERP", type: "database", sizeGB: 100, tier: 1 }],
+      protection: {
+        onprem: {
+          frequencyHours: 24,
+          replication: false,
+          replicationLagMin: 15,
+          offsiteCopy: false,
+          immutableCopy: false,
+          secondSite: false,
+        },
+      },
+      security: {}, // assessed, nothing present -> every core gap fires
+    };
+    const a = assess(env);
+    expect(a.findings.flags.length).toBeGreaterThan(20);
+    const req = { findings: a.findings, scenario: "ransomware", lang: "id" };
+    expect(validateRequest(JSON.parse(JSON.stringify(req)))).not.toBeNull();
   });
 });

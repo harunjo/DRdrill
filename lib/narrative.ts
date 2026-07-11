@@ -121,7 +121,10 @@ export function validateRequest(body: unknown): NarrativeRequest | null {
   }
 
   const flags = f.flags;
-  if (!Array.isArray(flags) || flags.length > 20) return null;
+  // Cost/DoS guard. A full CSF assessment (DR flags + Govern/Identify/Protect/
+  // Detect/Respond gaps, per placement group) can legitimately reach the high
+  // twenties, so the cap is generous.
+  if (!Array.isArray(flags) || flags.length > 50) return null;
   for (const fl of flags) {
     if (typeof fl !== "object" || fl === null) return null;
     const ff = fl as Record<string, unknown>;
