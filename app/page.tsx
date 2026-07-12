@@ -35,19 +35,22 @@ export default function Home() {
       <header className="sticky top-0 z-20 border-b border-line bg-panel/85 backdrop-blur-md">
         <div className="grid-texture">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-3">
-            <div className="flex items-center gap-2.5">
+            <div className="flex min-w-0 items-center gap-2.5">
+              {/* Incident Timeline mark — the amber t=0 event line inside a
+                  datasheet box; ties the wordmark to the signature visual. */}
               <span
                 aria-hidden
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-b from-[#5b64df] to-[#4b56d6] text-white shadow-[0_6px_16px_-8px_rgba(75,86,214,0.8)]"
+                className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] border border-text bg-panel"
               >
-                <ShieldCheck className="h-[18px] w-[18px]" strokeWidth={2.2} />
+                <span className="absolute inset-y-[6px] left-1/2 w-[2px] -translate-x-1/2 bg-event" />
+                <span className="absolute left-1/2 top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-event" />
               </span>
-              <div className="leading-tight">
+              <div className="min-w-0 leading-tight">
                 <div className="text-[15px] font-semibold tracking-tight">{t.appName}</div>
-                <div className="tag text-[10px]">{t.masthead}</div>
+                <div className="tag hidden truncate text-[10px] sm:block">{t.masthead}</div>
               </div>
             </div>
-            <div className="flex overflow-hidden rounded-lg border border-line bg-panel text-xs font-semibold shadow-sm">
+            <div className="flex shrink-0 overflow-hidden rounded-lg border border-line bg-panel text-xs font-semibold shadow-sm">
               {(["id", "en"] as Lang[]).map((l) => (
                 <button
                   key={l}

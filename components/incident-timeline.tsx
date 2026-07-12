@@ -56,20 +56,25 @@ export function IncidentTimeline({
 
   return (
     <div className="w-full">
-      {/* readouts */}
+      {/* readouts — value never wraps; the "/ target" reference drops on
+          narrow screens (still shown by the dashed target tick below). */}
       <div className="mb-2 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="tag !text-[10px] text-faint">{labels.dataYouLose}</div>
-          <div className="font-mono text-[13px] font-bold sm:text-[14px]">
+          <div className="whitespace-nowrap font-mono text-[12px] font-bold sm:text-[14px]">
             <span className={rpoMissed ? "text-crit" : "text-ok"}>{fmtDur(rpoAchievableMin)}</span>
-            {!compact && <span className="text-faint"> / {fmtDur(rpoTargetMin)}</span>}
+            {!compact && (
+              <span className="hidden text-faint sm:inline"> / {fmtDur(rpoTargetMin)}</span>
+            )}
           </div>
         </div>
         <div className="min-w-0 text-right">
           <div className="tag !text-[10px] text-faint">{labels.timeDown}</div>
-          <div className="font-mono text-[13px] font-bold sm:text-[14px]">
+          <div className="whitespace-nowrap font-mono text-[12px] font-bold sm:text-[14px]">
             <span className={rtoMissed ? "text-crit" : "text-ok"}>{fmtDur(rtoAchievableMin)}</span>
-            {!compact && <span className="text-faint"> / {fmtDur(rtoTargetMin)}</span>}
+            {!compact && (
+              <span className="hidden text-faint sm:inline"> / {fmtDur(rtoTargetMin)}</span>
+            )}
           </div>
         </div>
       </div>
