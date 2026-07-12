@@ -194,6 +194,7 @@ export const id: Dictionary = {
     },
     coverageShort: "Berdasarkan {n} workload yang Anda gambarkan",
     lensesLabel: "Tampilan laporan",
+    lensesHint: "Temuan sama, tiga tampilan — ketuk untuk ganti audiens:",
     lenses: { business: "Dampak bisnis", technical: "Teknis", investment: "Usulan investasi" },
     tiles: { readiness: "Kesiapan", workloads: "Workload", flags: "Tanda risiko", rule: "3-2-1" },
     scoreTitle: "Kesiapan recovery",
@@ -230,8 +231,8 @@ export const id: Dictionary = {
     invest: {
       fundingCase: "Business continuity — usulan pendanaan",
       exposureAtRisk: "Eksposur berisiko",
-      plusUnrecoverable: "plus {names} tak terpulihkan jika terjadi bencana",
-      allUnrecoverable: "{names} tak terpulihkan jika terjadi bencana",
+      plusUnrecoverable: "plus {names} tidak dapat dipulihkan",
+      allUnrecoverable: "{names} tidak dapat dipulihkan",
       noCost: "Isi biaya downtime di intake untuk mengukur eksposur.",
       posture: "Postur",
       bia: "BIA · asesmen mandiri selaras dengan ISO 22301 / NIST CSF",
@@ -521,7 +522,7 @@ export const id: Dictionary = {
     regenerate: "Jalankan lagi",
     scenarios: {
       ransomware: "Ransomware",
-      siteloss: "Bencana lokal (kebakaran/banjir/pencurian/kerusakan infra)",
+      siteloss: "Bencana lokal (kebakaran/banjir)",
       outage: "Gangguan cloud/region",
       deletion: "Penghapusan tidak sengaja",
     },

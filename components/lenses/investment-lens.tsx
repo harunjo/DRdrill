@@ -267,8 +267,25 @@ export function InvestmentLens({
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () =>
-      onBranding({ ...branding, logo: typeof reader.result === "string" ? reader.result : null });
+    reader.onload = () => {
+      if (typeof reader.result !== "string") return;
+      // Normalize to PNG via canvas: jsPDF's addImage only supports PNG/JPEG/WEBP,
+      // so an SVG (or any other format) would silently drop from the PDF. Decoding
+      // through an <img> + canvas gives us a PNG the exporter always renders.
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth || 240;
+        canvas.height = img.naturalHeight || 80;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return onBranding({ ...branding, logo: reader.result as string });
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        onBranding({ ...branding, logo: canvas.toDataURL("image/png") });
+      };
+      // If decoding fails, fall back to the raw data URL (still shows on-screen).
+      img.onerror = () => onBranding({ ...branding, logo: reader.result as string });
+      img.src = reader.result;
+    };
     reader.readAsDataURL(file);
   };
 

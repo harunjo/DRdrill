@@ -203,7 +203,7 @@ export function Drill({
               disabled={generating}
               onClick={() => selectScenario(sc)}
               aria-pressed={active}
-              className={`flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3 py-2 text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+              className={`flex min-h-[44px] max-w-full items-center gap-1.5 rounded-lg border px-3 py-2 text-left text-[13px] transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
                 active
                   ? "border-signal bg-signal-soft font-semibold text-signal-ink"
                   : "border-line text-muted hover:border-faint hover:text-text"

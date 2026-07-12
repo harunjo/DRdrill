@@ -201,6 +201,7 @@ export const en = {
     },
     coverageShort: "Based on the {n} workloads you described",
     lensesLabel: "Report view",
+    lensesHint: "Same findings, three views — tap to switch audience:",
     lenses: { business: "Business impact", technical: "Technical", investment: "Investment case" },
     tiles: { readiness: "Readiness", workloads: "Workloads", flags: "Risk flags", rule: "3-2-1" },
     scoreTitle: "Recovery readiness",

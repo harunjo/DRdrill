@@ -65,10 +65,11 @@ export function Report({
   return (
     <div className="mt-4">
       <PostureRadar t={t} scores={postureScores} />
+      <p className="mt-5 text-[12px] font-medium text-muted">{t.report.lensesHint}</p>
       <div
         role="tablist"
         aria-label={t.report.lensesLabel}
-        className="mt-4 flex gap-1 rounded-xl border border-line bg-panel p-1 shadow-sm"
+        className="mt-1.5 flex gap-1 rounded-xl border-2 border-signal-soft bg-panel p-1 shadow-md"
       >
         {LENSES.map(({ key, icon: Icon }, i) => {
           const active = lens === key;
@@ -83,10 +84,10 @@ export function Report({
               tabIndex={active ? 0 : -1}
               onClick={() => select(key)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className={`flex min-h-[40px] flex-1 items-center justify-center gap-1.5 rounded-lg border-b-2 px-2 text-[12px] transition-colors sm:text-[13px] ${
+              className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border-b-2 px-2 text-[12px] font-medium transition-colors sm:text-[13px] ${
                 active
-                  ? "border-signal bg-signal-soft font-semibold text-signal-ink"
-                  : "border-transparent text-faint hover:text-muted"
+                  ? "border-signal bg-signal-soft font-semibold text-signal-ink shadow-sm"
+                  : "border-transparent text-muted hover:bg-well hover:text-text"
               }`}
             >
               <Icon className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden />

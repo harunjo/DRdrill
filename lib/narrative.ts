@@ -203,6 +203,7 @@ export function buildPrompt(req: NarrativeRequest): string {
     `- Output 6 to 10 beats, one per line, each starting with a clock time like "02:14 — ".`,
     `- Refer to workloads ONLY by their labels (W1, W2, ...). Never invent system names.`,
     `- Every duration or quantity you mention MUST come from the facts above (you may convert minutes to hours). Do not invent any number except the clock times.`,
+    `- Show elapsed time and the duration of the disaster itself ONLY by advancing the clock-time prefixes (e.g. move from 02:14 to 09:30). NEVER write the outage/incident length as a bare number of hours, minutes, or days unless that exact figure is one of the RPO/RTO facts above — say "still down by 09:30", not "a 7-hour outage".`,
     `- Describe detection and response posture qualitatively (e.g. "weak", "undetected", "slow to contain"); never state a maturity score or invent a duration for it.`,
     `- For a cyber-attack scenario with weak detection or response, you may narrate the intruder operating undetected and spreading before recovery begins — kept qualitative per the rule above — then let recovery unfold per the RPO/RTO facts.`,
     `- Do not name any product, vendor, or tool.`,
