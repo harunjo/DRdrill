@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react";
 import { track } from "@vercel/analytics";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
-import { assess, fmtMinutes, type Assessment, type Environment } from "@/lib/engine";
+import { assess, type Assessment, type Environment } from "@/lib/engine";
 import { aggregateExposure } from "@/lib/exposure";
 import { dictionaries, type Lang } from "@/lib/i18n";
 import { Intake, emptyProtection, emptyWorkload } from "@/components/intake";
 import { Report } from "@/components/report";
 import { Drill } from "@/components/drill";
-import { IncidentTimeline } from "@/components/incident-timeline";
 import { Logo } from "@/components/logo";
 
 export default function Home() {
@@ -106,26 +105,6 @@ export default function Home() {
             <h1 className="mt-5 max-w-[20ch] text-[1.5rem] font-semibold leading-[1.12] tracking-[-0.02em] text-balance sm:text-[2.05rem]">
               {t.tagline}
             </h1>
-
-            {/* Signature thesis — a labelled sample timeline so the visitor sees
-                the payoff before filling anything. Compact + tight so the wizard
-                stays in view on the landing (illustrative values only). */}
-            <section className="panel mt-5 px-5 py-4 sm:px-6">
-              <div className="mb-2">
-                <span className="tag text-[10px] text-event">{t.heroExampleTag}</span>
-              </div>
-              <IncidentTimeline
-                rpoAchievableMin={1440}
-                rpoTargetMin={240}
-                rtoAchievableMin={1800}
-                rtoTargetMin={480}
-                fmtDur={(m) =>
-                  fmtMinutes(m, { unrecoverable: t.report.unrecoverable, ...t.report.units })
-                }
-                labels={t.report.timeline}
-                compact
-              />
-            </section>
 
             <Intake
               t={t}
