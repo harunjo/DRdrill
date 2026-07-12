@@ -303,13 +303,25 @@ describe("assess() CSF wiring (U1)", () => {
     expect(a.flags.some((f) => f.code.startsWith("no-siem"))).toBe(false);
   });
 
+  const allAbsent = Object.fromEntries(SECURITY_CONTROLS.map((c) => [c.key, false]));
+
   it("adds security gaps to flags but leaves the Recover score unchanged (R1)", () => {
-    const a = assess({ ...base, security: {} }); // assessed, nothing present
+    const a = assess({ ...base, security: allAbsent }); // every function engaged, nothing present
     const recoverOnly = assess(base);
     expect(a.score).toBe(recoverOnly.score); // Recover score not dragged by security gaps
     expect(a.detect?.score).toBe(0);
     expect(a.findings.detect).toEqual({ score: 0 });
     expect(a.flags.some((f) => f.code === "no-siem")).toBe(true);
+  });
+
+  it("only assesses functions the user engaged with — untouched stay unassessed (R2)", () => {
+    const a = assess({ ...base, security: { siem: true } }); // touched a Detect control only
+    expect(a.detect?.score).toBeGreaterThan(0);
+    expect(a.govern).toBeUndefined();
+    expect(a.findings.govern).toBeUndefined();
+    // no phantom gaps for functions the user never opened
+    expect(a.flags.some((f) => f.code === "no-mfa")).toBe(false);
+    expect(a.flags.some((f) => f.code === "no-security-policy")).toBe(false);
   });
 });
 
@@ -320,7 +332,7 @@ describe("assess() — all CSF security functions (Govern/Identify/Protect)", ()
     protection: { onprem: { ...noProtection, frequencyHours: 24 } },
   };
   it("scores all five functions and flags their core gaps when security is provided", () => {
-    const a = assess({ ...base, security: {} });
+    const a = assess({ ...base, security: Object.fromEntries(SECURITY_CONTROLS.map((c) => [c.key, false])) });
     for (const fn of ["govern", "identify", "protect", "detect", "respond"] as const) {
       expect(a[fn]?.score).toBe(0);
       expect(a.findings[fn]).toEqual({ score: 0 });

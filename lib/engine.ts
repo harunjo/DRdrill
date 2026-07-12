@@ -295,12 +295,20 @@ export function assess(env: Environment): Assessment {
   // gaps are appended to the report/investment flag set but never affect the
   // Recover score (R1 — Recover computations unchanged).
   const drFlags = collectFlags(env);
-  const sec = env.security
-    ? (Object.fromEntries(
-        CSF_SECURITY_FUNCTIONS.map((f) => [f, assessFunction(f, env.security!)]),
-      ) as Record<CsfFunction, FunctionResult>)
-    : null;
-  const flags = [...drFlags, ...(sec ? CSF_SECURITY_FUNCTIONS.flatMap((f) => sec[f].gaps) : [])];
+  // A CSF function is assessed only when the user engaged with one of its
+  // controls (a key is present in env.security) — not merely because they opened
+  // the security step. Untouched functions stay "not assessed" (R2), so the radar
+  // shows them grey rather than an alarming red 0, and no phantom gaps fire.
+  const security = env.security;
+  const sec: Partial<Record<CsfFunction, FunctionResult>> = {};
+  if (security) {
+    for (const f of CSF_SECURITY_FUNCTIONS) {
+      if (SECURITY_CONTROLS.some((c) => c.fn === f && c.key in security)) {
+        sec[f] = assessFunction(f, security);
+      }
+    }
+  }
+  const flags = [...drFlags, ...CSF_SECURITY_FUNCTIONS.flatMap((f) => sec[f]?.gaps ?? [])];
 
   // 3-2-1 across the environment: any protected group counts copies; media
   // diversity approximated by replication or a cloud+onprem split; offsite by
@@ -347,11 +355,9 @@ export function assess(env: Environment): Assessment {
     flags,
     rule321,
     score,
-    ...(sec
-      ? (Object.fromEntries(
-          CSF_SECURITY_FUNCTIONS.map((f) => [f, { score: sec[f].score }]),
-        ) as Partial<Record<CsfFunction, { score: number }>>)
-      : {}),
+    ...(Object.fromEntries(
+      CSF_SECURITY_FUNCTIONS.filter((f) => sec[f]).map((f) => [f, { score: sec[f]!.score }]),
+    ) as Partial<Record<CsfFunction, { score: number }>>),
   };
 
   return {
@@ -361,7 +367,7 @@ export function assess(env: Environment): Assessment {
     score,
     findings,
     labelMap,
-    ...(sec ?? {}),
+    ...sec,
   };
 }
 

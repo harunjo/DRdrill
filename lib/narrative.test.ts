@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { assess, type Environment, type FindingsPayload } from "./engine";
+import { SECURITY_CONTROLS } from "./calibration";
 import {
   buildPrompt,
   substituteLabels,
@@ -220,7 +221,8 @@ describe("validateRequest — full CSF payload (regression, >20 flags)", () => {
           secondSite: false,
         },
       },
-      security: {}, // assessed, nothing present -> every core gap fires
+      // every function engaged (all controls present-but-false) -> every core gap fires
+      security: Object.fromEntries(SECURITY_CONTROLS.map((c) => [c.key, false])),
     };
     const a = assess(env);
     expect(a.findings.flags.length).toBeGreaterThan(20);

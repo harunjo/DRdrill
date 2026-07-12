@@ -103,16 +103,11 @@ export default function Home() {
         ) : (
           /* ── Intake screen: thesis + wizard ── */
           <>
-            {/* Thesis */}
+            {/* Thesis — the persistent trust banner above already carries the
+                privacy promise, so the hero doesn't repeat it. */}
             <h1 className="mt-6 max-w-[22ch] text-[1.95rem] font-semibold leading-[1.16] tracking-[-0.02em] text-balance sm:text-[2.5rem]">
               {t.tagline}
             </h1>
-
-            {/* Trust note — the full privacy promise */}
-            <div className="mt-6 flex max-w-2xl items-start gap-3 rounded-xl border border-signal-soft bg-signal-soft/50 px-4 py-3.5 text-[13px] leading-relaxed text-signal-ink">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-signal" strokeWidth={2} aria-hidden />
-              <span>{t.privacyLine}</span>
-            </div>
 
             <Intake
               t={t}

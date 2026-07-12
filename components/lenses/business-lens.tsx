@@ -62,9 +62,13 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
         </div>
       </div>
 
-      {/* Heatmap + per-workload breakdown */}
+      {/* Heatmap + per-workload breakdown. The 3×3 grid only reads as a grid with
+          a few workloads to place — below that it's mostly empty cells, so the
+          per-workload list below carries it. */}
       <div className="px-5 py-5 sm:px-6">
-        <Heatmap t={t} results={a.results} flags={a.flags} model={a.findings.model} />
+        {a.results.length >= 3 && (
+          <Heatmap t={t} results={a.results} flags={a.flags} model={a.findings.model} />
+        )}
 
         <div className="mt-5 border-t border-line-soft pt-4">
           <div className="tag mb-2 text-[10px]">{b.perWorkload}</div>
