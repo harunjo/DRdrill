@@ -521,6 +521,7 @@ export const en = {
 
   drill: {
     title: "Live drill",
+    totalLoss: "Total business loss at stake",
     pickScenario: "Pick the disaster to simulate:",
     idlePrompt: "Choose a scenario, then run the drill to see how tonight would unfold — beat by beat.",
     generate: "Run the drill",

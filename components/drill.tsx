@@ -54,11 +54,16 @@ export function Drill({
   lang,
   findings,
   labelMap,
+  totalLoss,
 }: {
   t: Dictionary;
   lang: Lang;
   findings: FindingsPayload;
   labelMap: Record<string, string>;
+  // Pre-formatted exposure total — browser-only money (R13), computed by the
+  // caller from aggregateExposure(). Never enters the payload or the LLM story;
+  // it just frames the stakes above the timeline. null when no cost was given.
+  totalLoss: string | null;
 }) {
   const [scenario, setScenario] = useState<Scenario>("ransomware");
   const [status, setStatus] = useState<Status>("idle");
@@ -225,6 +230,15 @@ export function Drill({
             </button>
           )}
         </div>
+
+        {/* Stakes: deterministic browser-only loss total, stays intact even if
+            the story degrades — the numbers here never come from the LLM. */}
+        {totalLoss && (
+          <div className="flex items-baseline justify-between gap-2 border-b border-line bg-crit-soft/40 px-4 py-2.5">
+            <span className="tag text-[10px]">{t.drill.totalLoss}</span>
+            <span className="font-mono text-[15px] font-semibold text-crit">{totalLoss}</span>
+          </div>
+        )}
 
         <div className="min-h-[9rem] p-4">
           {/* Idle — prompt + run CTA */}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { track } from "@vercel/analytics";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { assess, type Assessment, type Environment } from "@/lib/engine";
+import { aggregateExposure, formatMoney } from "@/lib/exposure";
 import { dictionaries, type Lang } from "@/lib/i18n";
 import { Intake, emptyProtection, emptyWorkload } from "@/components/intake";
 import { Report } from "@/components/report";
@@ -91,6 +92,10 @@ export default function Home() {
                   lang={lang}
                   findings={assessment.findings}
                   labelMap={assessment.labelMap}
+                  totalLoss={(() => {
+                    const agg = aggregateExposure(assessment.results);
+                    return agg.monetizedCount > 0 ? formatMoney(agg.total, t.currency) : null;
+                  })()}
                 />
               }
             />

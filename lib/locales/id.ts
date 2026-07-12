@@ -514,6 +514,7 @@ export const id: Dictionary = {
 
   drill: {
     title: "Simulasi langsung",
+    totalLoss: "Total potensi kerugian bisnis",
     pickScenario: "Pilih bencana yang ingin disimulasikan:",
     idlePrompt: "Pilih skenario, lalu jalankan simulasi untuk melihat kronologis terjadinya bencana menit per menit secara detail.",
     generate: "Jalankan simulasi",
