@@ -179,7 +179,7 @@ export function Intake({
     onToggle: (v: boolean) => void,
   ) => (
     <label
-      className={`flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2.5 text-[13px] transition-colors ${
+      className={`keycap flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded-lg border bg-panel px-3 py-2.5 text-[13px] transition-colors ${
         checked
           ? "border-signal bg-signal-soft text-signal-ink"
           : "border-line text-muted hover:border-faint hover:text-text"
@@ -302,9 +302,9 @@ export function Intake({
                       onClick={() => onChange({ ...env, model: key })}
                       role="radio"
                       aria-checked={active}
-                      className={`flex min-h-[92px] flex-col items-start gap-2 rounded-xl border p-4 text-left transition-all ${
+                      className={`keycap flex min-h-[92px] flex-col items-start gap-2 rounded-xl border p-4 text-left transition-all ${
                         active
-                          ? "border-signal bg-signal-soft shadow-[0_8px_24px_-14px_rgba(16,20,27,0.45)]"
+                          ? "border-signal bg-signal-soft"
                           : "border-line bg-panel hover:border-faint hover:bg-well/50"
                       }`}
                     >

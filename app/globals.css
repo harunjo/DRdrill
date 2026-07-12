@@ -210,6 +210,22 @@ input[type="checkbox"] {
     pointer-events: none;
   }
 
+  /* Keycap — option controls read as physical switchgear: raised on a hard
+     bottom ledge, pressed down-and-in when selected. State comes from the
+     controls' own ARIA (pressed/checked/selected) or a checked input inside. */
+  .keycap {
+    box-shadow: 0 2px 0 var(--color-line), 0 3px 6px -2px rgba(16, 20, 27, 0.08);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .keycap:active:not(:disabled),
+  .keycap[aria-pressed="true"],
+  .keycap[aria-checked="true"],
+  .keycap[aria-selected="true"],
+  label.keycap:has(input:checked) {
+    transform: translateY(1px);
+    box-shadow: 0 1px 0 var(--color-line), inset 0 1.5px 3px rgba(16, 20, 27, 0.12);
+  }
+
   /* Squared status tag — a datasheet badge, always labeled, with a hairline edge. */
   .chip {
     display: inline-flex;

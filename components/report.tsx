@@ -84,9 +84,9 @@ export function Report({
               tabIndex={active ? 0 : -1}
               onClick={() => select(key)}
               onKeyDown={(e) => onKeyDown(e, i)}
-              className={`flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border-b-2 px-2 text-[12px] font-medium transition-colors sm:text-[13px] ${
+              className={`keycap flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border-b-2 px-2 text-[12px] font-medium transition-colors sm:text-[13px] ${
                 active
-                  ? "border-signal bg-signal-soft font-semibold text-signal-ink shadow-sm"
+                  ? "border-signal bg-signal-soft font-semibold text-signal-ink"
                   : "border-transparent text-muted hover:bg-well hover:text-text"
               }`}
             >
