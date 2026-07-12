@@ -260,7 +260,7 @@ export const en = {
         clear: "Clear",
       },
       pdf: {
-        download: "Download PDF",
+        download: "Download: Business Continuity (BC) investment proposal draft",
         docTitle: "Business Continuity — Investment Justification",
         forC: "Prepared for executive review (C-level)",
         intro:

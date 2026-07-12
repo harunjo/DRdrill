@@ -253,7 +253,7 @@ export const id: Dictionary = {
         clear: "Hapus",
       },
       pdf: {
-        download: "Unduh PDF",
+        download: "Unduh: draf usulan investasi Business Continuity (BC)",
         docTitle: "Business Continuity — Justifikasi Investasi",
         forC: "Disiapkan untuk tinjauan manajemen (C-level)",
         intro:
