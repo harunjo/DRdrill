@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { RiskFlag, Workload, WorkloadResult } from "./engine";
-import { buildSummary, orderAsks } from "./investment";
+import { askCategory, buildSummary, groupByFunction, orderAsks } from "./investment";
 
 const wl = (over: Partial<Workload>): Workload => ({
   id: "x",
@@ -65,5 +65,34 @@ describe("buildSummary", () => {
     expect(text).toContain("2. Second site — resilience");
     expect(text.startsWith("Funding case")).toBe(true);
     expect(text.trimEnd().endsWith("Based on 2 workloads")).toBe(true);
+  });
+});
+
+describe("askCategory / groupByFunction", () => {
+  const f = (code: RiskFlag["code"], severity: RiskFlag["severity"] = "warning"): RiskFlag => ({
+    code,
+    severity,
+    scope: "all",
+  });
+
+  it("maps DR codes to recover and security codes to their CSF function", () => {
+    expect(askCategory("no-offsite")).toBe("recover");
+    expect(askCategory("no-mfa")).toBe("protect");
+    expect(askCategory("no-ir-plan")).toBe("respond");
+    expect(askCategory("no-security-policy")).toBe("govern");
+    expect(askCategory("no-asset-inventory")).toBe("identify");
+    expect(askCategory("no-siem")).toBe("detect");
+  });
+
+  it("buckets flags by function, critical-bearing groups first", () => {
+    const flags = [
+      f("single-site"), // recover, warning
+      f("no-mfa", "critical"), // protect, critical
+      f("no-immutable", "critical"), // recover, critical
+    ];
+    const groups = groupByFunction(flags, (x) => x);
+    expect(groups[0].hasCritical).toBe(true);
+    expect(groups.find((g) => g.category === "recover")!.items.length).toBe(2);
+    expect(groups.map((g) => g.category).sort()).toEqual(["protect", "recover"]);
   });
 });

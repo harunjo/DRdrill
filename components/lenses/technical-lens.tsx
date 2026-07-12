@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { AlertOctagon, AlertTriangle, CheckCircle2, Siren } from "lucide-react";
+import { AlertOctagon, AlertTriangle, CheckCircle2, Siren, ChevronDown } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import { fmtMinutes, type Assessment, type DurationLabels } from "@/lib/engine";
+import { groupByFunction } from "@/lib/investment";
 
 type Tone = "ok" | "warn" | "crit" | "signal";
 
@@ -182,6 +183,7 @@ export function TechnicalLens({
   const dur: DurationLabels = { unrecoverable: t.report.unrecoverable, ...t.report.units };
 
   const [lit, setLit] = useState(false);
+  const [openCat, setOpenCat] = useState<Record<string, boolean>>({});
   useEffect(() => {
     const id = requestAnimationFrame(() => setLit(true));
     return () => cancelAnimationFrame(id);
@@ -295,32 +297,64 @@ export function TechnicalLens({
             <span className="font-medium text-text">{t.report.investEmpty}</span>
           </div>
         ) : (
-          <div className="mt-4 grid gap-3">
-            {a.flags.map((f, i) => {
-              const copy = t.report.flags[f.code];
-              const critical = f.severity === "critical";
-              const railColor = critical ? TONE.crit : TONE.warn;
-              const Icon = critical ? AlertOctagon : AlertTriangle;
+          <div className="mt-4 grid gap-2">
+            {groupByFunction(a.flags, (f) => f).map((g, gi) => {
+              const open = openCat[g.category] ?? gi === 0;
+              const crit = g.hasCritical;
               return (
-                <div
-                  key={`${f.code}-${f.scope}-${i}`}
-                  className="relative overflow-hidden rounded-xl border border-line bg-panel"
-                >
-                  <span
-                    aria-hidden
-                    className="absolute inset-y-0 left-0 w-1"
-                    style={{ background: railColor }}
-                  />
-                  <div className="py-3.5 pl-4 pr-3.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Icon className="h-4 w-4 shrink-0" style={{ color: railColor }} aria-hidden />
-                      <span className={critical ? "chip chip-crit" : "chip chip-warn"}>
-                        {critical ? t.report.severity.critical : t.report.severity.warning}
-                      </span>
-                      <span className="text-[14px] font-semibold text-text">{copy.title}</span>
+                <div key={g.category} className="rounded-xl border border-line bg-panel">
+                  <button
+                    type="button"
+                    onClick={() => setOpenCat((s) => ({ ...s, [g.category]: !open }))}
+                    aria-expanded={open}
+                    className="flex w-full items-center gap-2 px-4 py-3 text-left"
+                  >
+                    <span
+                      aria-hidden
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ background: crit ? TONE.crit : TONE.warn }}
+                    />
+                    <span className="flex-1 text-[13px] font-semibold text-text">
+                      {t.report.csf.functions[g.category]}
+                    </span>
+                    <span className={`chip ${crit ? "chip-crit" : "chip-warn"}`}>{g.items.length}</span>
+                    <ChevronDown
+                      className={`h-4 w-4 shrink-0 text-faint transition-transform ${open ? "rotate-180" : ""}`}
+                      aria-hidden
+                    />
+                  </button>
+                  {open && (
+                    <div className="grid gap-2 border-t border-line-soft px-3 pb-3 pt-2">
+                      {g.items.map((f, i) => {
+                        const copy = t.report.flags[f.code];
+                        const critical = f.severity === "critical";
+                        const railColor = critical ? TONE.crit : TONE.warn;
+                        const Icon = critical ? AlertOctagon : AlertTriangle;
+                        return (
+                          <div
+                            key={`${f.code}-${f.scope}-${i}`}
+                            className="relative overflow-hidden rounded-lg border border-line bg-well/40"
+                          >
+                            <span
+                              aria-hidden
+                              className="absolute inset-y-0 left-0 w-1"
+                              style={{ background: railColor }}
+                            />
+                            <div className="py-3 pl-4 pr-3">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Icon className="h-4 w-4 shrink-0" style={{ color: railColor }} aria-hidden />
+                                <span className={critical ? "chip chip-crit" : "chip chip-warn"}>
+                                  {critical ? t.report.severity.critical : t.report.severity.warning}
+                                </span>
+                                <span className="text-[13px] font-semibold text-text">{copy.title}</span>
+                              </div>
+                              <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{copy.detail}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{copy.detail}</p>
-                  </div>
+                  )}
                 </div>
               );
             })}

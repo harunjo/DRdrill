@@ -3,11 +3,68 @@
 // strings in, so the ordering and formatting stay unit-testable.
 
 import { riskBoughtDown, type RiskBoughtDown } from "./exposure";
-import type { DeploymentModel, RiskFlag, WorkloadResult } from "./engine";
+import type { CsfFunction, DeploymentModel, FlagCode, RiskFlag, WorkloadResult } from "./engine";
+import { SECURITY_CONTROLS } from "./calibration";
 
 export interface Ask {
   flag: RiskFlag;
   boughtDown: RiskBoughtDown;
+}
+
+// --- Group asks/flags by CSF function so a long list reads as a few sections
+//     instead of a wall of cards. DR flags fall under "recover". ---
+
+export type AskCategory = CsfFunction | "recover";
+
+const GAP_FN = new Map<FlagCode, CsfFunction>();
+for (const c of SECURITY_CONTROLS) if (c.gap) GAP_FN.set(c.gap.code, c.fn);
+
+/** Which CSF function an ask/flag belongs to. DR recovery flags → "recover". */
+export function askCategory(code: FlagCode): AskCategory {
+  return GAP_FN.get(code) ?? "recover";
+}
+
+export const CSF_CATEGORY_ORDER: AskCategory[] = [
+  "recover",
+  "govern",
+  "identify",
+  "protect",
+  "detect",
+  "respond",
+];
+
+export interface FunctionGroup<T> {
+  category: AskCategory;
+  items: T[];
+  hasCritical: boolean;
+}
+
+/** Bucket items by CSF function; critical-bearing groups first, then CSF order.
+ *  Item order within a group is preserved (callers pass pre-sorted lists). */
+export function groupByFunction<T>(
+  items: T[],
+  flagOf: (t: T) => Pick<RiskFlag, "code" | "severity">,
+): FunctionGroup<T>[] {
+  const byCat = new Map<AskCategory, T[]>();
+  for (const it of items) {
+    const cat = askCategory(flagOf(it).code);
+    const arr = byCat.get(cat);
+    if (arr) arr.push(it);
+    else byCat.set(cat, [it]);
+  }
+  return [...byCat.entries()]
+    .map(([category, group]) => ({
+      category,
+      items: group,
+      hasCritical: group.some((x) => flagOf(x).severity === "critical"),
+    }))
+    .sort((a, b) =>
+      a.hasCritical !== b.hasCritical
+        ? a.hasCritical
+          ? -1
+          : 1
+        : CSF_CATEGORY_ORDER.indexOf(a.category) - CSF_CATEGORY_ORDER.indexOf(b.category),
+    );
 }
 
 const KIND_RANK: Record<RiskBoughtDown["kind"], number> = {

@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { track } from "@vercel/analytics";
-import { AlertOctagon, AlertTriangle, Copy, Check, FileDown } from "lucide-react";
+import { AlertOctagon, AlertTriangle, Copy, Check, FileDown, ChevronDown } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import type { Assessment } from "@/lib/engine";
 import { fmtMinutes } from "@/lib/engine";
 import { SECURITY_CONTROLS, TIER_TARGETS } from "@/lib/calibration";
 import { aggregateExposure, catastrophicList, formatMoney, isCatastrophic, postureBand } from "@/lib/exposure";
-import { buildSummary, orderAsks, type Ask } from "@/lib/investment";
+import { buildSummary, groupByFunction, orderAsks, type Ask } from "@/lib/investment";
 import type { Branding, PdfBlock, PdfDoc } from "@/lib/pdf";
 import { PostureChip } from "@/components/lenses/shared";
 
@@ -45,6 +45,7 @@ export function InvestmentLens({
 
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">("idle");
   const [fallback, setFallback] = useState("");
+  const [openCat, setOpenCat] = useState<Record<string, boolean>>({});
   const printDate = new Date().toLocaleDateString();
 
   // Name the unrecoverable workloads with their criticality (e.g. "ERP (Kritis)")
@@ -344,33 +345,73 @@ export function InvestmentLens({
               <span className="text-[13px] font-semibold">{t.report.investTitle}</span>
               <span className="chip chip-neutral">{asks.length}</span>
             </div>
-            <div className="grid gap-3">
-              {asks.map((ask, i) => {
-                const copy = t.report.flags[ask.flag.code];
-                const critical = ask.flag.severity === "critical";
-                const rail = critical ? "var(--color-crit)" : "var(--color-warn)";
-                const Icon = critical ? AlertOctagon : AlertTriangle;
+            {/* Grouped by CSF function so a long list reads as a few sections;
+                the highest-priority group opens by default. */}
+            <div className="grid gap-2">
+              {groupByFunction(asks, (ask) => ask.flag).map((g, gi) => {
+                const open = openCat[g.category] ?? gi === 0;
+                const crit = g.hasCritical;
                 return (
-                  <div
-                    key={`${ask.flag.code}-${ask.flag.scope}-${i}`}
-                    className="relative overflow-hidden rounded-xl border border-line bg-panel"
-                  >
-                    <span aria-hidden className="absolute inset-y-0 left-0 w-1" style={{ background: rail }} />
-                    <div className="py-3.5 pl-4 pr-3.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Icon className="h-4 w-4 shrink-0" style={{ color: rail }} aria-hidden />
-                        <span className={critical ? "chip chip-crit" : "chip chip-warn"}>
-                          {critical ? t.report.severity.critical : t.report.severity.warning}
-                        </span>
-                        <span className="text-[14px] font-semibold text-text">
-                          {copy.title}
-                          {scopeSuffix(ask)}
-                        </span>
+                  <div key={g.category} className="rounded-xl border border-line bg-panel">
+                    <button
+                      type="button"
+                      onClick={() => setOpenCat((s) => ({ ...s, [g.category]: !open }))}
+                      aria-expanded={open}
+                      className="flex w-full items-center gap-2 px-4 py-3 text-left"
+                    >
+                      <span
+                        aria-hidden
+                        className="h-2 w-2 shrink-0 rounded-full"
+                        style={{ background: crit ? "var(--color-crit)" : "var(--color-warn)" }}
+                      />
+                      <span className="flex-1 text-[13px] font-semibold text-text">
+                        {t.report.csf.functions[g.category]}
+                      </span>
+                      <span className={`chip ${crit ? "chip-crit" : "chip-warn"}`}>{g.items.length}</span>
+                      <ChevronDown
+                        className={`h-4 w-4 shrink-0 text-faint transition-transform ${open ? "rotate-180" : ""}`}
+                        aria-hidden
+                      />
+                    </button>
+                    {open && (
+                      <div className="grid gap-2 border-t border-line-soft px-3 pb-3 pt-2">
+                        {g.items.map((ask, i) => {
+                          const copy = t.report.flags[ask.flag.code];
+                          const critical = ask.flag.severity === "critical";
+                          const rail = critical ? "var(--color-crit)" : "var(--color-warn)";
+                          const Icon = critical ? AlertOctagon : AlertTriangle;
+                          // Effect line only when it carries a figure — the generic
+                          // posture line ("closes this security gap") is redundant
+                          // now the group header names the function.
+                          const effect = ask.boughtDown.kind !== "posture" ? effectLine(ask) : null;
+                          return (
+                            <div
+                              key={`${ask.flag.code}-${ask.flag.scope}-${i}`}
+                              className="relative overflow-hidden rounded-lg border border-line bg-well/40"
+                            >
+                              <span aria-hidden className="absolute inset-y-0 left-0 w-1" style={{ background: rail }} />
+                              <div className="py-3 pl-4 pr-3">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Icon className="h-4 w-4 shrink-0" style={{ color: rail }} aria-hidden />
+                                  <span className={critical ? "chip chip-crit" : "chip chip-warn"}>
+                                    {critical ? t.report.severity.critical : t.report.severity.warning}
+                                  </span>
+                                  <span className="text-[13px] font-semibold text-text">
+                                    {copy.title}
+                                    {scopeSuffix(ask)}
+                                  </span>
+                                </div>
+                                {effect && (
+                                  <p className="mt-1.5 text-[13px] font-semibold" style={{ color: rail }}>
+                                    {effect}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
-                      <p className="mt-1.5 text-[13px] font-semibold" style={{ color: rail }}>
-                        {effectLine(ask)}
-                      </p>
-                    </div>
+                    )}
                   </div>
                 );
               })}
