@@ -348,7 +348,7 @@ export function TechnicalLens({
                                 </span>
                                 <span className="text-[13px] font-semibold text-text">{copy.title}</span>
                               </div>
-                              <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{copy.detail}</p>
+                              <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{copy.technical}</p>
                             </div>
                           </div>
                         );

@@ -156,7 +156,10 @@ export function InvestmentLens({
       { kind: "paragraph", text: fmt(P.situationLead, { model: modelLabel }) },
       a.flags.length === 0
         ? { kind: "paragraph", text: P.noGaps }
-        : { kind: "bullets", items: a.flags.map((f) => t.report.flags[f.code].title) },
+        : {
+            kind: "bullets",
+            items: a.flags.map((f) => `${t.report.flags[f.code].title} — ${t.report.flags[f.code].business}`),
+          },
 
       { kind: "heading", num: 3, title: P.riskAssessment },
       asks.length === 0
@@ -401,6 +404,7 @@ export function InvestmentLens({
                                     {scopeSuffix(ask)}
                                   </span>
                                 </div>
+                                <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{copy.business}</p>
                                 {effect && (
                                   <p className="mt-1.5 text-[13px] font-semibold" style={{ color: rail }}>
                                     {effect}

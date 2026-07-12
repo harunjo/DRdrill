@@ -181,6 +181,9 @@ export const en = {
     back: "Back",
     next: "Continue",
     stepCounter: "Step {n} of {total}",
+    saveConfig: "Save config",
+    loadConfig: "Load config",
+    loadConfigError: "That file isn't a valid DR Drill config.",
   },
 
   report: {
@@ -365,127 +368,177 @@ export const en = {
     flags: {
       "no-immutable": {
         title: "Ransomware could reach the backups",
-        detail:
+        technical:
+          "Backup repositories are writable by the same admin credentials that control production. Without WORM/immutable retention enforced at the storage layer, ransomware with domain-admin or backup-console access can encrypt or delete snapshots before any retention lock would block it.",
+        business:
           "With admin credentials, an attacker can encrypt or delete backups along with production. An immutable (WORM) copy is the investment that closes this gap — it is what contained 2017-class outbreaks at the backup layer.",
       },
       "no-offsite": {
         title: "One location holds everything",
-        detail:
+        technical:
+          "Production and backup copies sit in the same physical location with no air gap. A single-site event — fire, flood, structural failure, physical theft — removes the primary copy and the only recovery copy in the same failure domain.",
+        business:
           "Fire, flood, or a site-level compromise takes production and backups together. An offsite copy is what protects the business against losing both at once.",
       },
       "no-cross-region": {
         title: "A region outage takes the business down",
-        detail:
+        technical:
+          "Backups replicate only within the same cloud region as production. A regional control-plane or infrastructure outage on the provider's side removes access to both production and its backup simultaneously, since neither crosses an availability boundary.",
+        business:
           "To survive a cloud-region incident, the business needs a cross-region copy of its data. Without it, recovery waits on the provider.",
       },
       "single-site": {
         title: "No second site to fail over to",
-        detail:
+        technical:
+          "No standby compute, network, or storage is provisioned in a second location. Recovery after a site-level failure is bounded by hardware procurement and rebuild lead time — not restore throughput — because there's nothing to fail over to.",
+        business:
           "A site- or region-level outage means recovery is bounded by procurement and rebuild time, not restore speed. A failover target is the investment that turns days into hours.",
       },
       "saas-shared-responsibility": {
         title: "SaaS data relies on the vendor",
-        detail:
+        technical:
+          "Under the SaaS shared-responsibility model, the vendor's SLA covers uptime, not data recoverability — deletion, sync errors, or a compromised admin account are the tenant's liability. Unless SaaS data is explicitly pulled into your own backup pipeline, it has no recovery point independent of the vendor's retention window.",
+        business:
           "Shared responsibility: the vendor keeps the service running; keeping the data recoverable requires the business's own copy. Verify SaaS data is actually in the backup scope.",
       },
       "unprotected-workloads": {
         title: "Some workloads cannot be recovered",
-        detail:
+        technical:
+          "One or more workloads have no backup job, snapshot schedule, or replication configured — achievable RPO/RTO resolve to null because there is no recovery point to restore from. Any failure on these systems is permanent data loss, not downtime.",
+        business:
           "Workloads without any protection are one incident away from permanent loss. Protecting them is the first investment to make.",
       },
       "no-security-policy": {
         title: "No security policy to steer by",
-        detail:
+        technical:
+          "No documented, approved policy defines control baselines, exceptions, or an accountable owner. Controls that exist were adopted ad hoc, so there's no artifact to audit against and no owner accountable when a control silently lapses.",
+        business:
           "Without a written security policy and an owner, controls are ad hoc and nothing is accountable. A policy is what turns scattered effort into a program.",
       },
       "no-security-roles": {
         title: "No one clearly owns security",
-        detail:
+        technical:
+          "Security duties aren't assigned to named roles — patching, access review, and incident response default to whoever notices. Routine control operations like key rotation and log review have no enforced cadence.",
+        business:
           "When security responsibilities aren't assigned, gaps fall between roles. Defined ownership is what makes the program run day to day.",
       },
       "no-third-party-risk": {
         title: "Vendor risk is unmanaged",
-        detail:
+        technical:
+          "Vendors and integrations with access to your environment aren't assessed for their own security posture. A compromise on their side — leaked credentials, supply-chain injection, over-scoped API access — reaches your environment through the same trusted path with no compensating control.",
+        business:
           "Your suppliers' weaknesses become yours. Managing third-party risk is how a breach at a vendor doesn't become a breach at you.",
       },
       "no-asset-inventory": {
         title: "You can't protect what you can't see",
-        detail:
+        technical:
+          "There is no authoritative, current inventory of systems, endpoints, and data stores. Unlisted assets receive no patches, monitoring, or backup coverage — they're invisible to every other control, including this assessment's own scope.",
+        business:
           "Without an asset inventory, unknown systems go unpatched and unmonitored. Knowing what you have is the first step of every other control.",
       },
       "no-risk-assessment": {
         title: "Risks are unmeasured",
-        detail:
+        technical:
+          "Risk isn't periodically assessed and ranked, so security and DR spend follows whoever raises the loudest concern rather than measured likelihood × impact. There's no baseline to show whether posture is improving or degrading over time.",
+        business:
           "Without periodic risk assessment, investment goes to the loudest voice, not the biggest risk. Assessment is what points spend at what matters.",
       },
       "no-data-classification": {
         title: "Sensitive data isn't identified",
-        detail:
+        technical:
+          "Data isn't tagged by sensitivity at the point of storage. Without classification, encryption, access control, and retention get applied uniformly or not at all — sensitive data ends up with the same protection as public data.",
+        business:
           "If you don't know which data is sensitive, you can't protect it proportionately. Classification is what tells you where to concentrate defenses.",
       },
       "no-mfa": {
         title: "Passwords are the only lock",
-        detail:
+        technical:
+          "Authentication is password-only. Credential theft via phishing, reuse, or credential-stuffing from an unrelated breach is sufficient on its own to obtain a valid session — there's no second factor to stop it.",
+        business:
           "Stolen or guessed passwords are the most common way in. Multi-factor authentication is the single highest-value control against account takeover.",
       },
       "no-patching": {
         title: "Known holes stay open",
-        detail:
+        technical:
+          "There's no enforced patch cadence. Public exploit code for disclosed CVEs typically appears within days, and every day a system stays unpatched past that point is an open, indexed attack path.",
+        business:
           "Attackers exploit known, unpatched vulnerabilities within days of disclosure. Timely patching closes the doors before they're used.",
       },
       "no-least-privilege": {
         title: "Everyone can reach everything",
-        detail:
+        technical:
+          "Access grants aren't scoped to job function — accounts commonly hold broader permissions than their role requires. One compromised credential reaches systems and data far outside what that user needed, expanding blast radius by default.",
+        business:
           "Broad access means one compromised account exposes the whole estate. Least privilege limits how far any single breach can reach.",
       },
       "no-encryption": {
         title: "Data is readable if taken",
-        detail:
+        technical:
+          "Data at rest and/or in transit is stored or transmitted in plaintext. Interception at any point — a lost laptop, an unencrypted backup, a sniffed connection — yields immediately usable data with no extra step for an attacker.",
+        business:
           "Unencrypted data is fully exposed the moment a device, backup, or connection is intercepted. Encryption makes stolen data useless.",
       },
       "no-siem": {
         title: "Attacks can go unseen",
-        detail:
+        technical:
+          "Logs from different systems aren't aggregated or correlated. Attack patterns only visible across multiple sources — a failed login on one host followed by lateral movement on another — go undetected because no single system sees the sequence.",
+        business:
           "Without a SIEM correlating logs, an intruder can operate for weeks before anyone notices. Central detection turns a silent breach into an early alert.",
       },
       "no-central-logging": {
         title: "No central record to investigate",
-        detail:
+        technical:
+          "Logs stay local to each system instead of shipping to a central, tamper-resistant store. An attacker with local access can delete evidence of their own intrusion, and there's no single timeline to reconstruct an incident from.",
+        business:
           "When logs live only on each system, there is no single place to see an attack unfold or prove what happened. Centralized logging is the foundation detection and response both build on.",
       },
       "no-endpoint-monitoring": {
         title: "Endpoints aren't watched",
-        detail:
+        technical:
+          "Endpoints have no EDR or equivalent agent watching process behavior. Malware and living-off-the-land techniques that don't trigger signature-based antivirus run undetected on the host where most intrusions begin.",
+        business:
           "Laptops and servers are where most intrusions land first. Endpoint monitoring (EDR) spots malicious activity on the machine before it spreads.",
       },
       "no-alerting": {
         title: "Detection without alerting is just history",
-        detail:
+        technical:
+          "Even where detection signals exist, no one is automatically paged when they fire. A detected event no one sees in time behaves like an undetected one — response starts whenever someone happens to check.",
+        business:
           "Signals no one is paged on get reviewed after the damage is done. Alerting turns a detected event into a timely response.",
       },
       "no-vuln-scanning": {
         title: "Unknown weaknesses stay open",
-        detail:
+        technical:
+          "There's no recurring scan for exposed services, missing patches, or misconfigurations. Weaknesses introduced by routine changes go unnoticed until an attacker — or an incident — finds them first.",
+        business:
           "Unpatched, exposed weaknesses are the doors attackers use. Regular vulnerability scanning is how the business finds and closes them first.",
       },
       "no-ir-plan": {
         title: "No plan when an incident hits",
-        detail:
+        technical:
+          "There's no documented incident-response plan — no predefined roles, escalation path, or playbook for common scenarios. The first response to a live incident is improvised in real time, which measurably extends containment.",
+        business:
           "Improvising during a live incident costs hours the business can't spare. A documented incident-response plan keeps a crisis from becoming chaos.",
       },
       "no-isolation": {
         title: "Nothing to stop the spread",
-        detail:
+        technical:
+          "The network has no segmentation or containment capability — no way to quarantine a compromised host without taking down adjacent systems. One infected endpoint can move laterally across the full flat network unobstructed.",
+        business:
           "Without the ability to isolate a compromised segment, one infected machine can take the whole environment. Network isolation is the control that contains an incident.",
       },
       "no-ir-ownership": {
         title: "No one owns the response",
-        detail:
+        technical:
+          "No individual or team is named incident commander for a security event. Absent explicit ownership, the first hour of any incident is spent establishing who's in charge before containment can start.",
+        business:
           "When no one is clearly on call, the first hour of an incident is lost to 'who handles this?'. Named response ownership starts the clock on containment.",
       },
       "no-breach-notification": {
         title: "No process to notify",
-        detail:
+        technical:
+          "There's no defined process for legally required breach notification within statutory windows (often 72 hours). Missing the window converts a security incident into a separate compliance violation with its own penalty.",
+        business:
           "Regulators and customers expect timely disclosure after a breach; a missed window adds penalties to the damage. A breach-notification process keeps a technical incident from becoming a compliance one.",
       },
     },

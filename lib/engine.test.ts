@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   assess,
   assessFunction,
+  isEnvironment,
   type Environment,
   type Protection,
   type Workload,
@@ -340,5 +341,27 @@ describe("assess() — all CSF security functions (Govern/Identify/Protect)", ()
     expect(a.flags.some((f) => f.code === "no-mfa")).toBe(true);
     expect(a.flags.some((f) => f.code === "no-asset-inventory")).toBe(true);
     expect(a.flags.some((f) => f.code === "no-security-policy")).toBe(true);
+  });
+});
+
+describe("isEnvironment() — save/load config guard", () => {
+  const env: Environment = {
+    model: "onprem",
+    workloads: [{ id: "a", name: "ERP", type: "database", sizeGB: 100, tier: 1 }],
+    protection: { onprem: noProtection },
+  };
+  it("accepts a real Environment", () => {
+    expect(isEnvironment(env)).toBe(true);
+    expect(isEnvironment(JSON.parse(JSON.stringify(env)))).toBe(true);
+  });
+  it("rejects garbage, wrong-shape, and unrelated JSON", () => {
+    expect(isEnvironment(null)).toBe(false);
+    expect(isEnvironment(42)).toBe(false);
+    expect(isEnvironment({})).toBe(false);
+    expect(isEnvironment({ model: "onprem" })).toBe(false);
+    expect(isEnvironment({ model: "not-a-model", workloads: [], protection: {} })).toBe(false);
+    expect(isEnvironment({ model: "onprem", workloads: [{ noId: true }], protection: {} })).toBe(
+      false,
+    );
   });
 });

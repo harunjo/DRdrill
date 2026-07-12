@@ -62,6 +62,25 @@ export interface Environment {
   security?: SecurityInputs;
 }
 
+/** Structural guard for a user-supplied config file (save/load config to
+ *  local disk) — narrow enough to keep garbage JSON from crashing the
+ *  wizard, not a full schema validator. */
+export function isEnvironment(x: unknown): x is Environment {
+  if (!x || typeof x !== "object") return false;
+  const e = x as Record<string, unknown>;
+  return (
+    (["onprem", "cloud", "hybrid", "private"] as DeploymentModel[]).includes(
+      e.model as DeploymentModel,
+    ) &&
+    Array.isArray(e.workloads) &&
+    e.workloads.every(
+      (w) => w && typeof w === "object" && typeof (w as Workload).id === "string" && typeof (w as Workload).name === "string",
+    ) &&
+    typeof e.protection === "object" &&
+    e.protection !== null
+  );
+}
+
 // Flags are emitted as codes; UI and narrative prompt map codes to localized,
 // business-framed text (origin R6, R18; keeps the findings payload minimal).
 export type FlagCode =

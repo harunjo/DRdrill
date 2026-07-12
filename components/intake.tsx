@@ -14,12 +14,15 @@ import {
   ArrowRight,
   ShieldCheck,
   ChevronDown,
+  Download,
+  Upload,
   type LucideProps,
 } from "lucide-react";
 import { fmt, type Dictionary } from "@/lib/i18n";
 import {
   MAX_NAME_LENGTH,
   MAX_WORKLOADS,
+  isEnvironment,
   type DeploymentModel,
   type Environment,
   type Placement,
@@ -80,6 +83,34 @@ export function Intake({
 }) {
   const TOTAL = 4;
   const [step, setStep] = useState(0);
+  // Save/load config to local disk (R13: stays a browser-only file, never
+  // uploaded anywhere) — lets a user resume a prior intake without retyping.
+  const [configError, setConfigError] = useState("");
+  const saveConfig = () => {
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify(env, null, 2)], { type: "application/json" }),
+    );
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "dr-drill-config.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  const loadConfig = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result));
+        if (!isEnvironment(parsed)) throw new Error("invalid shape");
+        onChange(parsed);
+        setConfigError("");
+        setStep(0);
+      } catch {
+        setConfigError(t.intake.loadConfigError);
+      }
+    };
+    reader.readAsText(file);
+  };
   // Dual depth (R18): generalist by default; advanced reveals the full control
   // set and CSF terminology. Display-only — not persisted to the environment.
   const [advanced, setAdvanced] = useState(false);
@@ -179,6 +210,36 @@ export function Intake({
   return (
     <div className="mt-10">
       <section className="panel overflow-hidden">
+        {/* ── Save/load config — resume a prior intake without retyping ── */}
+        <div className="flex items-center justify-end gap-1.5 border-b border-line-soft px-5 py-2 sm:px-7">
+          <button
+            type="button"
+            onClick={saveConfig}
+            className="btn-ghost h-8 gap-1.5 px-2.5 text-[12px] text-faint hover:text-text"
+          >
+            <Download className="h-3.5 w-3.5" aria-hidden />
+            {t.intake.saveConfig}
+          </button>
+          <label className="btn-ghost h-8 cursor-pointer gap-1.5 px-2.5 text-[12px] text-faint hover:text-text">
+            <Upload className="h-3.5 w-3.5" aria-hidden />
+            {t.intake.loadConfig}
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) loadConfig(file);
+                e.target.value = "";
+              }}
+            />
+          </label>
+        </div>
+        {configError && (
+          <div className="border-b border-line-soft bg-crit-soft/60 px-5 py-2 text-[12px] font-medium text-crit sm:px-7">
+            {configError}
+          </div>
+        )}
         {/* ── Numbered stepper with filling connectors ── */}
         <div className="border-b border-line bg-well/60 px-5 py-4 sm:px-7">
           <div className="flex items-start">
