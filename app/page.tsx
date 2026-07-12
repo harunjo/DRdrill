@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { track } from "@vercel/analytics";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
-import { assess, type Assessment, type Environment } from "@/lib/engine";
-import { aggregateExposure, formatMoney } from "@/lib/exposure";
+import { assess, fmtMinutes, type Assessment, type Environment } from "@/lib/engine";
+import { aggregateExposure } from "@/lib/exposure";
 import { dictionaries, type Lang } from "@/lib/i18n";
 import { Intake, emptyProtection, emptyWorkload } from "@/components/intake";
 import { Report } from "@/components/report";
 import { Drill } from "@/components/drill";
+import { IncidentTimeline } from "@/components/incident-timeline";
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("id");
@@ -92,10 +93,11 @@ export default function Home() {
                   lang={lang}
                   findings={assessment.findings}
                   labelMap={assessment.labelMap}
-                  totalLoss={(() => {
+                  totalLossValue={(() => {
                     const agg = aggregateExposure(assessment.results);
-                    return agg.monetizedCount > 0 ? formatMoney(agg.total, t.currency) : null;
+                    return agg.monetizedCount > 0 ? agg.total : null;
                   })()}
+                  currency={t.currency}
                 />
               }
             />
@@ -108,6 +110,25 @@ export default function Home() {
             <h1 className="mt-6 max-w-[22ch] text-[1.95rem] font-semibold leading-[1.16] tracking-[-0.02em] text-balance sm:text-[2.5rem]">
               {t.tagline}
             </h1>
+
+            {/* Signature thesis — the Incident Timeline, shown as a labelled
+                sample so the visitor sees the payoff before filling anything.
+                Illustrative values only; the real one is computed in the report. */}
+            <section className="panel mt-7 px-5 py-5 sm:px-6">
+              <div className="mb-3">
+                <span className="tag text-[10px] text-event">{t.heroExampleTag}</span>
+              </div>
+              <IncidentTimeline
+                rpoAchievableMin={1440}
+                rpoTargetMin={240}
+                rtoAchievableMin={1800}
+                rtoTargetMin={480}
+                fmtDur={(m) =>
+                  fmtMinutes(m, { unrecoverable: t.report.unrecoverable, ...t.report.units })
+                }
+                labels={t.report.timeline}
+              />
+            </section>
 
             <Intake
               t={t}

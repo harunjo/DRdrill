@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import type { Dictionary, Lang } from "@/lib/i18n";
 import type { FindingsPayload } from "@/lib/engine";
+import { formatMoney, type Currency } from "@/lib/exposure";
 import {
   SCENARIOS,
   substituteLabels,
@@ -36,6 +37,30 @@ const SCENARIO_ICON: Record<Scenario, ComponentType<LucideProps>> = {
   deletion: Trash2,
 };
 
+// Count a value up to target once `run` flips true — the exposure meter
+// bleeding as the incident clock runs. Reduced-motion lands on the final
+// figure immediately (no animation).
+function useCountUp(target: number, run: boolean): number {
+  const [v, setV] = useState(0);
+  useEffect(() => {
+    if (!run) return;
+    // Reduced motion → dur 0 so the first rAF frame lands on target; keeps all
+    // setState inside the callback (no synchronous setState-in-effect).
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dur = reduce ? 0 : 1500;
+    let raf = 0;
+    const start = performance.now();
+    const step = (now: number) => {
+      const p = dur === 0 ? 1 : Math.min(1, (now - start) / dur);
+      setV(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target, run]);
+  return v;
+}
+
 // Split the validated story into timeline beats. A beat line looks like
 // "02:14 — …"; the clock prefix becomes the timestamp, the rest the text.
 function parseBeats(text: string): { time: string | null; text: string }[] {
@@ -54,16 +79,18 @@ export function Drill({
   lang,
   findings,
   labelMap,
-  totalLoss,
+  totalLossValue,
+  currency,
 }: {
   t: Dictionary;
   lang: Lang;
   findings: FindingsPayload;
   labelMap: Record<string, string>;
-  // Pre-formatted exposure total — browser-only money (R13), computed by the
-  // caller from aggregateExposure(). Never enters the payload or the LLM story;
-  // it just frames the stakes above the timeline. null when no cost was given.
-  totalLoss: string | null;
+  // Browser-only exposure total in IDR (R13), from aggregateExposure(). Never
+  // enters the payload or the LLM story — it just frames the stakes above the
+  // timeline, and counts up as the meter scrolls into view. null = no cost given.
+  totalLossValue: number | null;
+  currency: Currency;
 }) {
   const [scenario, setScenario] = useState<Scenario>("ransomware");
   const [status, setStatus] = useState<Status>("idle");
@@ -190,6 +217,26 @@ export function Drill({
   const generating = status === "generating";
   const beats = story ? parseBeats(substituteLabels(story, labelMap)) : [];
 
+  // Run the exposure meter when it scrolls into view (once).
+  const lossRef = useRef<HTMLDivElement>(null);
+  const [lit, setLit] = useState(false);
+  useEffect(() => {
+    const el = lossRef.current;
+    if (!el || totalLossValue == null) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setLit(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.6 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [totalLossValue]);
+  const shownLoss = useCountUp(totalLossValue ?? 0, lit);
+
   return (
     <div className="mt-3">
       <div className="text-[13px] text-muted">{t.drill.pickScenario}</div>
@@ -232,11 +279,20 @@ export function Drill({
         </div>
 
         {/* Stakes: deterministic browser-only loss total, stays intact even if
-            the story degrades — the numbers here never come from the LLM. */}
-        {totalLoss && (
-          <div className="flex items-baseline justify-between gap-2 border-b border-line bg-crit-soft/40 px-4 py-2.5">
+            the story degrades — the numbers here never come from the LLM. The
+            figure counts up as it scrolls in: the money bleeding as it unfolds. */}
+        {totalLossValue != null && (
+          <div
+            ref={lossRef}
+            className="flex items-baseline justify-between gap-2 border-b border-line bg-crit-soft/40 px-4 py-2.5"
+          >
             <span className="tag text-[10px]">{t.drill.totalLoss}</span>
-            <span className="font-mono text-[15px] font-semibold text-crit">{totalLoss}</span>
+            <span className="font-mono text-[15px] font-semibold tabular-nums text-crit">
+              {formatMoney(Math.round(shownLoss), currency)}
+              <span aria-hidden className="ml-1 text-[12px]">
+                ▲
+              </span>
+            </span>
           </div>
         )}
 

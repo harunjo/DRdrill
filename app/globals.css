@@ -1,38 +1,50 @@
 @import "tailwindcss";
 
-/* ── DR Drill — product-grade SaaS design system ───────────────────────────
-   Light, airy, cool-neutral. White surfaces on a cool #e9ebf0 canvas, soft 1px
-   borders, gentle elevation. One accent: indigo. Semantic status set kept in
-   calm tints — legible, never panicky. IBM Plex Sans for UI, IBM Plex Mono for
-   every number/label. Token NAMES are stable across components; only values
-   changed from earlier iterations. */
+/* ── DR Drill — "Incident Timeline" design system ──────────────────────────
+   A recovery instrument, not a dashboard. Cool control-surface grey, PURE
+   white report panels on HARD hairline rules (depth from crisp edges, not
+   soft elevation), near-black ink, tight radius. TWO accents with distinct
+   jobs: steel-azure signal for structure + interaction (calm authority), and
+   a single incident amber reserved for the t=0 marker and nothing decorative.
+   Status is semantic and dark-saturated so it stays legible on white:
+   recovered = green, caution = amber-brown, exposure = red. The palette sits
+   at "caution" on purpose — you're not dead, you're exposed. Chivo carries the
+   engineered display voice; Chivo Mono every number / time / status readout.
+   Token NAMES are stable across components; only values changed. */
 @theme {
-  --color-ink: #e9ebf0; /* page canvas */
-  --color-panel: #ffffff; /* card / surface */
-  --color-well: #f4f5f8; /* inset well, tracks */
-  --color-line: #e6e8ee; /* soft hairline border */
-  --color-line-soft: #eef0f5; /* faint inner divider */
+  --color-ink: #e7eaee; /* page — cool control-surface grey */
+  --color-panel: #ffffff; /* report card / surface */
+  --color-well: #eef0f3; /* inset well, inputs, tracks */
+  --color-line: #c6ccd4; /* hairline — dark enough to read as a hard edge */
+  --color-line-soft: #dfe3e8; /* faint inner divider */
 
-  --color-text: #1a1d29;
-  --color-muted: #565b6b;
-  --color-faint: #878ca0;
+  --color-text: #10141b; /* near-black cool ink — high contrast */
+  --color-muted: #566070; /* dark grey, not washed */
+  --color-faint: #8890a0; /* labels, captions */
 
-  /* one accent: indigo */
-  --color-signal: #4b56d6;
-  --color-signal-ink: #3b45b5;
-  --color-signal-soft: #eef0fb;
+  /* structure + interaction: steel-azure, calm authority */
+  --color-signal: #2f5cc2;
+  --color-signal-ink: #21418f; /* deeper accent — text ON the soft tint */
+  --color-signal-soft: rgba(47, 92, 194, 0.09);
 
-  /* semantic status — calm tints, always paired with a label */
-  --color-ok: #1f9d63;
-  --color-ok-soft: #e4f4ec;
-  --color-warn: #c98a1a;
-  --color-warn-soft: #f8efda;
-  --color-crit: #d94a3d;
-  --color-crit-soft: #fbe7e4;
+  /* the incident: amber — t=0 marker + the one brand pop, never decoration */
+  --color-event: #ef7a1f;
+  --color-event-soft: rgba(239, 122, 31, 0.14);
+
+  /* data-loss window on the RPO (past) side of the timeline */
+  --color-slate: #8894a6;
+
+  /* semantic status — dark and saturated, legible on white */
+  --color-ok: #158a52;
+  --color-ok-soft: rgba(21, 138, 82, 0.1);
+  --color-warn: #c07d18;
+  --color-warn-soft: rgba(192, 125, 24, 0.12);
+  --color-crit: #cf3b2c;
+  --color-crit-soft: rgba(207, 59, 43, 0.1);
 
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, "SF Mono", monospace;
-  --font-display: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display), var(--font-sans), ui-sans-serif, sans-serif;
 }
 
 :root {
@@ -44,19 +56,28 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: 15px;
-  letter-spacing: -0.004em;
+  letter-spacing: -0.003em;
   min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
 }
 
+/* Display voice — Chivo, heavy and tight, for headings + the score readouts. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 ::selection {
-  background: rgba(75, 86, 214, 0.16);
+  background: rgba(47, 92, 194, 0.16);
 }
 
 *:focus-visible {
   outline: 2px solid var(--color-signal);
   outline-offset: 2px;
-  border-radius: 8px;
+  border-radius: 2px;
 }
 
 input[type="checkbox"] {
@@ -66,20 +87,21 @@ input[type="checkbox"] {
 }
 
 /* ── Chrome decoration ───────────────────────────────────────────────────── */
-/* Faint indigo gridline motif for header/footer depth — no photography. */
+/* Faint blueprint grid for header/footer depth — technical, precise, no photos. */
 .grid-texture {
   background-image:
-    linear-gradient(to right, rgba(75, 86, 214, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(75, 86, 214, 0.05) 1px, transparent 1px);
-  background-size: 22px 22px;
+    linear-gradient(to right, rgba(11, 14, 20, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11, 14, 20, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
   background-position: center;
 }
 
-/* Tinted hero band behind the score gauge. */
+/* Tinted hero band behind the score readout — a faint signal wash under paper,
+   capped by the panel's hard hairline instead of a soft glow. */
 .hero-band {
   background:
-    radial-gradient(115% 130% at 50% -10%, var(--color-signal-soft) 0%, rgba(238, 240, 251, 0) 68%),
-    linear-gradient(180deg, #f7f8fc 0%, var(--color-panel) 100%);
+    radial-gradient(120% 120% at 50% -30%, rgba(47, 92, 194, 0.06) 0%, transparent 55%),
+    linear-gradient(180deg, #eef1f6 0%, var(--color-panel) 100%);
 }
 
 /* ── Component helpers ─────────────────────────────────────────────────────── */
@@ -87,8 +109,8 @@ input[type="checkbox"] {
   .panel {
     background: var(--color-panel);
     border: 1px solid var(--color-line);
-    border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(26, 29, 41, 0.05), 0 10px 30px -20px rgba(26, 29, 41, 0.18);
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(11, 14, 20, 0.04);
   }
 
   .rule {
@@ -97,9 +119,9 @@ input[type="checkbox"] {
   }
 
   .field {
-    background: #ffffff;
-    border: 1px solid #d7dae3;
-    border-radius: 10px;
+    background: var(--color-panel);
+    border: 1px solid var(--color-line);
+    border-radius: 3px;
     color: var(--color-text);
     font-family: var(--font-sans);
     min-height: 44px;
@@ -111,7 +133,7 @@ input[type="checkbox"] {
   .field:focus {
     outline: none;
     border-color: var(--color-signal);
-    box-shadow: 0 0 0 3px rgba(75, 86, 214, 0.16);
+    box-shadow: 0 0 0 2px rgba(47, 92, 194, 0.2);
   }
 
   .btn-primary {
@@ -120,22 +142,25 @@ input[type="checkbox"] {
     justify-content: center;
     gap: 0.4rem;
     min-height: 44px;
-    background: linear-gradient(180deg, #5b64df 0%, #4b56d6 100%);
+    background: var(--color-signal);
     color: #ffffff;
-    border-radius: 11px;
-    font-weight: 600;
-    box-shadow: 0 1px 2px rgba(59, 69, 181, 0.35), 0 8px 20px -10px rgba(75, 86, 214, 0.55);
+    border-radius: 3px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
     transition: filter 0.12s, transform 0.05s;
   }
   .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.05);
+    filter: brightness(1.08);
   }
   .btn-primary:active:not(:disabled) {
     transform: translateY(1px);
   }
   .btn-primary:disabled {
-    background: #dfe2ea;
+    background: var(--color-well);
     color: var(--color-faint);
+    border: 1px solid var(--color-line);
     box-shadow: none;
     cursor: not-allowed;
   }
@@ -146,7 +171,7 @@ input[type="checkbox"] {
     justify-content: center;
     gap: 0.35rem;
     min-height: 44px;
-    border-radius: 11px;
+    border-radius: 3px;
     color: var(--color-muted);
     font-weight: 500;
     transition: color 0.12s, background 0.12s;
@@ -160,30 +185,32 @@ input[type="checkbox"] {
     pointer-events: none;
   }
 
-  /* Pill chip — always labeled, never color alone. */
+  /* Squared status tag — a datasheet badge, always labeled, with a hairline edge. */
   .chip {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
-    border-radius: 999px;
-    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    border: 1px solid transparent;
+    padding: 0.16rem 0.5rem;
     font-size: 12px;
     font-weight: 600;
     line-height: 1.4;
     white-space: nowrap;
   }
-  .chip-ok { background: var(--color-ok-soft); color: var(--color-ok); }
-  .chip-warn { background: var(--color-warn-soft); color: var(--color-warn); }
-  .chip-crit { background: var(--color-crit-soft); color: var(--color-crit); }
-  .chip-neutral { background: var(--color-well); color: var(--color-muted); }
-  .chip-accent { background: var(--color-signal-soft); color: var(--color-signal-ink); }
+  .chip-ok { background: var(--color-ok-soft); color: var(--color-ok); border-color: rgba(21, 138, 82, 0.25); }
+  .chip-warn { background: var(--color-warn-soft); color: var(--color-warn); border-color: rgba(192, 125, 24, 0.28); }
+  .chip-crit { background: var(--color-crit-soft); color: var(--color-crit); border-color: rgba(207, 59, 43, 0.26); }
+  .chip-neutral { background: var(--color-well); color: var(--color-muted); border-color: var(--color-line); }
+  .chip-accent { background: var(--color-signal-soft); color: var(--color-signal-ink); border-color: rgba(47, 92, 194, 0.28); }
 
   /* Solid verdict pill, colored inline to the band. */
   .verdict {
     display: inline-flex;
     align-items: center;
-    border-radius: 999px;
-    padding: 0.38rem 0.95rem;
+    border-radius: 2px;
+    padding: 0.34rem 0.85rem;
+    font-family: var(--font-display);
     font-weight: 700;
     font-size: 0.85rem;
     letter-spacing: 0.01em;
@@ -191,12 +218,12 @@ input[type="checkbox"] {
     white-space: nowrap;
   }
 
-  /* Mono data tag (RPO/RTO, tier, timestamps). */
+  /* Mono data tag (RPO/RTO, tier, timestamps) — the readout voice. */
   .tag {
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-faint);
   }
@@ -209,5 +236,5 @@ input[type="checkbox"] {
 /* Red-alert blink for the critical ("Rentan"/Exposed) posture chip. The
    reduced-motion rule above zeroes the duration, so it holds steady for users
    who opt out of motion. */
-@keyframes alert-blink { 50% { opacity: 0.35; } }
+@keyframes alert-blink { 50% { opacity: 0.4; } }
 .alert-blink { animation: alert-blink 1s ease-in-out infinite; }

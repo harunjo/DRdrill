@@ -1,19 +1,29 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Inter, Chivo, Chivo_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-// IBM Plex is not a variable font on Google Fonts — weights are explicit.
-const sans = IBM_Plex_Sans({
+// Body voice — Inter, a neutral workhorse that sets long ID/EN copy cleanly.
+const sans = Inter({
   variable: "--font-sans",
-  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   display: "swap",
 });
 
-const mono = IBM_Plex_Mono({
+// Readout voice — Chivo Mono, the incident-clock face: every RPO/RTO, time,
+// cost, and status readout. Explicit weights (not a variable font here).
+const mono = Chivo_Mono({
   variable: "--font-mono",
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Display voice — Chivo, a sturdy journalistic-technical grotesque, for
+// headings, verdicts, and the score. Reads "report," not generic SaaS.
+const display = Chivo({
+  variable: "--font-display",
+  weight: ["700", "900"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -33,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${sans.variable} ${mono.variable} h-full antialiased`}
+      className={`${sans.variable} ${mono.variable} ${display.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

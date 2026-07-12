@@ -18,6 +18,7 @@ export const en = {
     "Your environment details and workload names never leave this browser. The drill story is written from anonymized findings only (W1, W2, …), and nothing you enter is stored anywhere.",
   trustIndicator:
     "The assessment runs entirely on your device — your data never leaves; the simulation in the next step sends only anonymized data",
+  heroExampleTag: "Example — this is what you get",
 
   intake: {
     steps: {
@@ -222,6 +223,14 @@ export const en = {
     achievableRto: "Achievable RTO",
     unrecoverable: "unrecoverable",
     units: { min: "min", h: "h", d: "d" },
+    timeline: {
+      dataYouLose: "◄ Data lost · RPO",
+      timeDown: "Downtime · RTO ►",
+      incident: "Incident · t=0",
+      rpoTarget: "RPO target",
+      rtoTarget: "RTO target",
+      noPath: "no path",
+    },
     investTitle: "Where to invest",
     investLabel: "priorities",
     investOne: "priority",

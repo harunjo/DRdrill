@@ -6,6 +6,7 @@ import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import { fmtMinutes, type Assessment, type DurationLabels } from "@/lib/engine";
 import { groupByFunction } from "@/lib/investment";
+import { IncidentTimeline } from "@/components/incident-timeline";
 
 type Tone = "ok" | "warn" | "crit" | "signal";
 
@@ -95,72 +96,6 @@ function Gauge({ value, band, lit }: { value: number; band: string; lit: boolean
           {value}
         </span>
         <span className="tag mt-1 text-[10px]">/100</span>
-      </div>
-    </div>
-  );
-}
-
-// One RPO or RTO gap: mono value pair, a MEETS/GAP/NO PATH pill, and a bar with
-// a green fill to target and a red overrun to the (worse) achievable reality.
-function GapRow({
-  label,
-  target,
-  achievable,
-  meets,
-  dur,
-  pill,
-  lit,
-}: {
-  label: string;
-  target: number;
-  achievable: number | null;
-  meets: boolean;
-  dur: DurationLabels;
-  pill: { meets: string; gap: string; noPath: string };
-  lit: boolean;
-}) {
-  const noPath = achievable === null;
-  const scale = noPath ? target : Math.max(target, achievable, 1);
-  const greenW = noPath ? 0 : (Math.min(achievable, target) / scale) * 100;
-  const redW = noPath ? 100 : achievable > target ? ((achievable - target) / scale) * 100 : 0;
-  const tickPos = noPath ? -1 : (target / scale) * 100;
-
-  const [pillText, pillCls] = meets
-    ? [pill.meets, "chip-ok"]
-    : noPath
-      ? [pill.noPath, "chip-crit"]
-      : [pill.gap, "chip-warn"];
-
-  return (
-    <div>
-      <div className="mb-1.5 flex items-center justify-between gap-2 text-[12px]">
-        <span className="tag">{label}</span>
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px]">
-            <span className={meets ? "text-ok" : "text-crit"}>{fmtMinutes(achievable, dur)}</span>
-            <span className="text-faint"> / {fmtMinutes(target, dur)}</span>
-          </span>
-          <span className={`chip ${pillCls} font-mono !text-[10px]`}>{pillText}</span>
-        </div>
-      </div>
-      <div className="relative">
-        <div className="flex h-2 w-full overflow-hidden rounded-full bg-well">
-          <div
-            className="h-full bg-ok transition-[width] duration-700 ease-out"
-            style={{ width: lit ? `${greenW}%` : "0%" }}
-          />
-          <div
-            className="h-full bg-crit transition-[width] duration-700 ease-out"
-            style={{ width: lit ? `${redW}%` : "0%" }}
-          />
-        </div>
-        {tickPos >= 0 && tickPos < 100 && (
-          <span
-            aria-hidden
-            className="absolute -top-1 h-4 w-px bg-text/60"
-            style={{ left: `${tickPos}%` }}
-          />
-        )}
       </div>
     </div>
   );
@@ -258,24 +193,15 @@ export function TechnicalLens({
                   <span className="truncate text-sm font-semibold">{r.workload.name}</span>
                   <span className="tag shrink-0">{fmt(t.report.tierTag, { n: r.workload.tier })}</span>
                 </div>
-                <div className="mt-3 space-y-3">
-                  <GapRow
-                    label={t.report.achievableRpo}
-                    target={f.targetRpoMin}
-                    achievable={r.achievableRpoMin}
-                    meets={r.rpoMeets}
-                    dur={dur}
-                    pill={t.report.gapPill}
-                    lit={lit}
-                  />
-                  <GapRow
-                    label={t.report.achievableRto}
-                    target={f.targetRtoMin}
-                    achievable={r.achievableRtoMin}
-                    meets={r.rtoMeets}
-                    dur={dur}
-                    pill={t.report.gapPill}
-                    lit={lit}
+                <div className="mt-3">
+                  <IncidentTimeline
+                    rpoAchievableMin={r.achievableRpoMin}
+                    rpoTargetMin={f.targetRpoMin}
+                    rtoAchievableMin={r.achievableRtoMin}
+                    rtoTargetMin={f.targetRtoMin}
+                    fmtDur={(m) => fmtMinutes(m, dur)}
+                    labels={t.report.timeline}
+                    compact
                   />
                 </div>
               </div>

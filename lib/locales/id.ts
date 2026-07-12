@@ -11,6 +11,7 @@ export const id: Dictionary = {
     "Detail lingkungan dan nama workload Anda tidak pernah meninggalkan browser ini. Cerita simulasi ditulis hanya dari temuan yang dianonimkan (W1, W2, …), dan tidak ada input atau data Anda yang disimpan di server ini.",
   trustIndicator:
     "Asesmen berjalan sepenuhnya di perangkat Anda — data Anda tidak pernah dikirim keluar; proses simulasi di langkah berikutnya hanya mengirim data anonim",
+  heroExampleTag: "Contoh — beginilah hasilnya",
 
   intake: {
     steps: {
@@ -215,6 +216,14 @@ export const id: Dictionary = {
     achievableRto: "RTO tercapai",
     unrecoverable: "tidak dapat dipulihkan jika terjadi bencana",
     units: { min: "mnt", h: "jam", d: "hari" },
+    timeline: {
+      dataYouLose: "◄ Data hilang · RPO",
+      timeDown: "Downtime · RTO ►",
+      incident: "Insiden · t=0",
+      rpoTarget: "Target RPO",
+      rtoTarget: "Target RTO",
+      noPath: "tak terpulihkan",
+    },
     investTitle: "Prioritas investasi",
     investLabel: "prioritas",
     investOne: "prioritas",
