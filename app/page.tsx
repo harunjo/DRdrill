@@ -31,25 +31,30 @@ export default function Home() {
 
   return (
     <>
-      {/* ── App header: white, textured, persistent trust strip ── */}
-      <header className="sticky top-0 z-20 border-b border-line bg-panel/85 backdrop-blur-md">
-        <div className="grid-texture">
+      {/* ── Command masthead: dark ink band on a firm blueprint grid; its
+             bottom edge is the timeline axis (the logo's axis, page-wide). ── */}
+      <header className="sticky top-0 z-20">
+        <div className="masthead text-[#e7eaee]">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-3">
             <div className="flex min-w-0 items-center gap-2.5">
-              <Logo className="h-8 w-8 shrink-0 text-text" />
+              <Logo className="h-8 w-8 shrink-0 text-[#e7eaee]" />
               <div className="min-w-0 leading-tight">
-                <div className="text-[15px] font-semibold tracking-tight">{t.appName}</div>
-                <div className="tag hidden truncate text-[10px] sm:block">{t.masthead}</div>
+                <div className="font-display text-[15px] font-bold tracking-tight">
+                  {t.appName}
+                </div>
+                <div className="tag hidden truncate !text-[#8890a0] text-[10px] sm:block">
+                  {t.masthead}
+                </div>
               </div>
             </div>
-            <div className="flex shrink-0 overflow-hidden rounded-lg border border-line bg-panel text-xs font-semibold shadow-sm">
+            <div className="flex shrink-0 overflow-hidden rounded-[3px] border border-white/25 font-mono text-xs font-semibold">
               {(["id", "en"] as Lang[]).map((l) => (
                 <button
                   key={l}
                   onClick={() => setLang(l)}
                   aria-pressed={lang === l}
                   className={`flex h-11 min-w-[44px] items-center justify-center px-3 transition-colors ${
-                    lang === l ? "bg-signal text-white" : "text-faint hover:text-muted"
+                    lang === l ? "bg-[#e7eaee] text-text" : "text-white/55 hover:text-white"
                   }`}
                 >
                   {l.toUpperCase()}
@@ -57,13 +62,14 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </div>
-        {/* Trust indicator — privacy is a core promise, surfaced persistently */}
-        <div className="border-t border-line-soft bg-signal-soft/50">
-          <div className="mx-auto flex max-w-3xl items-center gap-1.5 px-5 py-1.5 text-[11px] font-medium text-signal-ink">
-            <ShieldCheck className="h-3.5 w-3.5 shrink-0" strokeWidth={2.2} aria-hidden />
-            <span>{t.trustIndicator}</span>
+          {/* Trust indicator — privacy is a core promise, inside the band */}
+          <div className="border-t border-white/10">
+            <div className="mx-auto flex max-w-3xl items-center gap-1.5 px-5 py-1.5 text-[11px] font-medium text-white/70">
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-event" strokeWidth={2.2} aria-hidden />
+              <span>{t.trustIndicator}</span>
+            </div>
           </div>
+          <div className="masthead-axis" aria-hidden />
         </div>
       </header>
 
@@ -121,12 +127,12 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="mt-auto border-t border-line bg-panel">
-        <div className="grid-texture">
-          <div className="mx-auto max-w-3xl px-5 py-6 text-[12px] text-faint">
+      <footer className="mt-auto">
+        <div className="masthead">
+          <div className="mx-auto max-w-3xl px-5 py-6 font-mono text-[11px] text-white/55">
             {t.footer.attribution}{" "}
             <a
-              className="text-muted underline decoration-line underline-offset-2 hover:text-text"
+              className="text-white/80 underline decoration-white/30 underline-offset-2 hover:text-white"
               href="https://harunjonatan.com"
             >
               harunjonatan.com

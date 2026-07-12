@@ -252,7 +252,7 @@ export function Intake({
                     <div
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold transition-colors ${
                         done || current
-                          ? "bg-signal text-white shadow-[0_4px_12px_-6px_rgba(75,86,214,0.9)]"
+                          ? "bg-signal text-white shadow-[0_4px_12px_-6px_rgba(16,20,27,0.6)]"
                           : "border border-line bg-panel text-faint"
                       } ${current ? "ring-4 ring-signal-soft" : ""}`}
                     >
@@ -304,7 +304,7 @@ export function Intake({
                       aria-checked={active}
                       className={`flex min-h-[92px] flex-col items-start gap-2 rounded-xl border p-4 text-left transition-all ${
                         active
-                          ? "border-signal bg-signal-soft shadow-[0_8px_24px_-14px_rgba(75,86,214,0.7)]"
+                          ? "border-signal bg-signal-soft shadow-[0_8px_24px_-14px_rgba(16,20,27,0.45)]"
                           : "border-line bg-panel hover:border-faint hover:bg-well/50"
                       }`}
                     >
