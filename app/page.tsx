@@ -10,6 +10,7 @@ import { Intake, emptyProtection, emptyWorkload } from "@/components/intake";
 import { Report } from "@/components/report";
 import { Drill } from "@/components/drill";
 import { IncidentTimeline } from "@/components/incident-timeline";
+import { Logo } from "@/components/logo";
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("id");
@@ -36,15 +37,7 @@ export default function Home() {
         <div className="grid-texture">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-3">
             <div className="flex min-w-0 items-center gap-2.5">
-              {/* Incident Timeline mark — the amber t=0 event line inside a
-                  datasheet box; ties the wordmark to the signature visual. */}
-              <span
-                aria-hidden
-                className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] border border-text bg-panel"
-              >
-                <span className="absolute inset-y-[6px] left-1/2 w-[2px] -translate-x-1/2 bg-event" />
-                <span className="absolute left-1/2 top-1/2 h-[7px] w-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 bg-event" />
-              </span>
+              <Logo className="h-8 w-8 shrink-0 text-text" />
               <div className="min-w-0 leading-tight">
                 <div className="text-[15px] font-semibold tracking-tight">{t.appName}</div>
                 <div className="tag hidden truncate text-[10px] sm:block">{t.masthead}</div>
@@ -110,15 +103,15 @@ export default function Home() {
           <>
             {/* Thesis — the persistent trust banner above already carries the
                 privacy promise, so the hero doesn't repeat it. */}
-            <h1 className="mt-6 max-w-[22ch] text-[1.95rem] font-semibold leading-[1.16] tracking-[-0.02em] text-balance sm:text-[2.5rem]">
+            <h1 className="mt-5 max-w-[20ch] text-[1.5rem] font-semibold leading-[1.12] tracking-[-0.02em] text-balance sm:text-[2.05rem]">
               {t.tagline}
             </h1>
 
-            {/* Signature thesis — the Incident Timeline, shown as a labelled
-                sample so the visitor sees the payoff before filling anything.
-                Illustrative values only; the real one is computed in the report. */}
-            <section className="panel mt-7 px-5 py-5 sm:px-6">
-              <div className="mb-3">
+            {/* Signature thesis — a labelled sample timeline so the visitor sees
+                the payoff before filling anything. Compact + tight so the wizard
+                stays in view on the landing (illustrative values only). */}
+            <section className="panel mt-5 px-5 py-4 sm:px-6">
+              <div className="mb-2">
                 <span className="tag text-[10px] text-event">{t.heroExampleTag}</span>
               </div>
               <IncidentTimeline
@@ -130,6 +123,7 @@ export default function Home() {
                   fmtMinutes(m, { unrecoverable: t.report.unrecoverable, ...t.report.units })
                 }
                 labels={t.report.timeline}
+                compact
               />
             </section>
 

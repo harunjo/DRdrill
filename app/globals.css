@@ -90,9 +90,9 @@ input[type="checkbox"] {
 /* Faint blueprint grid for header/footer depth — technical, precise, no photos. */
 .grid-texture {
   background-image:
-    linear-gradient(to right, rgba(11, 14, 20, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(11, 14, 20, 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
+    linear-gradient(to right, rgba(11, 14, 20, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(11, 14, 20, 0.1) 1px, transparent 1px);
+  background-size: 22px 22px;
   background-position: center;
 }
 

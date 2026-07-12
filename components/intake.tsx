@@ -208,7 +208,7 @@ export function Intake({
   const canAdvance = step === 1 ? canRun : true;
 
   return (
-    <div className="mt-10">
+    <div className="mt-6">
       <section className="panel overflow-hidden">
         {/* ── Save/load config — resume a prior intake without retyping ── */}
         <div className="flex items-center justify-end gap-1.5 border-b border-line-soft px-5 py-2 sm:px-7">
