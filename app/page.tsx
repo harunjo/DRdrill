@@ -73,7 +73,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl grow px-5 pb-28 pt-6 sm:pt-10">
+      <main className="mx-auto w-full max-w-3xl grow px-5 pb-28 pt-4 sm:pt-5">
         {assessment ? (
           /* ── Results screen: the intake is replaced, not appended ── */
           <div>
@@ -108,7 +108,7 @@ export default function Home() {
           <>
             {/* Thesis — the persistent trust banner above already carries the
                 privacy promise, so the hero doesn't repeat it. */}
-            <h1 className="mt-5 max-w-[20ch] text-[1.5rem] font-semibold leading-[1.12] tracking-[-0.02em] text-balance sm:text-[2.05rem]">
+            <h1 className="max-w-[20ch] text-[1.5rem] font-semibold leading-[1.12] tracking-[-0.02em] text-balance sm:text-[2.05rem]">
               {t.tagline}
             </h1>
 
