@@ -49,32 +49,33 @@ export default function Home() {
 
   return (
     <>
-      {/* ── Command masthead: a slim dark ink band (title block) on a firm
-             blueprint grid; its bottom edge is the timeline axis (the logo's
-             axis, page-wide). The privacy line sits on the paper below, so the
-             black stays a thin strip, not a slab. ── */}
+      {/* ── Title block: a light cream header on a firm blueprint grid; its
+             bottom edge is the timeline axis (the logo's axis, page-wide). The
+             privacy line sits on the paper just below. ── */}
       <header className="sticky top-0 z-20">
-        <div className="masthead text-[#efeade]">
+        <div className="titleblock">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-2.5">
             <div className="flex min-w-0 items-center gap-2.5">
-              <Logo className="h-7 w-7 shrink-0 text-[#efeade]" />
+              <Logo className="h-7 w-7 shrink-0 text-signal" />
               <div className="min-w-0 leading-tight">
-                <div className="font-display text-[15px] font-bold tracking-tight">
+                <div className="font-display text-[15px] font-bold tracking-tight text-text">
                   {t.appName}
                 </div>
-                <div className="tag hidden truncate !text-[#a29a88] text-[10px] sm:block">
+                <div className="tag hidden truncate text-[10px] sm:block">
                   {t.masthead}
                 </div>
               </div>
             </div>
-            <div className="flex shrink-0 overflow-hidden rounded-[3px] border border-white/25 font-mono text-xs font-semibold">
+            <div className="flex shrink-0 overflow-hidden rounded-[3px] border border-line font-mono text-xs font-semibold">
               {(["id", "en"] as Lang[]).map((l) => (
                 <button
                   key={l}
                   onClick={() => setLang(l)}
                   aria-pressed={lang === l}
                   className={`flex h-9 min-w-[44px] items-center justify-center px-3 transition-colors ${
-                    lang === l ? "bg-[#efeade] text-text" : "text-white/55 hover:text-white"
+                    lang === l
+                      ? "bg-key text-white"
+                      : "text-muted hover:bg-well hover:text-text"
                   }`}
                 >
                   {l.toUpperCase()}
@@ -101,7 +102,7 @@ export default function Home() {
             <div className="mb-2 flex items-center justify-between gap-2">
               <button
                 onClick={() => setAssessment(null)}
-                className="btn-ghost -ml-2 px-2 text-[13px] font-semibold text-signal"
+                className="btn-ghost -ml-2 px-2 text-[13px] font-semibold text-key-ink"
               >
                 <ArrowLeft className="h-4 w-4" aria-hidden />
                 {t.report.newAssessment}
@@ -159,12 +160,13 @@ export default function Home() {
         )}
       </main>
 
-      <footer className="mt-auto">
-        <div className="masthead">
-          <div className="mx-auto max-w-3xl px-5 py-6 font-mono text-[11px] text-white/55">
+      {/* Footer — a closing title block on paper, ruled off by the amber axis. */}
+      <footer className="mt-auto border-t-2 border-event">
+        <div className="titleblock">
+          <div className="mx-auto max-w-3xl px-5 py-6 font-mono text-[11px] text-muted">
             {t.footer.attribution}{" "}
             <a
-              className="text-white/80 underline decoration-white/30 underline-offset-2 hover:text-white"
+              className="text-key-ink underline decoration-key-ink/40 underline-offset-2 hover:decoration-key-ink"
               href="https://harunjonatan.com"
             >
               harunjonatan.com

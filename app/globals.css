@@ -33,6 +33,14 @@
   --color-event: #e2551f;
   --color-event-soft: rgba(226, 85, 31, 0.14);
 
+  /* action/selected vermilion — the interactive accent across the app.
+     --color-key carries WHITE text (AA ✓) for solid fills (buttons, active
+     step, selected icon); --color-key-ink is the darker shade for orange TEXT
+     on cream (links, controls) so it clears 4.5:1 on every surface. */
+  --color-key: #c44510;
+  --color-key-ink: #ad3a0c;
+  --color-key-ledge: #7c2a08;
+
   /* data-loss window on the RPO (past) side of the timeline */
   --color-slate: #9c9280;
 
@@ -89,7 +97,7 @@ h3 {
 }
 
 input[type="checkbox"] {
-  accent-color: var(--color-signal);
+  accent-color: var(--color-key);
   width: 1.05rem;
   height: 1.05rem;
 }
@@ -104,7 +112,18 @@ input[type="checkbox"] {
   background-position: center;
 }
 
-/* Dark command masthead — warm ink band with a firm light blueprint grid. */
+/* Light title block — the drawing sheet's own header: cream with a firm warm
+   grid, distinct from the paper body only by tone + the amber axis below it. */
+.titleblock {
+  background-color: var(--color-panel);
+  background-image:
+    linear-gradient(to right, rgba(139, 113, 78, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(139, 113, 78, 0.09) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: center;
+}
+
+/* Dark footer band — grounds the page bottom; warm ink with a faint grid. */
 .masthead {
   background-color: var(--color-text);
   background-image:
@@ -114,13 +133,14 @@ input[type="checkbox"] {
   background-position: center;
 }
 
-/* The masthead's bottom edge is the timeline axis: a ticked ruler running the
-   full width — the logo's axis extended across the page. */
+/* The title block's bottom edge is the timeline axis: a ticked ruler running
+   the full width — the logo's axis extended across the page. Dark ticks now,
+   for the light header. */
 .masthead-axis {
   height: 7px;
   background-image: repeating-linear-gradient(
     to right,
-    rgba(239, 234, 222, 0.35) 0 1px,
+    rgba(23, 20, 14, 0.28) 0 1px,
     transparent 1px 22px
   );
   background-position: bottom;
@@ -167,16 +187,16 @@ input[type="checkbox"] {
     box-shadow: 0 0 0 2px rgba(28, 24, 15, 0.18);
   }
 
-  /* Primary action — the vermilion key (the one place the incident colour
-     acts): raised on a burnt-orange ledge, pressed flat. #c44510 keeps white
-     text ≥4.5:1 (WCAG AA); the brighter --color-event stays the t=0 marker. */
+  /* Primary action — the vermilion key: raised on a burnt-orange ledge,
+     pressed flat. --color-key keeps white text ≥4.5:1 (WCAG AA); the brighter
+     --color-event stays the t=0 marker. */
   .btn-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
     min-height: 44px;
-    background: #c44510;
+    background: var(--color-key);
     color: #ffffff;
     border-radius: 3px;
     font-family: var(--font-display);
@@ -184,7 +204,7 @@ input[type="checkbox"] {
     letter-spacing: 0.01em;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.22),
-      0 3px 0 #7c2a08,
+      0 3px 0 var(--color-key-ledge),
       0 5px 10px -4px rgba(124, 42, 8, 0.45);
     transition: filter 0.12s, transform 0.08s, box-shadow 0.08s;
   }
@@ -193,7 +213,7 @@ input[type="checkbox"] {
   }
   .btn-primary:active:not(:disabled) {
     transform: translateY(2px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 1px 0 #7c2a08;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 1px 0 var(--color-key-ledge);
   }
   .btn-primary:disabled {
     background: var(--color-well);

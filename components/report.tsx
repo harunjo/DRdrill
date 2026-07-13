@@ -74,7 +74,7 @@ export function Report({
         aria-label={t.report.lensesLabel}
         // 2×2 on phones — four labels in one 390px row clips the longest
         // ("Usulan investasi"); a single row returns at sm.
-        className="mt-1.5 grid grid-cols-2 gap-1 rounded-xl border-2 border-signal-soft bg-panel p-1 shadow-md sm:flex"
+        className="mt-1.5 grid grid-cols-2 gap-1 rounded-xl border-2 border-line bg-panel p-1 shadow-md sm:flex"
       >
         {LENSES.map(({ key, icon: Icon }, i) => {
           const active = lens === key;
@@ -91,7 +91,7 @@ export function Report({
               onKeyDown={(e) => onKeyDown(e, i)}
               className={`keycap flex min-h-[44px] flex-1 items-center justify-center gap-1.5 rounded-lg border-b-2 px-2 text-[12px] font-medium transition-colors sm:text-[13px] ${
                 active
-                  ? "border-signal bg-signal-soft font-semibold text-signal-ink"
+                  ? "border-event bg-event-soft font-semibold text-signal-ink"
                   : "border-transparent text-muted hover:bg-well hover:text-text"
               }`}
             >
@@ -107,11 +107,11 @@ export function Report({
           <BusinessLens t={t} assessment={assessment} />
         )}
         {lens === "drill" && (
-          <section className="panel mt-4 overflow-hidden ring-2 ring-signal-soft">
+          <section className="panel mt-4 overflow-hidden ring-2 ring-event-soft">
             <div className="hero-band flex items-center gap-3 border-b border-line px-5 py-4 sm:px-6">
               <span
                 aria-hidden
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] bg-signal text-white shadow-[0_6px_16px_-8px_rgba(23,20,14,0.55)]"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] bg-event text-white shadow-[0_6px_16px_-8px_rgba(226,85,31,0.5)]"
               >
                 <Siren className="h-[18px] w-[18px]" strokeWidth={2.2} />
               </span>

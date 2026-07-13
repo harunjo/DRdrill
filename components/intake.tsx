@@ -185,7 +185,7 @@ export function Intake({
     <label
       className={`keycap flex min-h-[44px] cursor-pointer items-center gap-2.5 rounded-lg border bg-panel px-3 py-2.5 text-[13px] transition-colors ${
         checked
-          ? "border-signal bg-signal-soft text-signal-ink"
+          ? "border-event bg-event-soft text-signal-ink"
           : "border-line text-muted hover:border-faint hover:text-text"
       }`}
     >
@@ -226,9 +226,9 @@ export function Intake({
                     <div
                       className={`keycap flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold transition-colors ${
                         done || current
-                          ? "bg-signal text-white"
+                          ? "bg-key text-white"
                           : "border border-line bg-panel text-faint"
-                      } ${current ? "ring-4 ring-signal-soft" : ""}`}
+                      } ${current ? "ring-4 ring-event-soft" : ""}`}
                     >
                       {done ? <Check className="h-4 w-4" strokeWidth={3} /> : i + 1}
                     </div>
@@ -243,7 +243,7 @@ export function Intake({
                   {i < TOTAL - 1 && (
                     <div className="mt-4 h-0.5 flex-1 rounded-full bg-line">
                       <div
-                        className="h-full rounded-full bg-signal transition-all duration-300"
+                        className="h-full rounded-full bg-key transition-all duration-300"
                         style={{ width: step > i ? "100%" : "0%" }}
                       />
                     </div>
@@ -278,13 +278,13 @@ export function Intake({
                       aria-checked={active}
                       className={`keycap flex min-h-[92px] flex-col items-start gap-2 rounded-xl border p-4 text-left transition-all ${
                         active
-                          ? "border-signal bg-signal-soft"
+                          ? "border-event bg-event-soft"
                           : "border-line bg-panel hover:border-faint hover:bg-well/50"
                       }`}
                     >
                       <span
                         className={`flex h-9 w-9 items-center justify-center rounded-lg ${
-                          active ? "bg-signal text-white" : "bg-well text-muted"
+                          active ? "bg-key text-white" : "bg-well text-muted"
                         }`}
                       >
                         <Icon className="h-[18px] w-[18px]" strokeWidth={2} />
@@ -302,7 +302,7 @@ export function Intake({
                     config has proven worth keeping. */}
                 <div className="col-span-2 mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px]">
                   <span className="text-muted">{t.intake.loadConfigHint}</span>
-                  <label className="cursor-pointer font-medium text-signal underline decoration-signal/40 underline-offset-2 hover:decoration-signal">
+                  <label className="cursor-pointer font-medium text-key-ink underline decoration-key-ink/40 underline-offset-2 hover:decoration-key-ink">
                     <Upload className="mr-1 inline h-3.5 w-3.5 align-[-2px]" aria-hidden />
                     {t.intake.loadConfig}
                     <input
@@ -543,7 +543,7 @@ export function Intake({
 
                 {env.workloads.length < MAX_WORKLOADS ? (
                   <button
-                    className="btn-ghost mt-3 w-full border border-dashed border-line text-[13px] text-muted hover:border-signal hover:text-signal"
+                    className="btn-ghost mt-3 w-full border border-dashed border-line text-[13px] text-muted hover:border-event hover:text-key-ink"
                     onClick={() =>
                       onChange({ ...env, workloads: [...env.workloads, emptyWorkload()] })
                     }
@@ -570,9 +570,9 @@ export function Intake({
                     {groups.length > 1 && (
                       <div className="mb-3 flex items-center gap-2 text-[13px] font-semibold text-text">
                         {g === "cloud" ? (
-                          <Cloud className="h-4 w-4 text-signal" strokeWidth={2} />
+                          <Cloud className="h-4 w-4 text-event" strokeWidth={2} />
                         ) : (
-                          <Server className="h-4 w-4 text-signal" strokeWidth={2} />
+                          <Server className="h-4 w-4 text-event" strokeWidth={2} />
                         )}
                         {t.intake.protectionGroups[g]}
                       </div>
@@ -646,7 +646,7 @@ export function Intake({
                           aria-expanded={open}
                           className="flex w-full items-center gap-2 px-4 py-3 text-left text-[13px] font-semibold text-text"
                         >
-                          <ShieldCheck className="h-4 w-4 shrink-0 text-signal" strokeWidth={2} />
+                          <ShieldCheck className="h-4 w-4 shrink-0 text-event" strokeWidth={2} />
                           <span className="flex-1">{t.intake.security.groups[fn]}</span>
                           <span
                             className={`chip shrink-0 ${setCount > 0 ? "chip-ok" : "chip-neutral"}`}
@@ -664,7 +664,7 @@ export function Intake({
                               <button
                                 type="button"
                                 onClick={() => bulkSetSecurity(keys, true)}
-                                className="font-medium text-signal hover:underline"
+                                className="font-medium text-key-ink hover:underline"
                               >
                                 {t.intake.security.allPresent}
                               </button>
