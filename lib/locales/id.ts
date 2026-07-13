@@ -96,7 +96,7 @@ export const id: Dictionary = {
     stepSecurity: "4. Postur deteksi & respons",
     security: {
       intro:
-        "Langkah ini menilai keamanan organisasi Anda secara keseluruhan — cukup dijawab satu kali, bukan per workload. Centang yang sudah Anda miliki; yang belum ada biarkan kosong. Boleh juga dilewati: hasil asesmen lain tetap lengkap, hanya bagian keamanan yang tidak dinilai.",
+        "Pilih sistem cyber security yang sudah Anda terapkan di organisasi Anda — cukup dijawab satu kali, bukan per workload. Centang yang sudah Anda miliki; yang belum ada biarkan kosong. Kalau di-skip: hasil asesmen akan tetap ada, tapi bagian keamanan tidak ada penilaian.",
       advancedToggle: "Lanjutan (istilah NIST CSF)",
       allPresent: "Semua ada",
       clearGroup: "Kosongkan",

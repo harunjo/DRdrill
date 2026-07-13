@@ -103,7 +103,7 @@ export const en = {
     stepSecurity: "4. Detection & response posture",
     security: {
       intro:
-        "This step rates your organization's security as a whole — you answer it once, not per workload. Tick what you already have and leave the rest empty. You can also skip it: the rest of the report stays complete, only security goes unrated.",
+        "Pick the cyber-security controls your organization already has in place — answered once, not per workload. Tick what you have; leave the rest empty. If you skip this step, the assessment results remain — only the security section goes unscored.",
       advancedToggle: "Advanced (NIST CSF terms)",
       allPresent: "All present",
       clearGroup: "Clear",
