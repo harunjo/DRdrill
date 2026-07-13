@@ -165,6 +165,7 @@ export function Drill({
   labelMap,
   totalLossValue,
   currency,
+  onEditCost,
 }: {
   t: Dictionary;
   lang: Lang;
@@ -175,6 +176,8 @@ export function Drill({
   // timeline, and counts up as the meter scrolls into view. null = no cost given.
   totalLossValue: number | null;
   currency: Currency;
+  /** Jump back to the intake's workload step to fill the downtime cost. */
+  onEditCost: () => void;
 }) {
   const [scenario, setScenario] = useState<Scenario>("ransomware");
   const [status, setStatus] = useState<Status>("idle");
@@ -379,11 +382,16 @@ export function Drill({
             </span>
           </div>
         ) : (
-          // No downtime cost given → say why there's no money figure here,
-          // instead of silently omitting the stakes strip.
-          <div className="flex items-baseline justify-between gap-2 border-b border-line bg-well/60 px-4 py-2.5">
+          // No downtime cost given → a working way to fix that, not a notice.
+          <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 border-b border-line bg-well/60 px-4 py-2.5">
             <span className="tag text-[10px]">{t.drill.totalLoss}</span>
-            <span className="text-[12px] text-muted">{t.report.business.addCost}</span>
+            <button
+              type="button"
+              onClick={onEditCost}
+              className="text-left text-[12px] font-medium text-signal underline decoration-signal/40 underline-offset-2 hover:decoration-signal"
+            >
+              {t.report.business.addCost}
+            </button>
           </div>
         )}
 
@@ -461,9 +469,13 @@ export function Drill({
                         {formatMoney(totalLossValue, currency)}
                       </p>
                     ) : (
-                      <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                      <button
+                        type="button"
+                        onClick={onEditCost}
+                        className="mt-1 text-left text-[13px] font-medium leading-relaxed text-signal underline decoration-signal/40 underline-offset-2 hover:decoration-signal"
+                      >
                         {t.report.business.addCost}
-                      </p>
+                      </button>
                     )}
                   </div>
                 }

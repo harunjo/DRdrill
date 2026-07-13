@@ -238,7 +238,7 @@ export const id: Dictionary = {
       exposureHeadline: "Eksposur jika tidak ada perubahan",
       perWorkload: "Per workload",
       downtimeLabel: "downtime",
-      addCost: "Isi biaya downtime di intake untuk melihat eksposur dalam Rupiah. Postur dan kesenjangan tetap berlaku.",
+      addCost: "Belum tahu biaya downtime? Klik di sini untuk mengisi.",
       annualized: "Perkiraan kerugian tahunan (ALE)",
       aleNote:
         "Eksposur per insiden × seberapa mungkin gangguan terjadi tiap tahun — angkanya naik tiap ada celah kritis yang belum ditutup.",

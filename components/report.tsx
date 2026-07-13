@@ -29,10 +29,12 @@ export function Report({
   t,
   assessment,
   drill,
+  onEditCost,
 }: {
   t: Dictionary;
   assessment: Assessment;
   drill: ReactNode;
+  onEditCost: () => void;
 }) {
   const [lens, setLens] = useState<Lens>("business");
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -101,7 +103,9 @@ export function Report({
       </div>
 
       <div role="tabpanel">
-        {lens === "business" && <BusinessLens t={t} assessment={assessment} />}
+        {lens === "business" && (
+          <BusinessLens t={t} assessment={assessment} onEditCost={onEditCost} />
+        )}
         {lens === "drill" && (
           <section className="panel mt-4 overflow-hidden ring-2 ring-signal-soft">
             <div className="hero-band flex items-center gap-3 border-b border-line px-5 py-4 sm:px-6">

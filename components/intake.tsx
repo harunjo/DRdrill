@@ -75,14 +75,17 @@ export function Intake({
   env,
   onChange,
   onRun,
+  initialStep = 0,
 }: {
   t: Dictionary;
   env: Environment;
   onChange: (env: Environment) => void;
   onRun: () => void;
+  /** Open on a specific step — e.g. back to Workloads to fill downtime cost. */
+  initialStep?: number;
 }) {
   const TOTAL = 4;
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(initialStep);
   // Save/load config to local disk (R13: stays a browser-only file, never
   // uploaded anywhere) — lets a user resume a prior intake without retyping.
   const [configError, setConfigError] = useState("");

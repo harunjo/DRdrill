@@ -22,6 +22,13 @@ export default function Home() {
   // Increments per run — keys the Drill so its story cache/state never
   // survives a re-assessment (a story must match the findings on screen).
   const [runId, setRunId] = useState(0);
+  // Which step the intake opens on. "Klik di sini" from the report jumps
+  // straight back to Workloads (step 1) to fill the downtime cost.
+  const [intakeStep, setIntakeStep] = useState(0);
+  const editCost = () => {
+    setIntakeStep(1);
+    setAssessment(null);
+  };
 
   const t = dictionaries[lang];
 
@@ -78,7 +85,10 @@ export default function Home() {
           /* ── Results screen: the intake is replaced, not appended ── */
           <div>
             <button
-              onClick={() => setAssessment(null)}
+              onClick={() => {
+                setIntakeStep(0);
+                setAssessment(null);
+              }}
               className="btn-ghost -ml-2 mb-2 px-2 text-[13px] font-semibold text-signal"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden />
@@ -87,6 +97,7 @@ export default function Home() {
             <Report
               t={t}
               assessment={assessment}
+              onEditCost={editCost}
               drill={
                 <Drill
                   key={runId}
@@ -99,6 +110,7 @@ export default function Home() {
                     return agg.monetizedCount > 0 ? agg.total : null;
                   })()}
                   currency={t.currency}
+                  onEditCost={editCost}
                 />
               }
             />
@@ -116,6 +128,7 @@ export default function Home() {
               t={t}
               env={env}
               onChange={setEnv}
+              initialStep={intakeStep}
               onRun={() => {
                 setAssessment(assess(env));
                 setRunId((r) => r + 1);

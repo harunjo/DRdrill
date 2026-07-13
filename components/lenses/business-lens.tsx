@@ -7,7 +7,15 @@ import { aggregateExposure, annualizedLoss, catastrophicList, formatMoney, isCat
 import { Heatmap } from "@/components/heatmap";
 import { PostureChip } from "@/components/lenses/shared";
 
-export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Assessment }) {
+export function BusinessLens({
+  t,
+  assessment,
+  onEditCost,
+}: {
+  t: Dictionary;
+  assessment: Assessment;
+  onEditCost: () => void;
+}) {
   const a = assessment;
   const b = t.report.business;
   const inv = t.report.invest;
@@ -43,11 +51,27 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
               )}
             </div>
           ) : agg.catastrophicCount > 0 ? (
-            <div className="mt-1 font-mono text-[1.35rem] font-semibold tracking-tight text-crit">
-              {fmt(inv.allUnrecoverable, { names: catNames })}
+            <div>
+              <div className="mt-1 font-mono text-[1.35rem] font-semibold tracking-tight text-crit">
+                {fmt(inv.allUnrecoverable, { names: catNames })}
+              </div>
+              {/* still no money given — offer the same way in */}
+              <button
+                type="button"
+                onClick={onEditCost}
+                className="mt-2 max-w-sm text-left text-[13px] font-medium leading-relaxed text-signal underline decoration-signal/40 underline-offset-2 hover:decoration-signal"
+              >
+                {b.addCost}
+              </button>
             </div>
           ) : (
-            <p className="mt-1 max-w-sm text-[13px] leading-relaxed text-muted">{b.addCost}</p>
+            <button
+              type="button"
+              onClick={onEditCost}
+              className="mt-1 max-w-sm text-left text-[13px] font-medium leading-relaxed text-signal underline decoration-signal/40 underline-offset-2 hover:decoration-signal"
+            >
+              {b.addCost}
+            </button>
           )}
           {agg.monetizedCount > 0 && ale > 0 && (
             <div className="mt-3">
