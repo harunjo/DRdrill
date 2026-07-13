@@ -61,6 +61,66 @@ function useCountUp(target: number, run: boolean): number {
   return v;
 }
 
+// The incident feed: beats reveal one by one down the timeline, the newest
+// pulsing amber like a live event; the first beat is the t=0 diamond. Keyed by
+// story in the caller so a regenerate restarts the sequence from the top.
+// Reduced motion shows the full timeline immediately.
+function Beats({ beats }: { beats: { time: string | null; text: string }[] }) {
+  const [revealed, setRevealed] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const raf = requestAnimationFrame(() => setRevealed(beats.length));
+      return () => cancelAnimationFrame(raf);
+    }
+    const id = setInterval(() => {
+      setRevealed((r) => {
+        if (r >= beats.length) {
+          clearInterval(id);
+          return r;
+        }
+        return r + 1;
+      });
+    }, 450);
+    return () => clearInterval(id);
+  }, [beats.length]);
+
+  return (
+    <ol>
+      {beats.map((b, i) => {
+        const shown = i < revealed;
+        const live = shown && i === revealed - 1 && revealed < beats.length;
+        return (
+          <li
+            key={i}
+            className={`flex gap-3 transition-all duration-500 ${
+              shown ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+            }`}
+          >
+            <div className="flex flex-col items-center">
+              {i === 0 ? (
+                <span
+                  className={`mt-1 h-3 w-3 shrink-0 rotate-45 bg-event ring-4 ring-event-soft ${live ? "alert-blink" : ""}`}
+                />
+              ) : (
+                <span
+                  className={`mt-1 h-3 w-3 shrink-0 rounded-full ${
+                    live ? "alert-blink bg-event ring-4 ring-event-soft" : "bg-signal ring-4 ring-signal-soft"
+                  }`}
+                />
+              )}
+              {i < beats.length - 1 && <span className="mt-1 w-px flex-1 bg-line" />}
+            </div>
+            <div className="pb-4">
+              {b.time && <span className="tag block leading-none">{b.time}</span>}
+              <p className="mt-1 text-[13px] leading-relaxed text-text">{b.text}</p>
+            </div>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 // Split the validated story into timeline beats. A beat line looks like
 // "02:14 — …"; the clock prefix becomes the timestamp, the rest the text.
 function parseBeats(text: string): { time: string | null; text: string }[] {
@@ -356,20 +416,7 @@ export function Drill({
                   {t.drill.languageNotice}
                 </p>
               )}
-              <ol>
-                {beats.map((b, i) => (
-                  <li key={i} className="flex gap-3">
-                    <div className="flex flex-col items-center">
-                      <span className="mt-1 h-3 w-3 shrink-0 rounded-full bg-signal ring-4 ring-signal-soft" />
-                      {i < beats.length - 1 && <span className="mt-1 w-px flex-1 bg-line" />}
-                    </div>
-                    <div className="pb-4">
-                      {b.time && <span className="tag block leading-none">{b.time}</span>}
-                      <p className="mt-1 text-[13px] leading-relaxed text-text">{b.text}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+              <Beats key={story} beats={beats} />
             </>
           )}
         </div>
