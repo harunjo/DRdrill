@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { track } from "@vercel/analytics";
 import {
   Lock,
@@ -65,16 +65,26 @@ function useCountUp(target: number, run: boolean): number {
 // pulsing amber like a live event; the first beat is the t=0 diamond. Keyed by
 // story in the caller so a regenerate restarts the sequence from the top.
 // Reduced motion shows the full timeline immediately.
-function Beats({ beats }: { beats: { time: string | null; text: string }[] }) {
+function Beats({
+  beats,
+  finale,
+}: {
+  beats: { time: string | null; text: string }[];
+  // Deterministic closing beat, revealed after the last story beat — the
+  // business loss in money. Computed browser-side; never part of the LLM text.
+  finale?: ReactNode;
+}) {
   const [revealed, setRevealed] = useState(0);
+  // One extra reveal step for the finale, so it lands a beat after the story.
+  const steps = beats.length + (finale ? 1 : 0);
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const raf = requestAnimationFrame(() => setRevealed(beats.length));
+      const raf = requestAnimationFrame(() => setRevealed(steps));
       return () => cancelAnimationFrame(raf);
     }
     const id = setInterval(() => {
       setRevealed((r) => {
-        if (r >= beats.length) {
+        if (r >= steps) {
           clearInterval(id);
           return r;
         }
@@ -82,7 +92,7 @@ function Beats({ beats }: { beats: { time: string | null; text: string }[] }) {
       });
     }, 450);
     return () => clearInterval(id);
-  }, [beats.length]);
+  }, [steps]);
 
   return (
     <ol>
@@ -108,7 +118,9 @@ function Beats({ beats }: { beats: { time: string | null; text: string }[] }) {
                   }`}
                 />
               )}
-              {i < beats.length - 1 && <span className="mt-1 w-px flex-1 bg-line" />}
+              {(i < beats.length - 1 || !!finale) && (
+                <span className="mt-1 w-px flex-1 bg-line" />
+              )}
             </div>
             <div className="pb-4">
               {b.time && <span className="tag block leading-none">{b.time}</span>}
@@ -117,6 +129,18 @@ function Beats({ beats }: { beats: { time: string | null; text: string }[] }) {
           </li>
         );
       })}
+      {finale && (
+        <li
+          className={`flex gap-3 transition-all duration-500 ${
+            revealed >= steps ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+          }`}
+        >
+          <div className="flex flex-col items-center">
+            <span className="mt-1 h-3 w-3 shrink-0 rotate-45 bg-crit ring-4 ring-crit-soft" />
+          </div>
+          <div className="pb-1">{finale}</div>
+        </li>
+      )}
     </ol>
   );
 }
@@ -423,7 +447,27 @@ export function Drill({
                   {t.drill.languageNotice}
                 </p>
               )}
-              <Beats key={story} beats={beats} />
+              <Beats
+                key={story}
+                beats={beats}
+                // The punchline: the drill ends on the BUSINESS loss in money,
+                // not just the technical closing state. Deterministic figure
+                // (aggregateExposure), never from the LLM.
+                finale={
+                  <div>
+                    <span className="tag block leading-none !text-crit">{t.drill.totalLoss}</span>
+                    {totalLossValue != null ? (
+                      <p className="mt-1 font-mono text-[19px] font-bold tabular-nums text-crit">
+                        {formatMoney(totalLossValue, currency)}
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                        {t.report.business.addCost}
+                      </p>
+                    )}
+                  </div>
+                }
+              />
             </>
           )}
         </div>
