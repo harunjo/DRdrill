@@ -76,7 +76,9 @@ function sideGeometry(
  *  keeping the cap and dropping any tick within MIN_GAP% of the last kept one —
  *  labels never collide regardless of the ceiling chosen. */
 function buildTicks(capMin: number): { pct: number; min: number }[] {
-  const MIN_GAP = 10; // % between adjacent tick labels (spacing holds on mobile)
+  // % between adjacent tick labels. Sized for a ~350px axis on a phone, where
+  // a label like "−1 hari" is ~11% of the width — 16% keeps neighbours clear.
+  const MIN_GAP = 16;
   const inRange = CANDIDATE_CAPS_MIN.filter((c) => c <= capMin);
   const ticks: { pct: number; min: number }[] = [{ pct: 50, min: 0 }];
   for (const side of ["left", "right"] as const) {
