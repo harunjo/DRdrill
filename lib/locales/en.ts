@@ -44,6 +44,7 @@ export const en = {
     types: {
       database: "Database",
       vm: "Virtual machines",
+      cloudinfra: "Cloud infrastructure",
       files: "File server / NAS",
       saas: "SaaS",
     },

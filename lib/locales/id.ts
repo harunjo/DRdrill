@@ -37,6 +37,7 @@ export const id: Dictionary = {
     types: {
       database: "Database",
       vm: "Virtual machine",
+      cloudinfra: "Infrastruktur cloud",
       files: "File server / NAS",
       saas: "SaaS",
     },

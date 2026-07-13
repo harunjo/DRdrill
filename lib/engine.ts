@@ -16,7 +16,7 @@ import {
 } from "./calibration";
 
 export type DeploymentModel = "onprem" | "cloud" | "hybrid" | "private";
-export type WorkloadType = "database" | "vm" | "files" | "saas";
+export type WorkloadType = "database" | "vm" | "files" | "saas" | "cloudinfra";
 export type Tier = 1 | 2 | 3;
 export type Placement = "onprem" | "cloud";
 

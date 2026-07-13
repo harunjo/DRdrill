@@ -82,7 +82,7 @@ const MODELS: { key: DeploymentModel; icon: ComponentType<LucideProps> }[] = [
   { key: "hybrid", icon: Split },
   { key: "private", icon: Lock },
 ];
-const TYPES: WorkloadType[] = ["database", "vm", "files", "saas"];
+const TYPES: WorkloadType[] = ["database", "vm", "cloudinfra", "files", "saas"];
 const selectCls = "field px-2.5 text-sm";
 
 // Localized step titles carry a "1. " prefix; the stepper renders its own

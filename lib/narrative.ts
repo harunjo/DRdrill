@@ -18,7 +18,7 @@ export interface NarrativeRequest {
 
 const LABEL_RE = /^W\d{1,2}$/; // max 10 workloads — also caps label length (cost vector)
 const MODELS = ["onprem", "cloud", "hybrid", "private"];
-const TYPES = ["database", "vm", "files", "saas"];
+const TYPES = ["database", "vm", "files", "saas", "cloudinfra"];
 const FLAG_CODES = [
   "no-immutable",
   "no-offsite",
