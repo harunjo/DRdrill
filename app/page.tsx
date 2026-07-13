@@ -111,7 +111,7 @@ export default function Home() {
                   the load link on the intake's first step reads it back. */}
               <button
                 onClick={() => downloadConfig(env)}
-                className="btn-ghost -mr-2 px-2 text-[13px] font-medium"
+                className="btn-ghost -mr-2 px-2 text-[13px] font-semibold text-key-ink"
               >
                 <Download className="h-4 w-4" aria-hidden />
                 {t.intake.saveConfig}

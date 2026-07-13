@@ -429,7 +429,7 @@ export function InvestmentLens({
             {copyState === "copied" ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             {copyState === "copied" ? inv.copied : inv.copy}
           </button>
-          <button onClick={onDownloadPdf} className="btn-ghost px-4 text-sm">
+          <button onClick={onDownloadPdf} className="btn-ghost px-4 text-sm font-semibold text-key-ink">
             <FileDown className="h-4 w-4" />
             {inv.pdf.download}
           </button>
@@ -445,7 +445,7 @@ export function InvestmentLens({
             placeholder={inv.brand.companyName}
             className="field min-w-[160px] flex-1 px-3 py-2 text-sm"
           />
-          <label className="btn-ghost cursor-pointer px-3 text-sm">
+          <label className="btn-ghost cursor-pointer px-3 text-sm font-semibold text-key-ink">
             <input type="file" accept="image/*" onChange={onLogo} className="hidden" />
             {branding.logo ? inv.brand.changeLogo : inv.brand.addLogo}
           </label>
