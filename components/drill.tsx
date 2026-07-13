@@ -341,7 +341,7 @@ export function Drill({
         {/* Stakes: deterministic browser-only loss total, stays intact even if
             the story degrades — the numbers here never come from the LLM. The
             figure counts up as it scrolls in: the money bleeding as it unfolds. */}
-        {totalLossValue != null && (
+        {totalLossValue != null ? (
           <div
             ref={lossRef}
             className="flex items-baseline justify-between gap-2 border-b border-line bg-crit-soft/40 px-4 py-2.5"
@@ -353,6 +353,13 @@ export function Drill({
                 ▲
               </span>
             </span>
+          </div>
+        ) : (
+          // No downtime cost given → say why there's no money figure here,
+          // instead of silently omitting the stakes strip.
+          <div className="flex items-baseline justify-between gap-2 border-b border-line bg-well/60 px-4 py-2.5">
+            <span className="tag text-[10px]">{t.drill.totalLoss}</span>
+            <span className="text-[12px] text-muted">{t.report.business.addCost}</span>
           </div>
         )}
 

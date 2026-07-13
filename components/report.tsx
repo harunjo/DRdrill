@@ -2,8 +2,8 @@
 
 import { useRef, useState, type ComponentType, type ReactNode } from "react";
 import { track } from "@vercel/analytics";
-import { LineChart, Layers, Wallet, type LucideProps } from "lucide-react";
-import type { Dictionary } from "@/lib/i18n";
+import { LineChart, Layers, Wallet, Siren, type LucideProps } from "lucide-react";
+import { fmt, type Dictionary } from "@/lib/i18n";
 import type { Assessment } from "@/lib/engine";
 import { TechnicalLens } from "@/components/lenses/technical-lens";
 import { BusinessLens } from "@/components/lenses/business-lens";
@@ -12,10 +12,13 @@ import { PostureRadar } from "@/components/posture-radar";
 import type { PostureScores } from "@/lib/posture";
 import type { Branding } from "@/lib/pdf";
 
-type Lens = "business" | "technical" | "investment";
+type Lens = "business" | "drill" | "technical" | "investment";
 
+// The drill sits second — the headline feature gets its own surface instead
+// of hiding at the bottom of the technical lens.
 const LENSES: { key: Lens; icon: ComponentType<LucideProps> }[] = [
   { key: "business", icon: LineChart },
+  { key: "drill", icon: Siren },
   { key: "technical", icon: Layers },
   { key: "investment", icon: Wallet },
 ];
@@ -99,7 +102,26 @@ export function Report({
 
       <div role="tabpanel">
         {lens === "business" && <BusinessLens t={t} assessment={assessment} />}
-        {lens === "technical" && <TechnicalLens t={t} assessment={assessment} drill={drill} />}
+        {lens === "drill" && (
+          <section className="panel mt-4 overflow-hidden ring-2 ring-signal-soft">
+            <div className="hero-band flex items-center gap-3 border-b border-line px-5 py-4 sm:px-6">
+              <span
+                aria-hidden
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] bg-signal text-white shadow-[0_6px_16px_-8px_rgba(16,20,27,0.55)]"
+              >
+                <Siren className="h-[18px] w-[18px]" strokeWidth={2.2} />
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-[16px] font-semibold tracking-tight">{t.drill.title}</h2>
+                <p className="mt-0.5 text-[12px] text-faint">
+                  {fmt(t.report.coverageShort, { n: assessment.results.length })}
+                </p>
+              </div>
+            </div>
+            <div className="px-5 py-5 sm:px-6">{drill}</div>
+          </section>
+        )}
+        {lens === "technical" && <TechnicalLens t={t} assessment={assessment} />}
         {lens === "investment" && (
           <InvestmentLens
             t={t}

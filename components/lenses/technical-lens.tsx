@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { AlertOctagon, AlertTriangle, CheckCircle2, Siren, ChevronDown } from "lucide-react";
+import { AlertOctagon, AlertTriangle, CheckCircle2, ChevronDown } from "lucide-react";
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import { fmtMinutes, type Assessment, type DurationLabels } from "@/lib/engine";
@@ -101,16 +101,14 @@ function Gauge({ value, band, lit }: { value: number; band: string; lit: boolean
   );
 }
 
-// The technical lens — today's four-part report (unchanged): score gauge,
-// RPO/RTO recovery gaps, risk flags, and the live drill.
+// The technical lens: score gauge, RPO/RTO recovery gaps on the Incident
+// Timeline, and risk flags. (The drill lives in its own report tab.)
 export function TechnicalLens({
   t,
   assessment,
-  drill,
 }: {
   t: Dictionary;
   assessment: Assessment;
-  drill: ReactNode;
 }) {
   const a = assessment;
   const n = a.results.length;
@@ -167,10 +165,16 @@ export function TechnicalLens({
             </p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2 px-5 py-4 sm:px-6">
+        {/* 3-2-1 banner — the row itself carries the verdict: green when the
+            rule holds, red while any leg is missing. */}
+        <div
+          className={`flex flex-wrap items-center gap-2 px-5 py-4 sm:px-6 ${
+            rule.every(([pass]) => pass) ? "bg-ok-soft/60" : "bg-crit-soft/50"
+          }`}
+        >
           <span className="text-[12px] font-medium text-muted">{t.report.rule321Title}</span>
           {rule.map(([pass, label]) => (
-            <span key={label} className={pass ? "chip chip-ok" : "chip chip-neutral"}>
+            <span key={label} className={pass ? "chip chip-ok" : "chip chip-crit"}>
               {pass ? "✓" : "✕"} {label}
             </span>
           ))}
@@ -323,22 +327,6 @@ export function TechnicalLens({
         </div>
       )}
 
-      {/* ── Part 4: Live drill — accented so this headline feature stands out ── */}
-      <section className="panel mt-4 overflow-hidden ring-2 ring-signal-soft">
-        <div className="hero-band flex items-center gap-3 border-b border-line px-5 py-4 sm:px-6">
-          <span
-            aria-hidden
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] bg-signal text-white shadow-[0_6px_16px_-8px_rgba(16,20,27,0.55)]"
-          >
-            <Siren className="h-[18px] w-[18px]" strokeWidth={2.2} />
-          </span>
-          <div className="min-w-0">
-            <h2 className="text-[16px] font-semibold tracking-tight">{t.drill.title}</h2>
-            <p className="mt-0.5 text-[12px] text-faint">{coverage}</p>
-          </div>
-        </div>
-        <div className="px-5 py-5 sm:px-6">{drill}</div>
-      </section>
     </div>
   );
 }

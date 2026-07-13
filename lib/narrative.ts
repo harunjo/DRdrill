@@ -208,7 +208,9 @@ export function buildPrompt(req: NarrativeRequest): string {
     `- For a cyber-attack scenario with weak detection or response, you may narrate the intruder operating undetected and spreading before recovery begins — kept qualitative per the rule above — then let recovery unfold per the RPO/RTO facts.`,
     `- Do not name any product, vendor, or tool.`,
     `- Do not introduce any fact, system, person, or outcome not derivable from the facts above.`,
-    `- Tone: sober incident log, addressed to management; end with the state of the business at the end of the timeline.`,
+    // "condition", not "state" — models writing Indonesian mistranslated
+    // "state" as "negara" (the country kind) in the closing beat's heading.
+    `- Tone: sober incident log, addressed to management; end with the condition of the business at the end of the timeline (in Indonesian: "kondisi bisnis"). Do not add headings.`,
     `- Output only the beats, no title, no preamble.`,
     ``,
     `Now write the timeline, entirely in ${langName}:`,

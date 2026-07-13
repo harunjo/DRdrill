@@ -241,11 +241,18 @@ export function buildPdf(d: PdfDoc): jsPDF {
           y += 6;
         }
         const col: RGB = b.critical ? CRIT : INK;
-        doc.setFont("helvetica", "bold").setFontSize(20).setTextColor(col[0], col[1], col[2]);
+        // Short money figures get the display size; long values (e.g. the
+        // "unrecoverable" sentence with workload names) drop to body scale so
+        // the callout doesn't shout a paragraph.
+        const big = san(b.value).length <= 26;
+        doc
+          .setFont("helvetica", "bold")
+          .setFontSize(big ? 20 : 12)
+          .setTextColor(col[0], col[1], col[2]);
         for (const ln of doc.splitTextToSize(san(b.value), CW)) {
-          ensure(8);
+          ensure(big ? 8 : 5.5);
           doc.text(ln, M, y);
-          y += 8;
+          y += big ? 8 : 5.5;
         }
         if (b.sub) {
           doc.setFont("helvetica", "normal").setFontSize(8.5).setTextColor(85, 85, 85);
