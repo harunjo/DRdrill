@@ -33,6 +33,9 @@ export const metadata: Metadata = {
   description:
     "Describe your environment. Get your recovery reality — readiness score, RPO/RTO gaps, risk flags, and a disaster drill story. Free, bilingual (ID/EN), nothing stored.",
   metadataBase: new URL("https://drdrill.harunjonatan.com"),
+  // app/opengraph-image.png supplies og:image/twitter:image; this just asks
+  // X for the large-card layout.
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({
