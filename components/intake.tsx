@@ -32,7 +32,7 @@ import {
   type WorkloadType,
 } from "@/lib/engine";
 import { SECURITY_CONTROLS } from "@/lib/calibration";
-import { applyByTier, applyToAll, estimateDowntimeCost } from "@/lib/costfill";
+import { applyToAll, estimateDowntimeCost } from "@/lib/costfill";
 import { formatMoney } from "@/lib/exposure";
 
 export const emptyProtection: Protection = {
@@ -121,19 +121,14 @@ export function Intake({
   const [sizeUnit, setSizeUnit] = useState<Record<string, "GB" | "TB">>({});
   // Collapsed-by-default CSF groups so the security step opens tidy (R18/#3).
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
-  // Cost-of-downtime quick-fill (U2) — local input state; commits to env on Apply.
-  const [fillMode, setFillMode] = useState<"all" | "tier">("all");
-  const [fillAll, setFillAll] = useState("");
-  const [fillTier, setFillTier] = useState<Record<number, string>>({});
-  const tiersPresent = [...new Set(env.workloads.map((w) => w.tier))].sort();
-  // Educational estimator (U2) — decompose the number managers can't name into
-  // inputs they can. Computes live; "Use" hands off to the same-for-all field.
-  const [estOpen, setEstOpen] = useState(false);
+  // Downtime-cost calculator (U2) — the main way the cost gets filled. Every
+  // input is a number a manager already knows; nothing per-hour is guessed.
+  // Computes live in display currency; "Use" commits IDR to every workload.
   const [est, setEst] = useState({ staff: "", staffCost: "", revenue: "" });
   const estValue = estimateDowntimeCost({
     staffAffected: Number(est.staff),
     monthlySalaryPerStaff: Number(est.staffCost),
-    revenuePerHour: Number(est.revenue),
+    monthlyRevenue: Number(est.revenue),
   });
 
   // Money is stored in IDR (single source of truth), but shown/entered in the
@@ -331,148 +326,51 @@ export function Intake({
 
             {step === 1 && (
               <>
+                {/* Downtime-cost calculator — the main source of the number the
+                    whole business case stands on. No guessed per-hour figures:
+                    headcount, monthly salary, monthly revenue → cost/hour. */}
                 {env.workloads.length > 0 && (
                   <div className="mb-3 rounded-lg border border-line bg-panel p-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[12px] font-medium text-muted">
-                        {t.intake.cost.quickFill}
-                      </span>
-                      <div className="flex overflow-hidden rounded-lg border border-line text-xs font-semibold">
-                        {(["all", "tier"] as const).map((m) => (
-                          <button
-                            key={m}
-                            type="button"
-                            onClick={() => setFillMode(m)}
-                            aria-pressed={fillMode === m}
-                            className={`px-2.5 py-1.5 transition-colors ${
-                              fillMode === m ? "bg-signal text-white" : "text-faint hover:text-muted"
-                            }`}
-                          >
-                            {m === "all" ? t.intake.cost.sameForAll : t.intake.cost.byTier}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      {fillMode === "all" ? (
-                        <>
+                    <div className="text-[13px] font-semibold">{t.intake.cost.estTitle}</div>
+                    <p className="mt-0.5 text-[12px] leading-relaxed text-muted">
+                      {t.intake.cost.estimateHow}
+                    </p>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                      {(
+                        [
+                          ["staff", t.intake.cost.estStaff, t.intake.cost.estStaffPh],
+                          ["staffCost", t.intake.cost.estStaffCost, t.intake.cost.estSalaryPh],
+                          ["revenue", t.intake.cost.estRevenue, t.intake.cost.estRevenuePh],
+                        ] as const
+                      ).map(([key, lbl, ph]) => (
+                        <label key={key} className="flex flex-col gap-1 text-[11px] text-faint">
+                          {lbl}
                           <input
                             type="number"
                             min={0}
-                            className="field w-36 px-2 text-sm"
-                            placeholder={t.intake.cost.placeholder}
-                            value={fillAll}
-                            onChange={(e) => setFillAll(e.target.value)}
+                            className="field w-full px-2 py-1.5 text-sm"
+                            placeholder={ph}
+                            value={est[key]}
+                            onChange={(e) => setEst((s) => ({ ...s, [key]: e.target.value }))}
                           />
-                          <button
-                            type="button"
-                            className="btn-primary px-4 text-sm"
-                            disabled={fillAll === ""}
-                            onClick={() =>
-                              onChange({
-                                ...env,
-                                workloads: applyToAll(
-                                  env.workloads,
-                                  fillAll === "" ? undefined : toIDR(Number(fillAll)),
-                                ),
-                              })
-                            }
-                          >
-                            {t.intake.cost.apply}
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          {tiersPresent.map((tier) => (
-                            <label
-                              key={tier}
-                              className="flex items-center gap-1 text-[12px] text-muted"
-                            >
-                              {fmt(t.intake.cost.tierShort, { n: tier })}
-                              <input
-                                type="number"
-                                min={0}
-                                className="field w-24 px-2 text-sm"
-                                value={fillTier[tier] ?? ""}
-                                onChange={(e) =>
-                                  setFillTier((s) => ({ ...s, [tier]: e.target.value }))
-                                }
-                              />
-                            </label>
-                          ))}
-                          <button
-                            type="button"
-                            className="btn-primary px-4 text-sm"
-                            onClick={() => {
-                              const map: Partial<Record<Tier, number>> = {};
-                              for (const tr of tiersPresent) {
-                                const v = fillTier[tr];
-                                if (v !== undefined && v !== "") map[tr] = toIDR(Number(v));
-                              }
-                              onChange({ ...env, workloads: applyByTier(env.workloads, map) });
-                            }}
-                          >
-                            {t.intake.cost.apply}
-                          </button>
-                        </>
-                      )}
+                        </label>
+                      ))}
                     </div>
-
-                    {/* Educational estimator — turns "I don't know" into inputs they do */}
-                    <button
-                      type="button"
-                      onClick={() => setEstOpen((v) => !v)}
-                      aria-expanded={estOpen}
-                      className="mt-2 text-[12px] font-medium text-signal hover:underline"
-                    >
-                      {t.intake.cost.estimateCta}
-                    </button>
-                    {estOpen && (
-                      <div className="mt-2 rounded-lg border border-line bg-well/60 p-3">
-                        <p className="text-[12px] leading-relaxed text-muted">
-                          {t.intake.cost.estimateHow}
-                        </p>
-                        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                          {(
-                            [
-                              ["staff", t.intake.cost.estStaff, t.intake.cost.estStaffPh],
-                              ["staffCost", t.intake.cost.estStaffCost, t.intake.cost.estSalaryPh],
-                              ["revenue", t.intake.cost.estRevenue, t.intake.cost.estRevenuePh],
-                            ] as const
-                          ).map(([key, lbl, ph]) => (
-                            <label key={key} className="flex flex-col gap-1 text-[11px] text-faint">
-                              {lbl}
-                              <input
-                                type="number"
-                                min={0}
-                                className="field w-full px-2 py-1.5 text-sm"
-                                placeholder={ph}
-                                value={est[key]}
-                                onChange={(e) => setEst((s) => ({ ...s, [key]: e.target.value }))}
-                              />
-                            </label>
-                          ))}
-                        </div>
-                        <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                          <span className="font-mono text-[15px] font-semibold text-crit">
-                            {fmt(t.intake.cost.estResult, { v: formatMoney(toIDR(estValue), cur) })}
-                          </span>
-                          <button
-                            type="button"
-                            className="btn-primary px-4 text-sm"
-                            disabled={estValue <= 0}
-                            onClick={() => {
-                              setFillMode("all");
-                              setFillAll(String(estValue));
-                              onChange({ ...env, workloads: applyToAll(env.workloads, estValue) });
-                              setEstOpen(false);
-                            }}
-                          >
-                            {t.intake.cost.estUse}
-                          </button>
-                        </div>
-                      </div>
-                    )}
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-mono text-[15px] font-semibold text-crit">
+                        {fmt(t.intake.cost.estResult, { v: formatMoney(toIDR(estValue), cur) })}
+                      </span>
+                      <button
+                        type="button"
+                        className="btn-primary px-4 text-sm"
+                        disabled={estValue <= 0}
+                        onClick={() =>
+                          onChange({ ...env, workloads: applyToAll(env.workloads, toIDR(estValue)) })
+                        }
+                      >
+                        {t.intake.cost.estUse}
+                      </button>
+                    </div>
                   </div>
                 )}
                 {env.workloads.length === 0 ? (
@@ -494,7 +392,7 @@ export function Intake({
                         className="mt-3 rounded-xl border border-line bg-well/60 p-4 first:mt-0"
                       >
                         <div className="mb-3 flex items-center justify-between">
-                          <span className="chip chip-accent font-mono">W{i + 1}</span>
+                          <span className="chip chip-accent font-mono">Workload {i + 1}</span>
                           <button
                             className="btn-ghost -mr-1 h-9 gap-1 px-2 text-xs text-faint hover:text-crit"
                             onClick={() =>

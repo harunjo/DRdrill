@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applyByTier, applyToAll, estimateDowntimeCost } from "./costfill";
+import { applyToAll, estimateDowntimeCost } from "./costfill";
 import type { Workload } from "./engine";
 
 const wl = (over: Partial<Workload>): Workload => ({
@@ -23,38 +23,28 @@ describe("applyToAll", () => {
   });
 });
 
-describe("applyByTier", () => {
-  it("applies per-tier values and leaves absent tiers untouched", () => {
-    const wls = [wl({ tier: 1, costPerHourDowntime: 1 }), wl({ tier: 2, costPerHourDowntime: 2 })];
-    const out = applyByTier(wls, { 1: 10_000_000 });
-    expect(out[0].costPerHourDowntime).toBe(10_000_000); // tier 1 set
-    expect(out[1].costPerHourDowntime).toBe(2); // tier 2 not in map → untouched
-  });
-
-  it("clears when a tier is present with undefined", () => {
-    const out = applyByTier([wl({ tier: 1, costPerHourDowntime: 5 })], { 1: undefined });
-    expect(out[0].costPerHourDowntime).toBeUndefined();
-  });
-});
-
 describe("estimateDowntimeCost", () => {
-  it("sums staff productivity and lost revenue (salary ÷ 176 → hourly)", () => {
-    // 20 staff × (Rp13.2M/176 = Rp75k/hr) + Rp2M/hr revenue = 3.5M
+  it("sums staff productivity and revenue spread over the month (salary ÷ 176, revenue ÷ 720)", () => {
+    // 20 staff × (Rp13.2M/176 = Rp75k/hr) + Rp1.44B/mo ÷ 720 = Rp2M/hr → 3.5M
     expect(
-      estimateDowntimeCost({ staffAffected: 20, monthlySalaryPerStaff: 13_200_000, revenuePerHour: 2_000_000 }),
+      estimateDowntimeCost({
+        staffAffected: 20,
+        monthlySalaryPerStaff: 13_200_000,
+        monthlyRevenue: 1_440_000_000,
+      }),
     ).toBe(3_500_000);
   });
 
   it("works from productivity alone for internal systems", () => {
     // 10 staff × (Rp17.6M/176 = Rp100k/hr) = 1M
     expect(
-      estimateDowntimeCost({ staffAffected: 10, monthlySalaryPerStaff: 17_600_000, revenuePerHour: 0 }),
+      estimateDowntimeCost({ staffAffected: 10, monthlySalaryPerStaff: 17_600_000, monthlyRevenue: 0 }),
     ).toBe(1_000_000);
   });
 
   it("clamps blank/negative/NaN inputs to zero", () => {
     expect(
-      estimateDowntimeCost({ staffAffected: NaN, monthlySalaryPerStaff: -5, revenuePerHour: 0 }),
+      estimateDowntimeCost({ staffAffected: NaN, monthlySalaryPerStaff: -5, monthlyRevenue: 0 }),
     ).toBe(0);
   });
 });

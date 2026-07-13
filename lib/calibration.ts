@@ -98,3 +98,10 @@ export const SECURITY_CONTROLS: SecurityControl[] = [
   { key: "playbooks", fn: "respond", weight: 1, depth: "advanced" },
   { key: "tabletop", fn: "respond", weight: 1, depth: "advanced" },
 ];
+
+/** BIA estimator: hours a month over which system-dependent revenue is spread
+ * when converting "monthly revenue through this system" into revenue lost per
+ * hour of downtime. 30 days × 24h — assumes revenue arrives around the clock,
+ * which is deliberately conservative: an outage during business hours costs
+ * more per hour than this average. */
+export const REVENUE_HOURS_PER_MONTH = 720;
