@@ -52,15 +52,15 @@ export default function Home() {
       {/* ── Command masthead: dark ink band on a firm blueprint grid; its
              bottom edge is the timeline axis (the logo's axis, page-wide). ── */}
       <header className="sticky top-0 z-20">
-        <div className="masthead text-[#e7eaee]">
+        <div className="masthead text-[#efeade]">
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-3">
             <div className="flex min-w-0 items-center gap-2.5">
-              <Logo className="h-8 w-8 shrink-0 text-[#e7eaee]" />
+              <Logo className="h-8 w-8 shrink-0 text-[#efeade]" />
               <div className="min-w-0 leading-tight">
                 <div className="font-display text-[15px] font-bold tracking-tight">
                   {t.appName}
                 </div>
-                <div className="tag hidden truncate !text-[#8890a0] text-[10px] sm:block">
+                <div className="tag hidden truncate !text-[#a29a88] text-[10px] sm:block">
                   {t.masthead}
                 </div>
               </div>
@@ -72,7 +72,7 @@ export default function Home() {
                   onClick={() => setLang(l)}
                   aria-pressed={lang === l}
                   className={`flex h-11 min-w-[44px] items-center justify-center px-3 transition-colors ${
-                    lang === l ? "bg-[#e7eaee] text-text" : "text-white/55 hover:text-white"
+                    lang === l ? "bg-[#efeade] text-text" : "text-white/55 hover:text-white"
                   }`}
                 >
                   {l.toUpperCase()}

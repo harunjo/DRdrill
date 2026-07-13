@@ -111,7 +111,7 @@ export function Report({
             <div className="hero-band flex items-center gap-3 border-b border-line px-5 py-4 sm:px-6">
               <span
                 aria-hidden
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] bg-signal text-white shadow-[0_6px_16px_-8px_rgba(16,20,27,0.55)]"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[3px] bg-signal text-white shadow-[0_6px_16px_-8px_rgba(23,20,14,0.55)]"
               >
                 <Siren className="h-[18px] w-[18px]" strokeWidth={2.2} />
               </span>

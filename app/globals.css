@@ -1,48 +1,48 @@
 @import "tailwindcss";
 
-/* ── DR Drill — "Incident Timeline" design system ──────────────────────────
-   A recovery instrument, not a dashboard. Cool control-surface grey, PURE
-   white report panels on HARD hairline rules (depth from crisp edges, not
-   soft elevation), near-black ink, tight radius. TWO accents with distinct
-   jobs: steel-azure signal for structure + interaction (calm authority), and
-   a single incident amber reserved for the t=0 marker and nothing decorative.
-   Status is semantic and dark-saturated so it stays legible on white:
-   recovered = green, caution = amber-brown, exposure = red. The palette sits
-   at "caution" on purpose — you're not dead, you're exposed. Chivo carries the
-   engineered display voice; Chivo Mono every number / time / status readout.
+/* ── DR Drill — "Incident Timeline" design system, drafting-sheet edition ──
+   An engineering drawing of your recovery posture, not a dashboard. Warm
+   drafting paper carrying a fine drawing grid across the WHOLE page (the
+   signature — panels sit on the sheet like drawing views), warm near-black
+   ink, cream panels on HARD hairline rules, tight radius. TWO accents with
+   distinct jobs: warm ink for structure + interaction (an instrument's
+   switchgear), and one vermilion for the incident — the t=0 marker and the
+   primary action key — never decoration. Status is semantic and dark so it
+   stays legible on cream: recovered = green, caution = ochre, exposure = red
+   (kept clearly red vs the orange event). Chivo carries the engineered
+   display voice; Chivo Mono every number / time / status readout.
    Token NAMES are stable across components; only values changed. */
 @theme {
-  --color-ink: #e7eaee; /* page — cool control-surface grey */
-  --color-panel: #ffffff; /* report card / surface */
-  --color-well: #eef0f3; /* inset well, inputs, tracks */
-  --color-line: #c6ccd4; /* hairline — dark enough to read as a hard edge */
-  --color-line-soft: #dfe3e8; /* faint inner divider */
+  --color-ink: #efeade; /* page — warm drafting paper */
+  --color-panel: #fbf9f2; /* report card / surface — cream, not white */
+  --color-well: #f0ebdd; /* inset well, inputs, tracks */
+  --color-line: #cdc5b0; /* hairline — dark enough to read as a hard edge */
+  --color-line-soft: #e0d9c6; /* faint inner divider */
 
-  --color-text: #10141b; /* near-black cool ink — high contrast */
-  --color-muted: #566070; /* dark grey, not washed */
-  --color-faint: #626c7e; /* labels, captions — ≥4.5:1 (WCAG AA) down to the inset well */
+  --color-text: #17140e; /* warm near-black drawing ink */
+  --color-muted: #5d5646; /* dark warm grey, not washed */
+  --color-faint: #6b6353; /* labels, captions — ≥4.5:1 (WCAG AA) down to the inset well */
 
-  /* structure + interaction: INK. Actions, active states, and controls are
-     near-black — an instrument's switchgear, not a SaaS blue. Colour is
-     reserved for meaning (amber = incident, semantic status = outcome). */
-  --color-signal: #141a24;
-  --color-signal-ink: #10141b; /* deeper accent — text ON the soft tint */
-  --color-signal-soft: rgba(20, 26, 36, 0.07);
+  /* structure + interaction: INK. Selection and controls are warm near-black.
+     Colour is reserved for meaning (vermilion = incident/action, status = outcome). */
+  --color-signal: #1c180f;
+  --color-signal-ink: #17140e; /* deeper accent — text ON the soft tint */
+  --color-signal-soft: rgba(28, 24, 15, 0.07);
 
-  /* the incident: amber — t=0 marker + the one brand pop, never decoration */
-  --color-event: #ef7a1f;
-  --color-event-soft: rgba(239, 122, 31, 0.14);
+  /* the incident: vermilion — t=0 marker + the primary key, never decoration */
+  --color-event: #e2551f;
+  --color-event-soft: rgba(226, 85, 31, 0.14);
 
   /* data-loss window on the RPO (past) side of the timeline */
-  --color-slate: #8894a6;
+  --color-slate: #9c9280;
 
-  /* semantic status — dark and saturated, legible on white */
-  --color-ok: #158a52;
-  --color-ok-soft: rgba(21, 138, 82, 0.1);
-  --color-warn: #c07d18;
-  --color-warn-soft: rgba(192, 125, 24, 0.12);
-  --color-crit: #cf3b2c;
-  --color-crit-soft: rgba(207, 59, 43, 0.1);
+  /* semantic status — dark and saturated, legible on cream */
+  --color-ok: #177340;
+  --color-ok-soft: rgba(23, 115, 64, 0.1);
+  --color-warn: #996607;
+  --color-warn-soft: rgba(153, 102, 7, 0.12);
+  --color-crit: #b52d1f;
+  --color-crit-soft: rgba(181, 45, 31, 0.1);
 
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, "SF Mono", monospace;
@@ -53,8 +53,14 @@
   color-scheme: light;
 }
 
+/* The page IS the drawing sheet: a fine drafting grid runs edge to edge and
+   panels sit on it like drawing views. */
 body {
   background-color: var(--color-ink);
+  background-image:
+    linear-gradient(to right, rgba(139, 113, 78, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(139, 113, 78, 0.1) 1px, transparent 1px);
+  background-size: 26px 26px;
   color: var(--color-text);
   font-family: var(--font-sans);
   font-size: 15px;
@@ -73,7 +79,7 @@ h3 {
 }
 
 ::selection {
-  background: rgba(239, 122, 31, 0.22);
+  background: rgba(226, 85, 31, 0.22);
 }
 
 *:focus-visible {
@@ -92,18 +98,18 @@ input[type="checkbox"] {
 /* Faint blueprint grid for header/footer depth — technical, precise, no photos. */
 .grid-texture {
   background-image:
-    linear-gradient(to right, rgba(11, 14, 20, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(11, 14, 20, 0.1) 1px, transparent 1px);
+    linear-gradient(to right, rgba(23, 20, 14, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(23, 20, 14, 0.1) 1px, transparent 1px);
   background-size: 22px 22px;
   background-position: center;
 }
 
-/* Dark command masthead — ink band with a firm light blueprint grid. */
+/* Dark command masthead — warm ink band with a firm light blueprint grid. */
 .masthead {
   background-color: var(--color-text);
   background-image:
-    linear-gradient(to right, rgba(231, 234,238, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(231, 234,238, 0.07) 1px, transparent 1px);
+    linear-gradient(to right, rgba(239, 234, 222, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(239, 234, 222, 0.07) 1px, transparent 1px);
   background-size: 22px 22px;
   background-position: center;
 }
@@ -114,19 +120,19 @@ input[type="checkbox"] {
   height: 7px;
   background-image: repeating-linear-gradient(
     to right,
-    rgba(231, 234, 238, 0.35) 0 1px,
+    rgba(239, 234, 222, 0.35) 0 1px,
     transparent 1px 22px
   );
   background-position: bottom;
   border-bottom: 2px solid var(--color-event);
 }
 
-/* Tinted hero band behind the score readout — a faint signal wash under paper,
-   capped by the panel's hard hairline instead of a soft glow. */
+/* Tinted hero band behind the score readout — a faint vermilion wash under
+   paper, capped by the panel's hard hairline instead of a soft glow. */
 .hero-band {
   background:
-    radial-gradient(120% 120% at 50% -30%, rgba(239, 122, 31, 0.05) 0%, transparent 55%),
-    linear-gradient(180deg, #f0f1f4 0%, var(--color-panel) 100%);
+    radial-gradient(120% 120% at 50% -30%, rgba(226, 85, 31, 0.05) 0%, transparent 55%),
+    linear-gradient(180deg, #f2eee0 0%, var(--color-panel) 100%);
 }
 
 /* ── Component helpers ─────────────────────────────────────────────────────── */
@@ -158,34 +164,36 @@ input[type="checkbox"] {
   .field:focus {
     outline: none;
     border-color: var(--color-signal);
-    box-shadow: 0 0 0 2px rgba(20, 26, 36, 0.18);
+    box-shadow: 0 0 0 2px rgba(28, 24, 15, 0.18);
   }
 
-  /* Primary action — an ink key: raised on a near-black ledge, pressed flat. */
+  /* Primary action — the vermilion key (the one place the incident colour
+     acts): raised on a burnt-orange ledge, pressed flat. #c44510 keeps white
+     text ≥4.5:1 (WCAG AA); the brighter --color-event stays the t=0 marker. */
   .btn-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
     min-height: 44px;
-    background: var(--color-signal);
+    background: #c44510;
     color: #ffffff;
     border-radius: 3px;
     font-family: var(--font-display);
     font-weight: 700;
     letter-spacing: 0.01em;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.18),
-      0 3px 0 #05070a,
-      0 5px 10px -4px rgba(16, 20, 27, 0.4);
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 3px 0 #7c2a08,
+      0 5px 10px -4px rgba(124, 42, 8, 0.45);
     transition: filter 0.12s, transform 0.08s, box-shadow 0.08s;
   }
   .btn-primary:hover:not(:disabled) {
-    filter: brightness(1.08);
+    filter: brightness(1.06);
   }
   .btn-primary:active:not(:disabled) {
     transform: translateY(2px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 1px 0 #05070a;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 1px 0 #7c2a08;
   }
   .btn-primary:disabled {
     background: var(--color-well);
@@ -227,7 +235,7 @@ input[type="checkbox"] {
      bottom ledge, pressed down-and-in when selected. State comes from the
      controls' own ARIA (pressed/checked/selected) or a checked input inside. */
   .keycap {
-    box-shadow: 0 2px 0 var(--color-line), 0 3px 6px -2px rgba(16, 20, 27, 0.08);
+    box-shadow: 0 2px 0 var(--color-line), 0 3px 6px -2px rgba(23, 20, 14, 0.08);
     transition: transform 0.08s ease, box-shadow 0.08s ease;
   }
   .keycap:active:not(:disabled),
@@ -236,7 +244,7 @@ input[type="checkbox"] {
   .keycap[aria-selected="true"],
   label.keycap:has(input:checked) {
     transform: translateY(1px);
-    box-shadow: 0 1px 0 var(--color-line), inset 0 1.5px 3px rgba(16, 20, 27, 0.12);
+    box-shadow: 0 1px 0 var(--color-line), inset 0 1.5px 3px rgba(23, 20, 14, 0.12);
   }
 
   /* Squared status tag — a datasheet badge, always labeled, with a hairline edge. */
@@ -252,11 +260,11 @@ input[type="checkbox"] {
     line-height: 1.4;
     white-space: nowrap;
   }
-  .chip-ok { background: var(--color-ok-soft); color: var(--color-ok); border-color: rgba(21, 138, 82, 0.25); }
-  .chip-warn { background: var(--color-warn-soft); color: var(--color-warn); border-color: rgba(192, 125, 24, 0.28); }
-  .chip-crit { background: var(--color-crit-soft); color: var(--color-crit); border-color: rgba(207, 59, 43, 0.26); }
+  .chip-ok { background: var(--color-ok-soft); color: var(--color-ok); border-color: rgba(23, 115, 64, 0.28); }
+  .chip-warn { background: var(--color-warn-soft); color: var(--color-warn); border-color: rgba(153, 102, 7, 0.3); }
+  .chip-crit { background: var(--color-crit-soft); color: var(--color-crit); border-color: rgba(181, 45, 31, 0.28); }
   .chip-neutral { background: var(--color-well); color: var(--color-muted); border-color: var(--color-line); }
-  .chip-accent { background: var(--color-signal-soft); color: var(--color-signal-ink); border-color: rgba(20, 26, 36, 0.25); }
+  .chip-accent { background: var(--color-signal-soft); color: var(--color-signal-ink); border-color: rgba(28, 24, 15, 0.25); }
 
   /* Solid verdict pill, colored inline to the band. */
   .verdict {

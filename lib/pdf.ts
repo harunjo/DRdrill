@@ -42,12 +42,12 @@ const PH = 297; // A4
 const CW = PW - 2 * M; // content width
 
 // Incident Timeline brand — mirrors the app tokens (globals.css).
-const INK: RGB = [16, 20, 27];
-const AMBER: RGB = [239, 122, 31];
-const LINE: RGB = [198, 204, 212];
-const MUTED: RGB = [86, 96, 112];
-const FAINT: RGB = [136, 144, 160];
-const CRIT: RGB = [207, 59, 43];
+const INK: RGB = [23, 20, 14];
+const AMBER: RGB = [226, 85, 31];
+const LINE: RGB = [205, 197, 176];
+const MUTED: RGB = [93, 86, 70];
+const FAINT: RGB = [107, 99, 83];
+const CRIT: RGB = [181, 45, 31];
 
 /** The timeline mark, in vector: recovery axis with a forward arrow, struck at
  *  t=0 by the amber incident line + diamond (same as components/logo.tsx). */
