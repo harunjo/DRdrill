@@ -20,7 +20,7 @@
 
   --color-text: #10141b; /* near-black cool ink — high contrast */
   --color-muted: #566070; /* dark grey, not washed */
-  --color-faint: #8890a0; /* labels, captions */
+  --color-faint: #626c7e; /* labels, captions — ≥4.5:1 (WCAG AA) down to the inset well */
 
   /* structure + interaction: INK. Actions, active states, and controls are
      near-black — an instrument's switchgear, not a SaaS blue. Colour is

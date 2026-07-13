@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { track } from "@vercel/analytics";
 import { ShieldCheck, ArrowLeft } from "lucide-react";
 import { assess, type Assessment, type Environment } from "@/lib/engine";
 import { aggregateExposure } from "@/lib/exposure";
 import { dictionaries, type Lang } from "@/lib/i18n";
 import { Intake, emptyProtection, emptyWorkload } from "@/components/intake";
-import { Report } from "@/components/report";
-import { Drill } from "@/components/drill";
 import { Logo } from "@/components/logo";
+
+// The report half (lenses, charts, drill) renders only after the intake is
+// done — keep it out of the first-load bundle so the landing paint is light.
+const Report = dynamic(() => import("@/components/report").then((m) => m.Report));
+const Drill = dynamic(() => import("@/components/drill").then((m) => m.Drill));
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("id");
@@ -35,6 +39,21 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.lang = lang;
   }, [lang]);
+
+  // Warm the report/drill chunks on the first interaction — off the landing
+  // critical path, but downloaded long before the intake is finished.
+  useEffect(() => {
+    const warm = () => {
+      import("@/components/report");
+      import("@/components/drill");
+    };
+    window.addEventListener("pointerdown", warm, { once: true });
+    window.addEventListener("keydown", warm, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", warm);
+      window.removeEventListener("keydown", warm);
+    };
+  }, []);
 
   return (
     <>

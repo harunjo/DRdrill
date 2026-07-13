@@ -21,9 +21,11 @@ const mono = Chivo_Mono({
 
 // Display voice — Chivo, a sturdy journalistic-technical grotesque, for
 // headings, verdicts, and the score. Reads "report," not generic SaaS.
+// Only 700 ships — nothing in the app sets 900, and each weight is a
+// preloaded file ahead of LCP.
 const display = Chivo({
   variable: "--font-display",
-  weight: ["700", "900"],
+  weight: ["700"],
   subsets: ["latin"],
   display: "swap",
 });
