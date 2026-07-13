@@ -270,7 +270,7 @@ export const en = {
       copyFailed: "Copy unavailable — select the text below to copy manually:",
       scope: { onprem: "on-premise", cloud: "cloud" },
       brand: {
-        companyName: "Company name (optional)",
+        companyName: "Company name",
         addLogo: "Add logo",
         changeLogo: "Change logo",
         clear: "Clear",

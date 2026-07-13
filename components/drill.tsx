@@ -371,7 +371,7 @@ export function Drill({
         {totalLossValue != null ? (
           <div
             ref={lossRef}
-            className="flex items-baseline justify-between gap-2 border-b border-line bg-crit-soft/40 px-4 py-2.5"
+            className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 border-b border-line bg-crit-soft/40 px-4 py-2.5"
           >
             <span className="tag text-[10px]">{t.drill.totalLoss}</span>
             <span className="font-mono text-[15px] font-semibold tabular-nums text-crit">

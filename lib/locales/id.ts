@@ -263,7 +263,7 @@ export const id: Dictionary = {
       copyFailed: "Salin tidak tersedia — pilih teks di bawah untuk menyalin manual:",
       scope: { onprem: "on-premise", cloud: "cloud" },
       brand: {
-        companyName: "Nama perusahaan (opsional)",
+        companyName: "Nama perusahaan",
         addLogo: "Tambah logo",
         changeLogo: "Ganti logo",
         clear: "Hapus",
