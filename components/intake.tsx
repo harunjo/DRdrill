@@ -66,8 +66,14 @@ export const emptyWorkload = (): Workload => ({
   placement: "onprem",
 });
 
+/** Downtime cost is mandatory — the whole business case is priced from it,
+ *  so a workload without one can't proceed (the calculator fills it). */
+export function costValid(w: Workload): boolean {
+  return w.costPerHourDowntime != null && Number.isFinite(w.costPerHourDowntime) && w.costPerHourDowntime > 0;
+}
+
 export function workloadValid(w: Workload): boolean {
-  return w.name.trim().length > 0 && Number.isFinite(w.sizeGB) && w.sizeGB > 0;
+  return w.name.trim().length > 0 && Number.isFinite(w.sizeGB) && w.sizeGB > 0 && costValid(w);
 }
 
 const MODELS: { key: DeploymentModel; icon: ComponentType<LucideProps> }[] = [
@@ -88,17 +94,14 @@ export function Intake({
   env,
   onChange,
   onRun,
-  initialStep = 0,
 }: {
   t: Dictionary;
   env: Environment;
   onChange: (env: Environment) => void;
   onRun: () => void;
-  /** Open on a specific step — e.g. back to Workloads to fill downtime cost. */
-  initialStep?: number;
 }) {
   const TOTAL = 4;
-  const [step, setStep] = useState(initialStep);
+  const [step, setStep] = useState(0);
   // Save/load config to local disk (R13: stays a browser-only file, never
   // uploaded anywhere) — lets a user resume a prior intake without retyping.
   const [configError, setConfigError] = useState("");
@@ -507,7 +510,11 @@ export function Intake({
                             </select>
                           )}
                         </div>
-                        <label className="mt-2 flex min-h-[44px] items-center gap-2 rounded-lg border border-line px-3 py-2 text-[13px] text-muted">
+                        <label
+                          className={`mt-2 flex min-h-[44px] items-center gap-2 rounded-lg border px-3 py-2 text-[13px] text-muted ${
+                            costValid(w) ? "border-line" : "border-crit/50"
+                          }`}
+                        >
                           <span className="flex-1">{t.intake.cost.label}</span>
                           <span className="tag">{t.intake.cost.unit}</span>
                           <input
@@ -524,6 +531,11 @@ export function Intake({
                             }
                           />
                         </label>
+                        {!costValid(w) && (
+                          <div className="mt-1 font-mono text-[11px] text-crit">
+                            {t.intake.errors.costRequired}
+                          </div>
+                        )}
                       </div>
                     );
                   })

@@ -29,12 +29,10 @@ export function Report({
   t,
   assessment,
   drill,
-  onEditCost,
 }: {
   t: Dictionary;
   assessment: Assessment;
   drill: ReactNode;
-  onEditCost: () => void;
 }) {
   const [lens, setLens] = useState<Lens>("business");
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -74,7 +72,9 @@ export function Report({
       <div
         role="tablist"
         aria-label={t.report.lensesLabel}
-        className="mt-1.5 flex gap-1 rounded-xl border-2 border-signal-soft bg-panel p-1 shadow-md"
+        // 2×2 on phones — four labels in one 390px row clips the longest
+        // ("Usulan investasi"); a single row returns at sm.
+        className="mt-1.5 grid grid-cols-2 gap-1 rounded-xl border-2 border-signal-soft bg-panel p-1 shadow-md sm:flex"
       >
         {LENSES.map(({ key, icon: Icon }, i) => {
           const active = lens === key;
@@ -104,7 +104,7 @@ export function Report({
 
       <div role="tabpanel">
         {lens === "business" && (
-          <BusinessLens t={t} assessment={assessment} onEditCost={onEditCost} />
+          <BusinessLens t={t} assessment={assessment} />
         )}
         {lens === "drill" && (
           <section className="panel mt-4 overflow-hidden ring-2 ring-signal-soft">

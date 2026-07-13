@@ -165,7 +165,6 @@ export function Drill({
   labelMap,
   totalLossValue,
   currency,
-  onEditCost,
 }: {
   t: Dictionary;
   lang: Lang;
@@ -173,11 +172,10 @@ export function Drill({
   labelMap: Record<string, string>;
   // Browser-only exposure total in IDR (R13), from aggregateExposure(). Never
   // enters the payload or the LLM story — it just frames the stakes above the
-  // timeline, and counts up as the meter scrolls into view. null = no cost given.
+  // timeline, and counts up as the meter scrolls into view. null = every
+  // workload is unrecoverable (cost itself is mandatory at intake).
   totalLossValue: number | null;
   currency: Currency;
-  /** Jump back to the intake's workload step to fill the downtime cost. */
-  onEditCost: () => void;
 }) {
   const [scenario, setScenario] = useState<Scenario>("ransomware");
   const [status, setStatus] = useState<Status>("idle");
@@ -382,16 +380,11 @@ export function Drill({
             </span>
           </div>
         ) : (
-          // No downtime cost given → a working way to fix that, not a notice.
-          <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 border-b border-line bg-well/60 px-4 py-2.5">
+          // Cost is mandatory, so no total means nothing is recoverable —
+          // there is no finite figure to show, only the fact.
+          <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 border-b border-line bg-crit-soft/40 px-4 py-2.5">
             <span className="tag text-[10px]">{t.drill.totalLoss}</span>
-            <button
-              type="button"
-              onClick={onEditCost}
-              className="text-left text-[12px] font-medium text-signal underline decoration-signal/40 underline-offset-2 hover:decoration-signal"
-            >
-              {t.report.business.addCost}
-            </button>
+            <span className="text-[12px] font-semibold text-crit">{t.drill.lossUnbounded}</span>
           </div>
         )}
 
@@ -469,13 +462,9 @@ export function Drill({
                         {formatMoney(totalLossValue, currency)}
                       </p>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={onEditCost}
-                        className="mt-1 text-left text-[13px] font-medium leading-relaxed text-signal underline decoration-signal/40 underline-offset-2 hover:decoration-signal"
-                      >
-                        {t.report.business.addCost}
-                      </button>
+                      <p className="mt-1 text-[14px] font-semibold leading-relaxed text-crit">
+                        {t.drill.lossUnbounded}
+                      </p>
                     )}
                   </div>
                 }

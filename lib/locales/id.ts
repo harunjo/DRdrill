@@ -43,7 +43,7 @@ export const id: Dictionary = {
     sizeLabel: "Ukuran data",
     sizeUnit: "Satuan ukuran",
     cost: {
-      label: "Biaya downtime (opsional)",
+      label: "Biaya downtime",
       unit: "Rp / jam",
       placeholder: "mis. 5000000",
       estTitle: "Kalkulator biaya downtime",
@@ -71,6 +71,7 @@ export const id: Dictionary = {
     errors: {
       nameRequired: "Beri nama workload ini.",
       sizeInvalid: "Ukuran harus berupa angka di atas 0.",
+      costRequired: "Isi biaya downtime — pakai kalkulator di atas jika belum tahu angkanya.",
       maxWorkloads: "Maksimal 10 workload — fokus pada sistem paling kritikal.",
     },
     stepProtection: "3. Proteksi saat ini",
@@ -231,10 +232,9 @@ export const id: Dictionary = {
     posture: { strong: "Tangguh", developing: "Berkembang", exposed: "Rentan" },
     business: {
       title: "Dampak bisnis",
-      exposureHeadline: "Eksposur jika tidak ada perubahan",
+      exposureHeadline: "Eksposur per insiden jika tidak ada perubahan",
       perWorkload: "Per workload",
       downtimeLabel: "downtime",
-      addCost: "Belum tahu biaya downtime? Klik di sini untuk mengisi.",
       annualized: "Perkiraan kerugian tahunan (ALE)",
       aleNote:
         "Eksposur per insiden × seberapa mungkin gangguan terjadi tiap tahun — angkanya naik tiap ada celah kritis yang belum ditutup.",
@@ -577,7 +577,8 @@ export const id: Dictionary = {
 
   drill: {
     title: "Simulasi langsung",
-    totalLoss: "Total potensi kerugian bisnis",
+    totalLoss: "Total potensi kerugian bisnis per insiden",
+    lossUnbounded: "Data hilang permanen — kerugian tidak terhingga",
     pickScenario: "Pilih bencana yang ingin disimulasikan:",
     idlePrompt: "Pilih skenario, lalu jalankan simulasi untuk melihat kronologis terjadinya bencana menit per menit secara detail.",
     generate: "Jalankan simulasi",

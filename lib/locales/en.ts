@@ -50,7 +50,7 @@ export const en = {
     sizeLabel: "Data size",
     sizeUnit: "Size unit",
     cost: {
-      label: "Downtime cost (optional)",
+      label: "Downtime cost",
       unit: "USD / hour",
       placeholder: "e.g. 300",
       estTitle: "Downtime cost calculator",
@@ -78,6 +78,7 @@ export const en = {
     errors: {
       nameRequired: "Give this workload a name.",
       sizeInvalid: "Size must be a number above 0.",
+      costRequired: "Enter the downtime cost — use the calculator above if you don't know it.",
       maxWorkloads: "10 workloads is the cap — keep it to the most critical systems.",
     },
     stepProtection: "3. Current protection",
@@ -238,10 +239,9 @@ export const en = {
     posture: { strong: "Resilient", developing: "Developing", exposed: "Exposed" },
     business: {
       title: "Business impact",
-      exposureHeadline: "Exposure if nothing changes",
+      exposureHeadline: "Exposure per incident if nothing changes",
       perWorkload: "Per workload",
       downtimeLabel: "downtime",
-      addCost: "Don't know your downtime cost? Click here to add it.",
       annualized: "Estimated annual loss (ALE)",
       aleNote:
         "Per-incident exposure × how likely a disruption is each year — the rate rises with each unresolved critical gap.",
@@ -584,7 +584,8 @@ export const en = {
 
   drill: {
     title: "Live drill",
-    totalLoss: "Total business loss at stake",
+    totalLoss: "Total business loss per incident",
+    lossUnbounded: "Data permanently lost — the loss is unbounded",
     pickScenario: "Pick the disaster to simulate:",
     idlePrompt: "Choose a scenario, then run the drill to see how tonight would unfold — beat by beat.",
     generate: "Run the drill",
