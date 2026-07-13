@@ -41,6 +41,31 @@ const PW = 210;
 const PH = 297; // A4
 const CW = PW - 2 * M; // content width
 
+// Incident Timeline brand — mirrors the app tokens (globals.css).
+const INK: RGB = [16, 20, 27];
+const AMBER: RGB = [239, 122, 31];
+const LINE: RGB = [198, 204, 212];
+const MUTED: RGB = [86, 96, 112];
+const FAINT: RGB = [136, 144, 160];
+const CRIT: RGB = [207, 59, 43];
+
+/** The timeline mark, in vector: recovery axis with a forward arrow, struck at
+ *  t=0 by the amber incident line + diamond (same as components/logo.tsx). */
+function drawMark(doc: jsPDF, x: number, y: number, s: number): void {
+  const cy = y + s / 2;
+  const cx = x + s / 2;
+  doc.setDrawColor(...INK).setLineWidth(0.55);
+  doc.line(x, cy, x + s * 0.92, cy); // axis
+  doc.line(x + s * 0.72, cy - s * 0.16, x + s * 0.95, cy); // arrow top
+  doc.line(x + s * 0.72, cy + s * 0.16, x + s * 0.95, cy); // arrow bottom
+  doc.setDrawColor(...AMBER).setLineWidth(0.7);
+  doc.line(cx, y + s * 0.06, cx, y + s * 0.94); // t=0 event line
+  const d = s * 0.17; // diamond half-diagonal
+  doc.setFillColor(...AMBER);
+  doc.triangle(cx - d, cy, cx, cy - d, cx + d, cy, "F");
+  doc.triangle(cx - d, cy, cx, cy + d, cx + d, cy, "F");
+}
+
 // jsPDF's built-in Helvetica is WinAnsi-encoded — swap the few glyphs our copy
 // uses that aren't in it, so nothing renders as a blank box.
 const san = (s: string): string => s.replace(/≥/g, ">=").replace(/≤/g, "<=").replace(/≈/g, "~");
@@ -88,23 +113,28 @@ export function buildPdf(d: PdfDoc): jsPDF {
       }
     }
     if (d.company) {
-      doc.setFont("helvetica", "bold").setFontSize(13).setTextColor(17, 17, 17);
+      doc.setFont("helvetica", "bold").setFontSize(13).setTextColor(...INK);
       doc.text(san(d.company), bx, y + 7);
     }
     y += 14;
   }
 
-  // Header
-  doc.setFont("helvetica", "bold").setFontSize(15).setTextColor(17, 17, 17);
-  doc.text(san(d.title), M, y + 4);
-  doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(102, 102, 102);
+  // Header — the timeline mark, title, and the amber axis rule (the masthead
+  // edge from the app, carried onto the exported document).
+  drawMark(doc, M, y - 1.5, 9);
+  doc.setFont("helvetica", "bold").setFontSize(15).setTextColor(...INK);
+  doc.text(san(d.title), M + 12, y + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(...FAINT);
   doc.text(d.brand, PW - M, y + 1, { align: "right" });
   doc.text(d.date, PW - M, y + 5, { align: "right" });
   y += 7;
-  doc.setFontSize(8.5).setTextColor(102, 102, 102);
-  doc.text(san(d.subtitle), M, y);
+  doc.setFontSize(8.5).setTextColor(...MUTED);
+  doc.text(san(d.subtitle), M + 12, y);
   y += 3;
-  doc.setDrawColor(17, 17, 17).setLineWidth(0.5).line(M, y, PW - M, y);
+  // ruler ticks above the axis, then the amber rule
+  doc.setDrawColor(...LINE).setLineWidth(0.2);
+  for (let tx = M; tx <= PW - M; tx += 6) doc.line(tx, y - 1.4, tx, y);
+  doc.setDrawColor(...AMBER).setLineWidth(0.8).line(M, y, PW - M, y);
   y += 5;
 
   para(d.intro, 9, [68, 68, 68], 3);
@@ -114,11 +144,15 @@ export function buildPdf(d: PdfDoc): jsPDF {
       case "heading": {
         ensure(11);
         y += 2;
-        const label = `${b.num}. ${b.title}`;
-        doc.setFont("helvetica", "bold").setFontSize(11).setTextColor(17, 17, 17);
-        doc.text(san(label), M, y);
+        // Number in incident amber, title in ink — the brand's two voices.
+        doc.setFont("helvetica", "bold").setFontSize(11).setTextColor(...AMBER);
+        const numLabel = `${b.num}.`;
+        doc.text(numLabel, M, y);
+        const numW = doc.getTextWidth(`${numLabel} `);
+        doc.setTextColor(...INK);
+        doc.text(san(b.title), M + numW, y);
         if (b.guide) {
-          const tw = doc.getTextWidth(san(label));
+          const tw = numW + doc.getTextWidth(san(b.title));
           const tag = san(b.guide);
           doc.setFont("helvetica", "bold").setFontSize(6.5);
           const gw = doc.getTextWidth(tag) + 4;
@@ -128,13 +162,13 @@ export function buildPdf(d: PdfDoc): jsPDF {
           doc.text(tag, M + tw + 5, y);
         }
         y += 1.5;
-        doc.setDrawColor(221, 221, 221).setLineWidth(0.2).line(M, y, PW - M, y);
+        doc.setDrawColor(...LINE).setLineWidth(0.2).line(M, y, PW - M, y);
         y += 3.5;
         break;
       }
       case "subheading":
         ensure(6);
-        doc.setFont("helvetica", "bold").setFontSize(9.5).setTextColor(17, 17, 17);
+        doc.setFont("helvetica", "bold").setFontSize(9.5).setTextColor(...INK);
         doc.text(san(b.text), M, y);
         y += 4.5;
         break;
@@ -164,7 +198,7 @@ export function buildPdf(d: PdfDoc): jsPDF {
           wrapped.reduce((n, w) => n + w.length, 0) * lh + (b.lines.length - 1) * 1.5;
         const boxH = inner + 6;
         ensure(boxH + 2);
-        doc.setFillColor(247, 247, 247).setDrawColor(187, 187, 187).setLineWidth(0.2);
+        doc.setFillColor(240, 241, 244).setDrawColor(...LINE).setLineWidth(0.2);
         doc.roundedRect(M, y, CW, boxH, 1.5, 1.5, "FD");
         let ty = y + 4.5;
         doc.setTextColor(85, 85, 85);
@@ -186,13 +220,13 @@ export function buildPdf(d: PdfDoc): jsPDF {
           margin: { left: M, right: M },
           theme: "plain",
           styles: { fontSize: 9, cellPadding: 1.8, textColor: [51, 51, 51] },
-          headStyles: { fontStyle: "bold", textColor: [17, 17, 17] },
+          headStyles: { fontStyle: "bold", textColor: INK },
           // Horizontal rules only (like the on-screen tables): dark under the
           // header, light under each body row.
           didDrawCell: (data) => {
             const c = data.cell;
-            if (data.section === "head") doc.setDrawColor(17, 17, 17).setLineWidth(0.4);
-            else if (data.section === "body") doc.setDrawColor(229, 229, 229).setLineWidth(0.1);
+            if (data.section === "head") doc.setDrawColor(...INK).setLineWidth(0.4);
+            else if (data.section === "body") doc.setDrawColor(...LINE).setLineWidth(0.1);
             else return;
             doc.line(c.x, c.y + c.height, c.x + c.width, c.y + c.height);
           },
@@ -206,7 +240,7 @@ export function buildPdf(d: PdfDoc): jsPDF {
           doc.text(san(b.label.toUpperCase()), M, y);
           y += 6;
         }
-        const col: RGB = b.critical ? [192, 57, 43] : [17, 17, 17];
+        const col: RGB = b.critical ? CRIT : INK;
         doc.setFont("helvetica", "bold").setFontSize(20).setTextColor(col[0], col[1], col[2]);
         for (const ln of doc.splitTextToSize(san(b.value), CW)) {
           ensure(8);
@@ -223,10 +257,10 @@ export function buildPdf(d: PdfDoc): jsPDF {
     }
   }
 
-  // Footer
+  // Footer — closed by the same amber axis that opened the document.
   y += 3;
   ensure(8);
-  doc.setDrawColor(204, 204, 204).setLineWidth(0.2).line(M, y, PW - M, y);
+  doc.setDrawColor(...AMBER).setLineWidth(0.5).line(M, y, PW - M, y);
   y += 4;
   doc.setFont("helvetica", "normal").setFontSize(7.5).setTextColor(119, 119, 119);
   for (const ln of doc.splitTextToSize(san(d.footer), CW)) {
