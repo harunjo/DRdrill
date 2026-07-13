@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { track } from "@vercel/analytics";
-import { ShieldCheck, ArrowLeft } from "lucide-react";
+import { ShieldCheck, ArrowLeft, Download } from "lucide-react";
 import { assess, type Assessment, type Environment } from "@/lib/engine";
 import { aggregateExposure } from "@/lib/exposure";
 import { dictionaries, type Lang } from "@/lib/i18n";
-import { Intake, emptyProtection, emptyWorkload } from "@/components/intake";
+import { Intake, downloadConfig, emptyProtection, emptyWorkload } from "@/components/intake";
 import { Logo } from "@/components/logo";
 
 // The report half (lenses, charts, drill) renders only after the intake is
@@ -103,16 +103,27 @@ export default function Home() {
         {assessment ? (
           /* ── Results screen: the intake is replaced, not appended ── */
           <div>
-            <button
-              onClick={() => {
-                setIntakeStep(0);
-                setAssessment(null);
-              }}
-              className="btn-ghost -ml-2 mb-2 px-2 text-[13px] font-semibold text-signal"
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden />
-              {t.report.newAssessment}
-            </button>
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <button
+                onClick={() => {
+                  setIntakeStep(0);
+                  setAssessment(null);
+                }}
+                className="btn-ghost -ml-2 px-2 text-[13px] font-semibold text-signal"
+              >
+                <ArrowLeft className="h-4 w-4" aria-hidden />
+                {t.report.newAssessment}
+              </button>
+              {/* Save belongs here — the config has just proven worth keeping;
+                  the load link on the intake's first step reads it back. */}
+              <button
+                onClick={() => downloadConfig(env)}
+                className="btn-ghost -mr-2 px-2 text-[13px] font-medium"
+              >
+                <Download className="h-4 w-4" aria-hidden />
+                {t.intake.saveConfig}
+              </button>
+            </div>
             <Report
               t={t}
               assessment={assessment}

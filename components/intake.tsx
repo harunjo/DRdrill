@@ -14,7 +14,6 @@ import {
   ArrowRight,
   ShieldCheck,
   ChevronDown,
-  Download,
   Upload,
   type LucideProps,
 } from "lucide-react";
@@ -34,6 +33,20 @@ import {
 import { SECURITY_CONTROLS } from "@/lib/calibration";
 import { applyToAll, estimateDowntimeCost } from "@/lib/costfill";
 import { formatMoney } from "@/lib/exposure";
+
+/** Save the environment to a local JSON file (R13: browser-only, never
+ *  uploaded). Offered on the report screen — once the config has proven
+ *  worth keeping — and read back by the load link on the intake's first step. */
+export const downloadConfig = (env: Environment) => {
+  const url = URL.createObjectURL(
+    new Blob([JSON.stringify(env, null, 2)], { type: "application/json" }),
+  );
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "dr-drill-config.json";
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 export const emptyProtection: Protection = {
   frequencyHours: 24,
@@ -89,16 +102,6 @@ export function Intake({
   // Save/load config to local disk (R13: stays a browser-only file, never
   // uploaded anywhere) — lets a user resume a prior intake without retyping.
   const [configError, setConfigError] = useState("");
-  const saveConfig = () => {
-    const url = URL.createObjectURL(
-      new Blob([JSON.stringify(env, null, 2)], { type: "application/json" }),
-    );
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "dr-drill-config.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  };
   const loadConfig = (file: File) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -208,36 +211,6 @@ export function Intake({
   return (
     <div className="mt-6">
       <section className="panel overflow-hidden">
-        {/* ── Save/load config — resume a prior intake without retyping ── */}
-        <div className="flex items-center justify-end gap-1.5 border-b border-line-soft px-5 py-2 sm:px-7">
-          <button
-            type="button"
-            onClick={saveConfig}
-            className="btn-ghost h-8 gap-1.5 px-2.5 text-[12px] text-faint hover:text-text"
-          >
-            <Download className="h-3.5 w-3.5" aria-hidden />
-            {t.intake.saveConfig}
-          </button>
-          <label className="btn-ghost h-8 cursor-pointer gap-1.5 px-2.5 text-[12px] text-faint hover:text-text">
-            <Upload className="h-3.5 w-3.5" aria-hidden />
-            {t.intake.loadConfig}
-            <input
-              type="file"
-              accept="application/json,.json"
-              className="hidden"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) loadConfig(file);
-                e.target.value = "";
-              }}
-            />
-          </label>
-        </div>
-        {configError && (
-          <div className="border-b border-line-soft bg-crit-soft/60 px-5 py-2 text-[12px] font-medium text-crit sm:px-7">
-            {configError}
-          </div>
-        )}
         {/* ── Numbered stepper with filling connectors ── */}
         <div className="border-b border-line bg-well/60 px-5 py-4 sm:px-7">
           <div className="flex items-start">
@@ -321,6 +294,29 @@ export function Intake({
                     </button>
                   );
                 })}
+                {/* Load config lives where a returning user starts — before
+                    anything is typed. Saving lives on the report, once the
+                    config has proven worth keeping. */}
+                <div className="col-span-2 mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[13px]">
+                  <span className="text-muted">{t.intake.loadConfigHint}</span>
+                  <label className="cursor-pointer font-medium text-signal underline decoration-signal/40 underline-offset-2 hover:decoration-signal">
+                    <Upload className="mr-1 inline h-3.5 w-3.5 align-[-2px]" aria-hidden />
+                    {t.intake.loadConfig}
+                    <input
+                      type="file"
+                      accept="application/json,.json"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) loadConfig(file);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                  {configError && (
+                    <span className="basis-full font-medium text-crit">{configError}</span>
+                  )}
+                </div>
               </div>
             )}
 
