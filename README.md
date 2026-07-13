@@ -11,6 +11,8 @@ manager needs to win investment from a non-technical owner.
 
 Built by Harun Jonatan · [harunjonatan.com](https://harunjonatan.com)
 
+![Demo: describe the environment, read the report, run the disaster drill](docs/media/demo.gif)
+
 ## What it does
 
 - **One assessment, three lenses.** The same computed findings rendered for
@@ -26,6 +28,14 @@ Built by Harun Jonatan · [harunjonatan.com](https://harunjonatan.com)
   visual identity onto the document that gets forwarded upward.
 - **Save/load config.** The intake exports/imports as a local JSON file, so an
   assessment can be repeated or reviewed without retyping — still browser-only.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![Business lens — downtime exposure in money](docs/media/report-business.png) | ![Disaster drill — the story ends on the business loss](docs/media/drill-finale.png) |
+
+![Technical lens — readiness score, 3-2-1 verdict, and the Incident Timeline](docs/media/technical-timeline.png)
 
 ## The two rules that govern everything
 
