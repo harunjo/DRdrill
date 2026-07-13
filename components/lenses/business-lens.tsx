@@ -83,7 +83,9 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
                 >
                   <span className="truncate text-muted">{r.workload.name}</span>
                   {cat ? (
-                    <span className="chip chip-crit shrink-0">{t.report.unrecoverable}</span>
+                    // Short label — the full unrecoverable phrase inside a
+                    // nowrap chip forces the page wider than a phone viewport.
+                    <span className="chip chip-crit shrink-0">{t.report.timeline.noPath}</span>
                   ) : e != null ? (
                     <span className="shrink-0 font-mono font-semibold text-crit">{formatMoney(e, t.currency)}</span>
                   ) : (
