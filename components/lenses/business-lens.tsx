@@ -3,7 +3,7 @@
 import type { Dictionary } from "@/lib/i18n";
 import { fmt } from "@/lib/i18n";
 import { fmtMinutes, type Assessment, type DurationLabels } from "@/lib/engine";
-import { aggregateExposure, annualizedLoss, catastrophicList, formatMoney, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
+import { aggregateExposure, annualizedLoss, catastrophicDailyLoss, catastrophicList, formatMoney, isCatastrophic, postureBand, workloadExposure } from "@/lib/exposure";
 import { Heatmap } from "@/components/heatmap";
 import { PostureChip } from "@/components/lenses/shared";
 
@@ -18,6 +18,7 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
   const coverage = fmt(t.report.coverageShort, { n });
   const dur: DurationLabels = { unrecoverable: t.report.unrecoverable, ...t.report.units };
   const catNames = catastrophicList(a.results, (tier) => inv.pdf.crit[tier]);
+  const catDaily = catastrophicDailyLoss(a.results);
 
   return (
     <section className="panel mt-4 overflow-hidden">
@@ -43,10 +44,18 @@ export function BusinessLens({ t, assessment }: { t: Dictionary; assessment: Ass
               )}
             </div>
           ) : (
-            // Cost is mandatory at intake, so no money here means every
-            // workload is unrecoverable — the loss has no finite figure.
-            <div className="mt-1 font-mono text-[1.35rem] font-semibold tracking-tight text-crit">
-              {fmt(inv.allUnrecoverable, { names: catNames })}
+            // Every workload unrecoverable → no finite total, but the hourly
+            // cost still bleeds: lead with the concrete first-day figure, then
+            // name what can't be recovered.
+            <div>
+              {catDaily > 0 && (
+                <div className="mt-1 font-mono text-[2rem] font-semibold tracking-tight text-crit">
+                  {fmt(t.report.lossPerDay, { v: formatMoney(catDaily, t.currency) })}
+                </div>
+              )}
+              <div className="mt-1 text-[13px] font-medium leading-relaxed text-crit">
+                {fmt(inv.allUnrecoverable, { names: catNames })}
+              </div>
             </div>
           )}
           {agg.monetizedCount > 0 && ale > 0 && (

@@ -356,19 +356,24 @@ export function Intake({
                       ))}
                     </div>
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-mono text-[15px] font-semibold text-crit">
+                      <span
+                        className={`font-mono text-[15px] font-semibold ${
+                          estValue > 0 ? "text-crit" : "text-faint"
+                        }`}
+                      >
                         {fmt(t.intake.cost.estResult, { v: formatMoney(toIDR(estValue), cur) })}
                       </span>
-                      <button
-                        type="button"
-                        className="btn-primary px-4 text-sm"
-                        disabled={estValue <= 0}
-                        onClick={() =>
-                          onChange({ ...env, workloads: applyToAll(env.workloads, toIDR(estValue)) })
-                        }
-                      >
-                        {t.intake.cost.estUse}
-                      </button>
+                      {estValue > 0 && (
+                        <button
+                          type="button"
+                          className="btn-primary px-4 text-sm"
+                          onClick={() =>
+                            onChange({ ...env, workloads: applyToAll(env.workloads, toIDR(estValue)) })
+                          }
+                        >
+                          {t.intake.cost.estUse}
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}
@@ -703,7 +708,7 @@ export function Intake({
           <button
             onClick={() => setStep((s) => Math.max(0, s - 1))}
             disabled={step === 0}
-            className="btn-ghost px-3 text-[13px] font-medium"
+            className="btn-ghost px-3 text-[13px] font-semibold text-key-ink"
           >
             <ArrowLeft className="h-4 w-4" />
             {t.intake.back}

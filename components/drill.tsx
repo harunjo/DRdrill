@@ -12,7 +12,7 @@ import {
   AlertTriangle,
   type LucideProps,
 } from "lucide-react";
-import type { Dictionary, Lang } from "@/lib/i18n";
+import { fmt, type Dictionary, type Lang } from "@/lib/i18n";
 import type { FindingsPayload } from "@/lib/engine";
 import { formatMoney, type Currency } from "@/lib/exposure";
 import {
@@ -164,6 +164,7 @@ export function Drill({
   findings,
   labelMap,
   totalLossValue,
+  ongoingDailyLoss,
   currency,
 }: {
   t: Dictionary;
@@ -175,6 +176,9 @@ export function Drill({
   // timeline, and counts up as the meter scrolls into view. null = every
   // workload is unrecoverable (cost itself is mandatory at intake).
   totalLossValue: number | null;
+  // First-day bleed for the unrecoverable case (cost/hr × 24) — a concrete
+  // figure to show instead of only "unbounded". Browser-only.
+  ongoingDailyLoss: number;
   currency: Currency;
 }) {
   const [scenario, setScenario] = useState<Scenario>("ransomware");
@@ -380,11 +384,15 @@ export function Drill({
             </span>
           </div>
         ) : (
-          // Cost is mandatory, so no total means nothing is recoverable —
-          // there is no finite figure to show, only the fact.
+          // Nothing recoverable → no finite total, but the hourly cost still
+          // bleeds: show the first-day figure so the stake stays concrete.
           <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 border-b border-line bg-crit-soft/40 px-4 py-2.5">
             <span className="tag text-[10px]">{t.drill.totalLoss}</span>
-            <span className="text-[12px] font-semibold text-crit">{t.drill.lossUnbounded}</span>
+            <span className="font-mono text-[15px] font-semibold text-crit">
+              {ongoingDailyLoss > 0
+                ? fmt(t.report.lossPerDay, { v: formatMoney(ongoingDailyLoss, currency) })
+                : t.drill.lossUnbounded}
+            </span>
           </div>
         )}
 
@@ -462,9 +470,16 @@ export function Drill({
                         {formatMoney(totalLossValue, currency)}
                       </p>
                     ) : (
-                      <p className="mt-1 text-[14px] font-semibold leading-relaxed text-crit">
-                        {t.drill.lossUnbounded}
-                      </p>
+                      <div className="mt-1">
+                        {ongoingDailyLoss > 0 && (
+                          <p className="font-mono text-[19px] font-bold tabular-nums text-crit">
+                            {fmt(t.report.lossPerDay, { v: formatMoney(ongoingDailyLoss, currency) })}
+                          </p>
+                        )}
+                        <p className="mt-0.5 text-[13px] font-semibold leading-relaxed text-crit">
+                          {t.drill.lossUnbounded}
+                        </p>
+                      </div>
                     )}
                   </div>
                 }

@@ -25,7 +25,7 @@ export function PostureRadar({ t, scores }: { t: Dictionary; scores: PostureScor
       <div className="mt-3 flex justify-center">
         <svg
           viewBox="-130 -116 260 244"
-          className="w-full max-w-[360px]"
+          className="w-full max-w-[460px]"
           role="img"
           aria-label={csf.title}
         >

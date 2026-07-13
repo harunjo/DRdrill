@@ -230,6 +230,7 @@ export const id: Dictionary = {
     investOne: "prioritas",
     investEmpty: "Tidak ada celah terbuka — hal-hal esensial sudah tertutup.",
     posture: { strong: "Tangguh", developing: "Berkembang", exposed: "Rentan" },
+    lossPerDay: "≈ {v} / hari",
     business: {
       title: "Dampak bisnis",
       exposureHeadline: "Eksposur per insiden jika tidak ada perubahan",

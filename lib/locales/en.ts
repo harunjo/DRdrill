@@ -237,6 +237,7 @@ export const en = {
     investOne: "priority",
     investEmpty: "No open gaps — the essentials are covered.",
     posture: { strong: "Resilient", developing: "Developing", exposed: "Exposed" },
+    lossPerDay: "≈ {v} / day",
     business: {
       title: "Business impact",
       exposureHeadline: "Exposure per incident if nothing changes",

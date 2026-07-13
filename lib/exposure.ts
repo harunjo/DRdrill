@@ -84,6 +84,21 @@ export function aggregateExposure(results: WorkloadResult[]): AggregateExposure 
   return { total, monetizedCount, catastrophicCount, hasCost };
 }
 
+/** Unrecoverable workloads have no finite total (downtime never ends), but the
+ *  hourly cost still bleeds from t=0 — so express it as a concrete first-day
+ *  figure (cost/hr × 24) rather than only "unbounded". A lower bound: the real
+ *  loss keeps growing and the data never returns. 0 if no catastrophic workload
+ *  carries a cost. Browser-only (R13) — never enters the payload. */
+export function catastrophicDailyLoss(results: WorkloadResult[]): number {
+  let sum = 0;
+  for (const r of results) {
+    if (!isCatastrophic(r)) continue;
+    const cost = r.workload.costPerHourDowntime;
+    if (cost != null && Number.isFinite(cost) && cost > 0) sum += cost * 24;
+  }
+  return Math.round(sum);
+}
+
 export type PostureBand = "strong" | "developing" | "exposed";
 
 /** Continuity posture derived from continuity sub-signals (target compliance +

@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { track } from "@vercel/analytics";
 import { ShieldCheck, ArrowLeft, Download } from "lucide-react";
 import { assess, type Assessment, type Environment } from "@/lib/engine";
-import { aggregateExposure } from "@/lib/exposure";
+import { aggregateExposure, catastrophicDailyLoss } from "@/lib/exposure";
 import { dictionaries, type Lang } from "@/lib/i18n";
 import { Intake, downloadConfig, emptyProtection, emptyWorkload } from "@/components/intake";
 import { Logo } from "@/components/logo";
@@ -131,6 +131,7 @@ export default function Home() {
                     const agg = aggregateExposure(assessment.results);
                     return agg.monetizedCount > 0 ? agg.total : null;
                   })()}
+                  ongoingDailyLoss={catastrophicDailyLoss(assessment.results)}
                   currency={t.currency}
                 />
               }
