@@ -250,9 +250,9 @@ export function Intake({
                 <div key={label} className="flex min-w-0 flex-1 items-start">
                   <div className="flex min-w-0 flex-col items-center gap-1.5">
                     <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold transition-colors ${
+                      className={`keycap flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold transition-colors ${
                         done || current
-                          ? "bg-signal text-white shadow-[0_4px_12px_-6px_rgba(16,20,27,0.6)]"
+                          ? "bg-signal text-white"
                           : "border border-line bg-panel text-faint"
                       } ${current ? "ring-4 ring-signal-soft" : ""}`}
                     >
