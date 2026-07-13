@@ -55,7 +55,7 @@ export const en = {
       placeholder: "e.g. 300",
       estTitle: "Downtime cost calculator",
       estimateHow: "Answer with numbers you already know — we work out the cost per hour of downtime. Leave revenue at 0 if these systems don't earn money directly.",
-      estStaff: "Staff who can't work",
+      estStaff: "Staff who can't work during an IT outage",
       estStaffPh: "e.g. 20",
       estStaffCost: "Avg monthly salary / staff",
       estSalaryPh: "e.g. 500",

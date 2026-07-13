@@ -48,7 +48,7 @@ export const id: Dictionary = {
       placeholder: "mis. 5000000",
       estTitle: "Kalkulator biaya downtime",
       estimateHow: "Isi dengan angka yang sudah Anda tahu — kami hitung biaya per jam downtime-nya. Biarkan omzet 0 jika sistem ini tidak menghasilkan uang secara langsung.",
-      estStaff: "Staf yang tidak bisa bekerja",
+      estStaff: "Staf yang tidak bisa bekerja karena ada gangguan IT",
       estStaffPh: "mis. 20",
       estStaffCost: "Rata-rata gaji bulanan / staf",
       estSalaryPh: "mis. 8000000",
