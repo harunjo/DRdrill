@@ -49,13 +49,15 @@ export default function Home() {
 
   return (
     <>
-      {/* ── Command masthead: dark ink band on a firm blueprint grid; its
-             bottom edge is the timeline axis (the logo's axis, page-wide). ── */}
+      {/* ── Command masthead: a slim dark ink band (title block) on a firm
+             blueprint grid; its bottom edge is the timeline axis (the logo's
+             axis, page-wide). The privacy line sits on the paper below, so the
+             black stays a thin strip, not a slab. ── */}
       <header className="sticky top-0 z-20">
         <div className="masthead text-[#efeade]">
-          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-3">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-2.5">
             <div className="flex min-w-0 items-center gap-2.5">
-              <Logo className="h-8 w-8 shrink-0 text-[#efeade]" />
+              <Logo className="h-7 w-7 shrink-0 text-[#efeade]" />
               <div className="min-w-0 leading-tight">
                 <div className="font-display text-[15px] font-bold tracking-tight">
                   {t.appName}
@@ -71,7 +73,7 @@ export default function Home() {
                   key={l}
                   onClick={() => setLang(l)}
                   aria-pressed={lang === l}
-                  className={`flex h-11 min-w-[44px] items-center justify-center px-3 transition-colors ${
+                  className={`flex h-9 min-w-[44px] items-center justify-center px-3 transition-colors ${
                     lang === l ? "bg-[#efeade] text-text" : "text-white/55 hover:text-white"
                   }`}
                 >
@@ -80,16 +82,17 @@ export default function Home() {
               ))}
             </div>
           </div>
-          {/* Trust indicator — privacy is a core promise, inside the band */}
-          <div className="border-t border-white/10">
-            <div className="mx-auto flex max-w-3xl items-center gap-1.5 px-5 py-1.5 text-[11px] font-medium text-white/70">
-              <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-event" strokeWidth={2.2} aria-hidden />
-              <span>{t.trustIndicator}</span>
-            </div>
-          </div>
           <div className="masthead-axis" aria-hidden />
         </div>
       </header>
+
+      {/* Privacy promise — on the paper, keeping the dark band a thin strip. */}
+      <div className="border-b border-line-soft bg-well/50">
+        <div className="mx-auto flex max-w-3xl items-start gap-1.5 px-5 py-1.5 text-[11px] font-medium text-muted">
+          <ShieldCheck className="mt-px h-3.5 w-3.5 shrink-0 text-event" strokeWidth={2.2} aria-hidden />
+          <span>{t.trustIndicator}</span>
+        </div>
+      </div>
 
       <main className="mx-auto w-full max-w-3xl grow px-5 pb-28 pt-4 sm:pt-5">
         {assessment ? (
