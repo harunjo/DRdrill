@@ -39,6 +39,11 @@ export function IncidentTimeline({
   const g = timelineGeometry(rpoAchievableMin, rpoTargetMin, rtoAchievableMin, rtoTargetMin);
   const rpoMissed = rpoAchievableMin === null || rpoAchievableMin > rpoTargetMin;
   const rtoMissed = rtoAchievableMin === null || rtoAchievableMin > rtoTargetMin;
+  // Unrecoverable prints the SHORT label (the locale's long "unrecoverable"
+  // phrase, twice, in nowrap mono, overflows the card) and paints its whole
+  // side crit — a green "within target" segment under a bar that never comes
+  // back would read as good news.
+  const val = (m: number | null) => (m === null ? labels.noPath : fmtDur(m));
 
   // Vertical rhythm — one set for the hero, a tighter one for report rows.
   const H = compact ? 84 : 116; // track height (bars + ruler)
@@ -62,7 +67,7 @@ export function IncidentTimeline({
         <div className="min-w-0">
           <div className="tag !text-[10px] text-faint">{labels.dataYouLose}</div>
           <div className="whitespace-nowrap font-mono text-[12px] font-bold sm:text-[14px]">
-            <span className={rpoMissed ? "text-crit" : "text-ok"}>{fmtDur(rpoAchievableMin)}</span>
+            <span className={rpoMissed ? "text-crit" : "text-ok"}>{val(rpoAchievableMin)}</span>
             {!compact && (
               <span className="hidden text-faint sm:inline"> / {fmtDur(rpoTargetMin)}</span>
             )}
@@ -71,7 +76,7 @@ export function IncidentTimeline({
         <div className="min-w-0 text-right">
           <div className="tag !text-[10px] text-faint">{labels.timeDown}</div>
           <div className="whitespace-nowrap font-mono text-[12px] font-bold sm:text-[14px]">
-            <span className={rtoMissed ? "text-crit" : "text-ok"}>{fmtDur(rtoAchievableMin)}</span>
+            <span className={rtoMissed ? "text-crit" : "text-ok"}>{val(rtoAchievableMin)}</span>
             {!compact && (
               <span className="hidden text-faint sm:inline"> / {fmtDur(rtoTargetMin)}</span>
             )}
@@ -106,25 +111,46 @@ export function IncidentTimeline({
           />
         </div>
 
-        {/* bar segments — within target vs overrun, both sides on one line */}
-        {g.rpo.within && (
-          <div style={segStyle(g.rpo.within)} className="rounded-[1px] bg-slate" />
-        )}
-        {g.rpo.overrun && (
+        {/* bar segments — within target vs overrun, both sides on one line.
+            An unrecoverable side is one solid crit run to the axis edge. */}
+        {g.rpo.noPath ? (
           <div
-            style={{ ...segStyle(g.rpo.overrun), borderRadius: "2px 0 0 2px" }}
+            style={{ ...segStyle({ leftPct: 50 - 44, widthPct: 44 }), borderRadius: "2px 0 0 2px" }}
             className="bg-crit"
           />
+        ) : (
+          <>
+            {g.rpo.within && (
+              <div style={segStyle(g.rpo.within)} className="rounded-[1px] bg-slate" />
+            )}
+            {g.rpo.overrun && (
+              <div
+                style={{ ...segStyle(g.rpo.overrun), borderRadius: "2px 0 0 2px" }}
+                className="bg-crit"
+              />
+            )}
+          </>
         )}
-        {g.rto.within && <div style={segStyle(g.rto.within)} className="rounded-[1px] bg-ok" />}
-        {g.rto.overrun && (
+        {g.rto.noPath ? (
           <div
-            style={{
-              ...segStyle(g.rto.overrun),
-              borderRadius: "0 2px 2px 0",
-              background: "linear-gradient(90deg, var(--color-warn), var(--color-crit))",
-            }}
+            style={{ ...segStyle({ leftPct: 50, widthPct: 44 }), borderRadius: "0 2px 2px 0" }}
+            className="bg-crit"
           />
+        ) : (
+          <>
+            {g.rto.within && (
+              <div style={segStyle(g.rto.within)} className="rounded-[1px] bg-ok" />
+            )}
+            {g.rto.overrun && (
+              <div
+                style={{
+                  ...segStyle(g.rto.overrun),
+                  borderRadius: "0 2px 2px 0",
+                  background: "linear-gradient(90deg, var(--color-warn), var(--color-crit))",
+                }}
+              />
+            )}
+          </>
         )}
 
         {/* target ticks */}
