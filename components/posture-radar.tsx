@@ -24,8 +24,10 @@ export function PostureRadar({ t, scores }: { t: Dictionary; scores: PostureScor
       <p className="mt-0.5 text-[12px] text-faint">{csf.subtitle}</p>
       <div className="mt-3 flex justify-center">
         <svg
-          viewBox="-130 -116 260 244"
-          className="w-full max-w-[460px]"
+          // Wide enough for the side "not yet assessed" labels (longest in EN)
+          // to clear the edge; max-w scales up to keep the radar its drawn size.
+          viewBox="-145 -116 290 244"
+          className="w-full max-w-[520px]"
           role="img"
           aria-label={csf.title}
         >
