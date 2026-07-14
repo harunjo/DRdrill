@@ -70,14 +70,16 @@ service is down, the deterministic report above it is untouched by design.
 
 ## Design
 
-The visual system is built around DR's one iconic artifact: the
-**RPO ← incident → RTO axis**. A shared log time-scale (`lib/timeline.ts`,
-unit-tested geometry) draws every workload's data-loss and downtime against
-its targets, broken at an amber `t=0` marker — the same mark that is the
-logo, the favicon, the masthead's page-wide ruled edge, and the PDF header.
-Interactive controls are ink (never SaaS blue); amber is reserved for the
-incident; all option controls share a physical "keycap" press. Type: Chivo /
-Chivo Mono / Inter.
+The page is an **engineering drawing sheet**: warm drafting paper under a
+fine grid, cream panels sitting on it like drawing views. It's built around
+DR's one iconic artifact — the **RPO ← incident → RTO axis**. A shared log
+time-scale (`lib/timeline.ts`, unit-tested geometry) draws every workload's
+data-loss and downtime against its targets, broken at a vermilion `t=0`
+marker — the same mark that is the logo, the favicon, the header's page-wide
+ruled edge, and the PDF header. One vermilion is the whole accent: the t=0
+marker, the primary action key, and every selected state; structure and body
+stay warm ink. All option controls share a physical "keycap" press. Type:
+Chivo / Chivo Mono / Inter.
 
 ## Stack
 
